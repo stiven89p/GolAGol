@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 
-app = FastAPI()
+import routers.Equipos
+from db import create_tables
+app = FastAPI(lifespan=create_tables, title="Gol a Gol API")
+app.include_router(routers.Equipos.router)
 
 
 @app.get("/")
