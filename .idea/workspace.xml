@@ -4,18 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c908b9c-b3de-4969-adf8-2087551b374f" name="Changes" comment="Refactor partido creation and validation logic to ensure teams exist and are not the same">
-      <change afterPath="$PROJECT_DIR$/modelos/Estadisticas_Equipos.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modelos/Estadisticas_Jugadores.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modelos/Eventos.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modelos/Jugadores.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routers/Eventos.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routers/Jugadores.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/enumeraciones.py" afterDir="false" />
+    <list default="true" id="3c908b9c-b3de-4969-adf8-2087551b374f" name="Changes" comment="Add models and routes for event statistics, including validation for existing players and teams">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modelos/Partidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/modelos/Partidos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/Partidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/Partidos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modelos/Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/modelos/Jugadores.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modelos/__init__..py" beforeDir="false" afterPath="$PROJECT_DIR$/modelos/__init__..py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/Jugadores.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -154,7 +147,7 @@
       <workItem from="1759893903288" duration="1125000" />
       <workItem from="1759898832075" duration="323000" />
       <workItem from="1759899434321" duration="4653000" />
-      <workItem from="1759944577649" duration="7325000" />
+      <workItem from="1759944577649" duration="8803000" />
     </task>
     <task id="LOCAL-00001" summary="Add initial FastAPI application and migration state configuration files">
       <option name="closed" value="true" />
@@ -188,7 +181,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759904113821</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="Add models and routes for event statistics, including validation for existing players and teams">
+      <option name="closed" value="true" />
+      <created>1759952190323</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1759952190323</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -199,6 +200,7 @@
     <MESSAGE value="Add FastAPI application with PostgreSQL integration and initial CRUD operations for equipos" />
     <MESSAGE value="Refactor database connection to use environment variables for PostgreSQL configuration" />
     <MESSAGE value="Refactor partido creation and validation logic to ensure teams exist and are not the same" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor partido creation and validation logic to ensure teams exist and are not the same" />
+    <MESSAGE value="Add models and routes for event statistics, including validation for existing players and teams" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add models and routes for event statistics, including validation for existing players and teams" />
   </component>
 </project>

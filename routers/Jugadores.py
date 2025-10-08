@@ -1,14 +1,14 @@
 from fastapi import APIRouter, HTTPException
 from modelos.Equipos import Equipo
 from modelos.Partidos import Partido
-from modelos.Jugadores import Jugador
+from modelos.Jugadores import Jugador, JugadorCrear, JugadorActualizar
 from modelos.Eventos import Evento
 from db import SessionDep
 
 router = APIRouter(prefix="/jugadores", tags=["jugadores"])
 
 @router.post("/", response_model=Jugador)
-async def create_jugador(new_jugador: Jugador, session: SessionDep):
+async def create_jugador(new_jugador: JugadorCrear, session: SessionDep):
     jugador = Jugador.model_validate(new_jugador)
 
     if jugador.equipo_id:
@@ -36,7 +36,7 @@ async def get_jugador(jugador_id: int, session: SessionDep):
     return jugador
 
 @router.put("/{jugador_id}", response_model=Jugador)
-async def update_jugador(jugador_id: int, jugador_update: Jugador, session: SessionDep):
+async def update_jugador(jugador_id: int, jugador_update: JugadorActualizar, session: SessionDep):
     jugador = session.get(Jugador, jugador_id)
     if not jugador:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
