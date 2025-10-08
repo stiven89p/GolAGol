@@ -4,6 +4,7 @@ from sqlmodel import SQLModel, Field
 
 class PartidoBase(SQLModel):
     fecha: date = Field(nullable=False, description="Fecha del partido")
+    jornada: int = Field(nullable=False, description="Jornada del partido")
     estadio: str = Field(nullable=False, description="Estadio del partido")
     equipo_local_id: int = Field(foreign_key="equipo.id_equipo", nullable=False, description="ID del equipo local")
     equipo_visitante_id: int = Field(foreign_key="equipo.id_equipo", nullable=False, description="ID del equipo visitante")
@@ -20,8 +21,7 @@ class PartidoCrear(PartidoBase):
 
 class PartidoActualizar(SQLModel):
     fecha: Optional[date] = None
+    jornada: Optional[int] = None
     estadio: Optional[str] = None
     equipo_local_id: Optional[int] = None
     equipo_visitante_id: Optional[int] = None
-    goles_local: Optional[int] = None
-    goles_visitante: Optional[int] = None

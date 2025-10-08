@@ -1,0 +1,25 @@
+from typing import Optional
+from datetime import date
+from sqlmodel import SQLModel, Field
+
+
+class JugadorBase(SQLModel):
+    nombre: str = Field(nullable=False, description="Nombre del jugador")
+    apellido: str = Field(nullable=False, description="Apellido del jugador")
+    fecha_nacimiento: date = Field(nullable=False, description="Fecha de nacimiento del jugador")
+    posicion: str = Field(nullable=False, description="Posición del jugador")
+    nacionalidad: str = Field(nullable=False, description="Nacionalidad del jugador")
+
+class Jugador(JugadorBase, table=True):
+    id_jugador: Optional[int] = Field(default=None, primary_key=True)
+
+class JugadorCrear(JugadorBase):
+    pass
+
+class JugadorActualizar(SQLModel):
+    nombre: Optional[str] = None
+    apellido: Optional[str] = None
+    fecha_nacimiento: Optional[date] = None
+    posicion: Optional[str] = None
+    nacionalidad: Optional[str] = None
+    equipo_id: Optional[int] = None
