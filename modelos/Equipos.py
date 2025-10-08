@@ -5,7 +5,7 @@ class EquipoBase(SQLModel):
     nombre: str = Field(nullable=False, description="nombre del equipo")
     ciudad: str = Field(nullable=False, description="ciudad del equipo")
     estadio: str = Field(nullable=False, description="estadio del equipo")
-    anio_fundacion: int = Field(nullable=False, description="año de fundacion del equipo")
+    anio_fundacion: int = Field(nullable=False, description="año de fundación del equipo")
 
 
 class Equipo(EquipoBase, table=True):
