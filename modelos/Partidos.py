@@ -1,26 +1,27 @@
 from typing import Optional
-from sqlmodel import SQLModel, Field, Relationship
+from datetime import date
+from sqlmodel import SQLModel, Field
 
 class PartidoBase(SQLModel):
-    fecha: str = Field(nullable=False, description="fecha del partido")
-    estadio: str = Field(nullable=False, description="estadio del partido")
+    fecha: date = Field(nullable=False, description="Fecha del partido")
+    estadio: str = Field(nullable=False, description="Estadio del partido")
     equipo_local_id: int = Field(foreign_key="equipo.id_equipo", nullable=False, description="ID del equipo local")
     equipo_visitante_id: int = Field(foreign_key="equipo.id_equipo", nullable=False, description="ID del equipo visitante")
-    goles_local: int = Field(default=0, nullable=False, description="goles del equipo local")
-    goles_visitante: int = Field(default=0, nullable=False, description="goles del equipo visitante")
+
+
 
 class Partido(PartidoBase, table=True):
-    id_partido: int | None = Field(default=None, primary_key=True)
+    id_partido: Optional[int] = Field(default=None, primary_key=True)
 
-class PartidoCrear(PartidoBase, table=True):
+
+class PartidoCrear(PartidoBase):
     pass
 
+
 class PartidoActualizar(SQLModel):
-    fecha: Optional[str] = None
+    fecha: Optional[date] = None
     estadio: Optional[str] = None
     equipo_local_id: Optional[int] = None
     equipo_visitante_id: Optional[int] = None
     goles_local: Optional[int] = None
     goles_visitante: Optional[int] = None
-
-

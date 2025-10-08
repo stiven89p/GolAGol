@@ -4,9 +4,11 @@ import time
 from sqlalchemy import text
 
 import routers.Equipos
+import routers.Partidos
 from db import create_tables
 app = FastAPI(lifespan=create_tables, title="Gol a Gol API")
 app.include_router(routers.Equipos.router)
+app.include_router(routers.Partidos.router)
 
 
 
