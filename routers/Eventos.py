@@ -27,13 +27,13 @@ async def create_evento(new_evento: EventoCrear, session: SessionDep):
     if evento.jugador_id and not jugador:
         raise HTTPException(status_code=404, detail="El jugador no existe")
 
-    if evento.jugador_id and jugador.equipo_id != partido.equipo_id:
+    if evento.jugador_id and jugador.equipo_id not in [partido.equipo_local_id, partido.equipo_visitante_id]:
         raise HTTPException(status_code=400, detail="El jugador no pertenece al equipo que está participando en el partido")
 
     if evento.jugador_asociado_id:
         if evento.jugador_asociado_id and not jugador:
             raise HTTPException(status_code=404, detail="El jugador no existe")
-        if evento.jugador_asociado_id and jugador_asociado.equipo_id != partido.equipo_id:
+        if evento.jugador_asociado_id and jugador_asociado.equipo_id not in [partido.equipo_local_id, partido.equipo_visitante_id]:
             raise HTTPException(status_code=400, detail="El jugador asociado no pertenece al equipo que está participando en el partido")
 
     session.add(evento)

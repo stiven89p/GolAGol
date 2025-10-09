@@ -26,10 +26,8 @@ async def create_partido(new_partido: PartidoCrear, session: SessionDep):
 
 @router.get("/", response_model=list[Partido])
 async def read_partido(session: SessionDep):
-    partidos = session.query(Partido).all()
-    if not partidos:
-        raise HTTPException(status_code=404, detail="No se encontraron partidos para este equipo")
-    return partidos
+    return session.query(Partido).all()
+
 
 @router.get("/{partido_id}", response_model=Partido)
 async def get_partido(partido_id: int, session: SessionDep):
