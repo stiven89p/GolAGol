@@ -4,25 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c908b9c-b3de-4969-adf8-2087551b374f" name="Changes" comment="Refactor event model and validation logic to ensure player associations are correctly validated against participating teams">
-      <change afterPath="$PROJECT_DIR$/modelos/Pantilla_partido.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/modelos/Temporada.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/routers/Temporadas.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/Fun_Eventos.py" afterDir="false" />
+    <list default="true" id="3c908b9c-b3de-4969-adf8-2087551b374f" name="Changes" comment="Add models and routes for temporada, including validation for associated equipos and jugadores">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modelos/Equipos.py" beforeDir="false" afterPath="$PROJECT_DIR$/modelos/Equipos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modelos/Estadisticas_Equipos.py" beforeDir="false" afterPath="$PROJECT_DIR$/modelos/Estadisticas_Equipos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modelos/Estadisticas_Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/modelos/Estadisticas_Jugadores.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modelos/Eventos.py" beforeDir="false" afterPath="$PROJECT_DIR$/modelos/Eventos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modelos/Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/modelos/Jugadores.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modelos/Partidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/modelos/Partidos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/modelos/__init__..py" beforeDir="false" afterPath="$PROJECT_DIR$/modelos/__init__..py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/Equipos.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/Equipos.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/routers/Eventos.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/Eventos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/Jugadores.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/Partidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/Partidos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_main.http" beforeDir="false" afterPath="$PROJECT_DIR$/test_main.http" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -65,36 +49,37 @@
     <option name="showLibraryContents" value="true" />
     <option name="showMembers" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "HTTP Request.All in test_main.executor": "Run",
-    "HTTP Request.test_main | #1.executor": "Run",
-    "HTTP Request.test_main | #46.executor": "Run",
-    "HTTP Request.test_main | #47.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "master",
-    "ignore.virus.scanning.warn.message": "true",
-    "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "D:/visual/GolAGol/.venv",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;HTTP Request.All in test_main.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.test_main | #1.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.test_main | #39.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.test_main | #46.executor&quot;: &quot;Run&quot;,
+    &quot;HTTP Request.test_main | #47.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/visual/GolAGol/.venv&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
-  "keyToStringList": {
-    "DatabaseDriversLRU": [
-      "postgresql"
+  &quot;keyToStringList&quot;: {
+    &quot;DatabaseDriversLRU&quot;: [
+      &quot;postgresql&quot;
     ]
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\visual\GolAGol\.venv" />
@@ -111,6 +96,7 @@
           <value>
             <map>
               <entry key="All in test_main" value="STOPPED" />
+              <entry key="test_main | #39" value="STOPPED" />
               <entry key="test_main | #46" value="STOPPED" />
               <entry key="test_main | #47" value="STOPPED" />
             </map>
@@ -152,9 +138,9 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="HTTP Request.test_main | #39" />
         <item itemvalue="HTTP Request.All in test_main" />
         <item itemvalue="HTTP Request.test_main | #47" />
+        <item itemvalue="HTTP Request.test_main | #39" />
         <item itemvalue="HTTP Request.test_main | #46" />
         <item itemvalue="HTTP Request.test_main | #1" />
       </list>
@@ -184,7 +170,9 @@
       <workItem from="1759899434321" duration="4653000" />
       <workItem from="1759944577649" duration="8834000" />
       <workItem from="1759965108322" duration="5021000" />
-      <workItem from="1759973729901" duration="20527000" />
+      <workItem from="1759973729901" duration="20786000" />
+      <workItem from="1760059347788" duration="5282000" />
+      <workItem from="1760113760719" duration="622000" />
     </task>
     <task id="LOCAL-00001" summary="Add initial FastAPI application and migration state configuration files">
       <option name="closed" value="true" />
@@ -242,7 +230,15 @@
       <option name="project" value="LOCAL" />
       <updated>1759970623786</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="Add models and routes for temporada, including validation for associated equipos and jugadores">
+      <option name="closed" value="true" />
+      <created>1760057498874</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1760057498875</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -256,6 +252,7 @@
     <MESSAGE value="Add models and routes for event statistics, including validation for existing players and teams" />
     <MESSAGE value="Add models and routes for jugadores, including validation for equipo association" />
     <MESSAGE value="Refactor event model and validation logic to ensure player associations are correctly validated against participating teams" />
-    <option name="LAST_COMMIT_MESSAGE" value="Refactor event model and validation logic to ensure player associations are correctly validated against participating teams" />
+    <MESSAGE value="Add models and routes for temporada, including validation for associated equipos and jugadores" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add models and routes for temporada, including validation for associated equipos and jugadores" />
   </component>
 </project>

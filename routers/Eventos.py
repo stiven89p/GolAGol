@@ -16,7 +16,6 @@ async def create_evento(new_evento: EventoCrear, session: SessionDep):
     partido = session.get(Partido, evento.partido_id)
     jugador = session.get(Jugador, evento.jugador_id)
     jugador_asociado = session.get(Jugador, evento.jugador_asociado_id) if evento.jugador_asociado_id else None
-    estadistica = session.get(Estadisticas_E, evento.equipo_id)
     estadistica_jugador = session.get(Estadisticas_J, evento.jugador_id)
 
 
@@ -42,7 +41,7 @@ async def create_evento(new_evento: EventoCrear, session: SessionDep):
         if evento.jugador_asociado_id and jugador_asociado.equipo_id not in [partido.equipo_local_id, partido.equipo_visitante_id]:
             raise HTTPException(status_code=400, detail="El jugador asociado no pertenece al equipo que está participando en el partido")
 
-    if evento.jugador_id != evento.equipo_id:
+    if jugador.equipo_id != evento.equipo_id:
         raise HTTPException(status_code=400, detail="El jugador no pertenece al equipo del evento")
 
 
@@ -50,16 +49,26 @@ async def create_evento(new_evento: EventoCrear, session: SessionDep):
     if evento.tipo == TipoEvento.GOL:
         if evento.equipo_id == partido.equipo_local_id:
             partido.goles_local = (partido.goles_local or 0) + 1
-        else:
-            partido.goles_visitante = (partido.goles_visitante or 0) + 1
-        session.add(partido)
-        session.commit()
-        session.refresh(partido)
-        if estadistica:
+            estadistica = session.get(Estadisticas_E, partido.equipo_local_id)
+            estadistica_s = session.get(Estadisticas_E, partido.equipo_visitante_id)
             estadistica.goles_favor = (estadistica.goles_favor or 0) + 1
+            estadistica_s.goles_contra = (estadistica_s.goles_contra or 0) + 1
             session.add(estadistica)
             session.commit()
             session.refresh(estadistica)
+        else:
+            partido.goles_visitante = (partido.goles_visitante or 0) + 1
+            estadistica = session.get(Estadisticas_E, partido.equipo_visitante_id)
+            estadistica_s = session.get(Estadisticas_E, partido.equipo_local_id)
+            estadistica.goles_favor = (estadistica.goles_favor or 0) + 1
+            estadistica_s.goles_contra = (estadistica_s.goles_contra or 0) + 1
+            session.add(estadistica)
+            session.commit()
+            session.refresh(estadistica)
+        session.add(partido)
+        session.commit()
+        session.refresh(partido)
+
         if estadistica_jugador:
             estadistica_jugador.goles = (estadistica_jugador.goles or 0) + 1
             session.add(estadistica_jugador)
