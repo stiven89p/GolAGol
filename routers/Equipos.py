@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
 from modelos.Equipos import Equipo, EquipoCrear, EquipoActualizar
+from modelos.Estadisticas_Equipos import Estadisticas_E
 from db import SessionDep
 
 router = APIRouter(prefix="/equipos", tags=["equipos"])
@@ -8,9 +9,11 @@ router = APIRouter(prefix="/equipos", tags=["equipos"])
 @router.post("/", response_model=Equipo)
 async def create_equipo(new_equipo: EquipoCrear, session: SessionDep):
     equipo = Equipo.model_validate(new_equipo)
+
     session.add(equipo)
     session.commit()
     session.refresh(equipo)
+
     return equipo
 
 @router.get("/", response_model=List[Equipo])

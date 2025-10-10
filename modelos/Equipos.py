@@ -9,7 +9,7 @@ class EquipoBase(SQLModel):
 
 
 class Equipo(EquipoBase, table=True):
-    id_equipo: int | None = Field(default=None, primary_key=True)
+    equipo_id: int | None = Field(default=None, primary_key=True)
 
 class EquipoCrear(EquipoBase):
     pass

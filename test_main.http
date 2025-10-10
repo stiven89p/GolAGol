@@ -1,11 +1,640 @@
 # Test your FastAPI endpoints
 
-GET http://127.0.0.1:8000/
+GET http://127.0.0.1:8000/health
 Accept: application/json
 
 ###
 
-GET http://127.0.0.1:8000/hello/User
-Accept: application/json
+POST http://127.0.0.1:8000/equipos/
+Content-Type: application/json
+
+{
+  "nombre": "Equipo 1",
+  "ciudad": "Ciudad 1",
+  "estadio": "Estadio 1",
+  "anio_fundacion": 2001
+}
+
+###
+
+POST http://127.0.0.1:8000/equipos/
+Content-Type: application/json
+
+{
+  "nombre": "Equipo 2",
+  "ciudad": "Ciudad 2",
+  "estadio": "Estadio 2",
+  "anio_fundacion": 2002
+}
+
+###
+
+POST http://127.0.0.1:8000/equipos/
+Content-Type: application/json
+
+{
+  "nombre": "Equipo 3",
+  "ciudad": "Ciudad 3",
+  "estadio": "Estadio 3",
+  "anio_fundacion": 2003
+}
+
+###
+
+POST http://127.0.0.1:8000/equipos/
+Content-Type: application/json
+
+{
+  "nombre": "Equipo 4",
+  "ciudad": "Ciudad 4",
+  "estadio": "Estadio 4",
+  "anio_fundacion": 2004
+}
+
+###
+
+POST http://127.0.0.1:8000/equipos/
+Content-Type: application/json
+
+{
+  "nombre": "Equipo 5",
+  "ciudad": "Ciudad 5",
+  "estadio": "Estadio 5",
+  "anio_fundacion": 2005
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 1",
+  "apellido": "Uno",
+  "fecha_nacimiento": "2000-01-01",
+  "posicion": "Delantero",
+  "nacionalidad": "País 1",
+  "equipo_id": 1
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 2",
+  "apellido": "Dos",
+  "fecha_nacimiento": "2000-02-01",
+  "posicion": "Defensa",
+  "nacionalidad": "País 2",
+  "equipo_id": 1
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 3",
+  "apellido": "Tres",
+  "fecha_nacimiento": "2000-03-01",
+  "posicion": "Portero",
+  "nacionalidad": "País 3",
+  "equipo_id": 1
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 4",
+  "apellido": "Cuatro",
+  "fecha_nacimiento": "2000-04-01",
+  "posicion": "Centrocampista",
+  "nacionalidad": "País 4",
+  "equipo_id": 1
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 5",
+  "apellido": "Cinco",
+  "fecha_nacimiento": "2000-05-01",
+  "posicion": "Delantero",
+  "nacionalidad": "País 5",
+  "equipo_id": 1
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 6",
+  "apellido": "Seis",
+  "fecha_nacimiento": "2001-01-01",
+  "posicion": "Delantero",
+  "nacionalidad": "País 1",
+  "equipo_id": 2
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 7",
+  "apellido": "Siete",
+  "fecha_nacimiento": "2001-02-01",
+  "posicion": "Defensa",
+  "nacionalidad": "País 2",
+  "equipo_id": 2
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 8",
+  "apellido": "Ocho",
+  "fecha_nacimiento": "2001-03-01",
+  "posicion": "Portero",
+  "nacionalidad": "País 3",
+  "equipo_id": 2
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 9",
+  "apellido": "Nueve",
+  "fecha_nacimiento": "2001-04-01",
+  "posicion": "Centrocampista",
+  "nacionalidad": "País 4",
+  "equipo_id": 2
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 10",
+  "apellido": "Diez",
+  "fecha_nacimiento": "2001-05-01",
+  "posicion": "Delantero",
+  "nacionalidad": "País 5",
+  "equipo_id": 2
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 11",
+  "apellido": "Once",
+  "fecha_nacimiento": "2002-01-01",
+  "posicion": "Delantero",
+  "nacionalidad": "País 1",
+  "equipo_id": 3
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 12",
+  "apellido": "Doce",
+  "fecha_nacimiento": "2002-02-01",
+  "posicion": "Defensa",
+  "nacionalidad": "País 2",
+  "equipo_id": 3
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 13",
+  "apellido": "Trece",
+  "fecha_nacimiento": "2002-03-01",
+  "posicion": "Portero",
+  "nacionalidad": "País 3",
+  "equipo_id": 3
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 14",
+  "apellido": "Catorce",
+  "fecha_nacimiento": "2002-04-01",
+  "posicion": "Centrocampista",
+  "nacionalidad": "País 4",
+  "equipo_id": 3
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 15",
+  "apellido": "Quince",
+  "fecha_nacimiento": "2002-05-01",
+  "posicion": "Delantero",
+  "nacionalidad": "País 5",
+  "equipo_id": 3
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 16",
+  "apellido": "Dieciseis",
+  "fecha_nacimiento": "2003-01-01",
+  "posicion": "Delantero",
+  "nacionalidad": "País 1",
+  "equipo_id": 4
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 17",
+  "apellido": "Diecisiete",
+  "fecha_nacimiento": "2003-02-01",
+  "posicion": "Defensa",
+  "nacionalidad": "País 2",
+  "equipo_id": 4
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 18",
+  "apellido": "Dieciocho",
+  "fecha_nacimiento": "2003-03-01",
+  "posicion": "Portero",
+  "nacionalidad": "País 3",
+  "equipo_id": 4
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 19",
+  "apellido": "Diecinueve",
+  "fecha_nacimiento": "2003-04-01",
+  "posicion": "Centrocampista",
+  "nacionalidad": "País 4",
+  "equipo_id": 4
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 20",
+  "apellido": "Veinte",
+  "fecha_nacimiento": "2003-05-01",
+  "posicion": "Delantero",
+  "nacionalidad": "País 5",
+  "equipo_id": 4
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 21",
+  "apellido": "Veintiuno",
+  "fecha_nacimiento": "2004-01-01",
+  "posicion": "Delantero",
+  "nacionalidad": "País 1",
+  "equipo_id": 5
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 22",
+  "apellido": "Veintidos",
+  "fecha_nacimiento": "2004-02-01",
+  "posicion": "Defensa",
+  "nacionalidad": "País 2",
+  "equipo_id": 5
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 23",
+  "apellido": "Veintitres",
+  "fecha_nacimiento": "2004-03-01",
+  "posicion": "Portero",
+  "nacionalidad": "País 3",
+  "equipo_id": 5
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 24",
+  "apellido": "Veinticuatro",
+  "fecha_nacimiento": "2004-04-01",
+  "posicion": "Centrocampista",
+  "nacionalidad": "País 4",
+  "equipo_id": 5
+}
+
+###
+
+POST http://127.0.0.1:8000/jugadores/
+Content-Type: application/json
+
+{
+  "nombre": "Jugador 25",
+  "apellido": "Veinticinco",
+  "fecha_nacimiento": "2004-05-01",
+  "posicion": "Delantero",
+  "nacionalidad": "País 5",
+  "equipo_id": 5
+}
+
+###
+POST http://127.0.0.1:8000/temporadas/
+Content-Type: application/json
+
+{
+  "nombre": "2024/2025",
+  "fecha_inicio": "2024-08-01",
+  "fecha_fin": "2025-06-01"
+}
+###
+# Jornada 1
+POST http://127.0.0.1:8000/partidos/
+Content-Type: application/json
+
+{
+  "fecha": "2024-08-10",
+  "jornada": 1,
+  "estadio": "Estadio 1",
+  "equipo_local_id": 1,
+  "equipo_visitante_id": 2
+}
+
+###
+
+POST http://127.0.0.1:8000/partidos/
+Content-Type: application/json
+
+{
+  "fecha": "2024-08-10",
+  "jornada": 1,
+  "estadio": "Estadio 2",
+  "equipo_local_id": 3,
+  "equipo_visitante_id": 4
+}
+
+###
+
+# Jornada 2
+POST http://127.0.0.1:8000/partidos/
+Content-Type: application/json
+
+{
+  "fecha": "2024-08-17",
+  "jornada": 2,
+  "estadio": "Estadio 3",
+  "equipo_local_id": 2,
+  "equipo_visitante_id": 5
+}
+
+###
+
+POST http://127.0.0.1:8000/partidos/
+Content-Type: application/json
+
+{
+  "fecha": "2024-08-17",
+  "jornada": 2,
+  "estadio": "Estadio 4",
+  "equipo_local_id": 4,
+  "equipo_visitante_id": 1
+}
+
+###
+
+POST http://127.0.0.1:8000/partidos/
+Content-Type: application/json
+
+{
+  "fecha": "2024-08-17",
+  "jornada": 2,
+  "estadio": "Estadio 5",
+  "equipo_local_id": 5,
+  "equipo_visitante_id": 3
+}
+
+###
+# Evento: Gol de Jugador 1 (Equipo 1) en Partido 1
+POST http://127.0.0.1:8000/eventos/
+Content-Type: application/json
+
+{
+  "minuto": 15,
+  "tipo": "gol",
+  "descripcion": "Gol de Jugador 1",
+  "partido_id": 1,
+  "equipo_id": 1,
+  "jugador_id": 1
+}
+
+###
+
+# Evento: Gol de Jugador 2 (Equipo 2) en Partido 1
+POST http://127.0.0.1:8000/eventos/
+Content-Type: application/json
+
+{
+  "minuto": 30,
+  "tipo": "gol",
+  "descripcion": "Gol de Jugador 6",
+  "partido_id": 1,
+  "equipo_id": 2,
+  "jugador_id": 2
+}
+
+###
+
+# Evento: Gol de Jugador 11 (Equipo 3) en Partido 2
+POST http://127.0.0.1:8000/eventos/
+Content-Type: application/json
+
+{
+  "minuto": 10,
+  "tipo": "gol",
+  "descripcion": "Gol de Jugador 11",
+  "partido_id": 2,
+  "equipo_id": 3,
+  "jugador_id": 11
+}
+
+###
+
+# Evento: Gol de Jugador 16 (Equipo 4) en Partido 2
+POST http://127.0.0.1:8000/eventos/
+Content-Type: application/json
+
+{
+  "minuto": 60,
+  "tipo": "gol",
+  "descripcion": "Gol de Jugador 16",
+  "partido_id": 2,
+  "equipo_id": 4,
+  "jugador_id": 16
+}
+
+###
+
+# Evento: Gol de Jugador 7 (Equipo 2) en Partido 3
+POST http://127.0.0.1:8000/eventos/
+Content-Type: application/json
+
+{
+  "minuto": 22,
+  "tipo": "gol",
+  "descripcion": "Gol de Jugador 7",
+  "partido_id": 3,
+  "equipo_id": 2,
+  "jugador_id": 7
+}
+
+###
+
+# Evento: Gol de Jugador 21 (Equipo 5) en Partido 3
+POST http://127.0.0.1:8000/eventos/
+Content-Type: application/json
+
+{
+  "minuto": 80,
+  "tipo": "gol",
+  "descripcion": "Gol de Jugador 21",
+  "partido_id": 3,
+  "equipo_id": 5,
+  "jugador_id": 21
+}
+
+###
+
+# Evento: Gol de Jugador 19 (Equipo 4) en Partido 4
+POST http://127.0.0.1:8000/eventos/
+Content-Type: application/json
+
+{
+  "minuto": 50,
+  "tipo": "gol",
+  "descripcion": "Gol de Jugador 19",
+  "partido_id": 4,
+  "equipo_id": 4,
+  "jugador_id": 19
+}
+
+###
+
+# Evento: Gol de Jugador 3 (Equipo 1) en Partido 4
+POST http://127.0.0.1:8000/eventos/
+Content-Type: application/json
+
+{
+  "minuto": 70,
+  "tipo": "gol",
+  "descripcion": "Gol de Jugador 3",
+  "partido_id": 4,
+  "equipo_id": 1,
+  "jugador_id": 3
+}
+
+###
+
+# Evento: Gol de Jugador 25 (Equipo 5) en Partido 5
+POST http://127.0.0.1:8000/eventos/
+Content-Type: application/json
+
+{
+  "minuto": 40,
+  "tipo": "gol",
+  "descripcion": "Gol de Jugador 25",
+  "partido_id": 5,
+  "equipo_id": 5,
+  "jugador_id": 25
+}
+
+###
+
+# Evento: Gol de Jugador 13 (Equipo 3) en Partido 5
+POST http://127.0.0.1:8000/eventos/
+Content-Type: application/json
+
+{
+  "minuto": 75,
+  "tipo": "gol",
+  "descripcion": "Gol de Jugador 13",
+  "partido_id": 5,
+  "equipo_id": 3,
+  "jugador_id": 13
+}
 
 ###

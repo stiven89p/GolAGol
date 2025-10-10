@@ -9,7 +9,7 @@ class JugadorBase(SQLModel):
     fecha_nacimiento: date = Field(nullable=False, description="Fecha de nacimiento del jugador")
     posicion: str = Field(nullable=False, description="Posición del jugador")
     nacionalidad: str = Field(nullable=False, description="Nacionalidad del jugador")
-    equipo_id: Optional[int] = Field(default=None, foreign_key="equipo.id_equipo", description="ID del equipo al que pertenece el jugador")
+    equipo_id: int = Field(foreign_key="equipo.equipo_id", nullable=False, description="ID del equipo al que pertenece el jugador")
 
 class Jugador(JugadorBase, table=True):
     jugador_id: int | None = Field(default=None, primary_key=True)

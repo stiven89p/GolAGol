@@ -1,5 +1,4 @@
 from typing import Optional
-from datetime import date
 from sqlmodel import SQLModel, Field
 from utils.enumeraciones import TipoEvento
 
@@ -7,8 +6,8 @@ class EventoBase(SQLModel):
     minuto: int = Field(nullable=False, description="Minuto del evento")
     tipo: TipoEvento = Field(nullable=False, description="Tipo de evento")
     descripcion: Optional[str] = Field(default=None, description="Descripción adicional del evento")
-    partido_id: int = Field(foreign_key="partido.id_partido", nullable=False, description="ID del partido asociado")
-    equipo_id: int = Field(foreign_key="equipo.id_equipo", nullable=False, description="ID del equipo asociado")
+    partido_id: int = Field(foreign_key="partido.partido_id", nullable=False, description="ID del partido asociado")
+    equipo_id: int = Field(foreign_key="equipo.equipo_id", nullable=False, description="ID del equipo asociado")
     jugador_id: int = Field(foreign_key="jugador.jugador_id", nullable=False, description="ID del jugador asociado")
     jugador_asociado_id: Optional[int] = Field(default=None, foreign_key="jugador.jugador_id", description="ID del jugador asociado (para sustituciones u otros eventos)")
 

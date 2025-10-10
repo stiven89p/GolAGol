@@ -1,10 +1,9 @@
 from typing import Optional
-from datetime import date
 from sqlmodel import SQLModel, Field
 
 class Estadisticas_EBase(SQLModel):
-    equipo_id: int = Field(foreign_key="equipo.id_equipo", nullable=False, description="ID del equipo asociado")
-    temporada: str = Field(nullable=False, description="Temporada de la estadística (e.g., '2023/2024')")
+    equipo_id: int = Field(foreign_key="equipo.equipo_id", nullable=False, description="ID del equipo asociado")
+    temporada: int = Field(foreign_key="temporada.temporada_id", description="Temporada de la estadística (e.g., '2023/2024')")
     partidos_jugados: int = Field(default=0, nullable=False, description="Número de partidos jugados en la temporada")
     victorias: int = Field(default=0, nullable=False, description="Número de victorias en la temporada")
     empates: int = Field(default=0, nullable=False, description="Número de empates en la temporada")

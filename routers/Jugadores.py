@@ -1,8 +1,8 @@
 from fastapi import APIRouter, HTTPException
+from datetime import date
 from modelos.Equipos import Equipo
-from modelos.Partidos import Partido
+from modelos.Estadisticas_Jugadores import Estadisticas_J
 from modelos.Jugadores import Jugador, JugadorCrear, JugadorActualizar
-from modelos.Eventos import Evento
 from db import SessionDep
 
 router = APIRouter(prefix="/jugadores", tags=["jugadores"])
@@ -10,6 +10,7 @@ router = APIRouter(prefix="/jugadores", tags=["jugadores"])
 @router.post("/", response_model=Jugador)
 async def create_jugador(new_jugador: JugadorCrear, session: SessionDep):
     jugador = Jugador.model_validate(new_jugador)
+    estadistica = session.get(Estadisticas_J, jugador.jugador_id)
 
     if jugador.equipo_id:
         equipo = session.get(Equipo, jugador.equipo_id)
@@ -19,6 +20,7 @@ async def create_jugador(new_jugador: JugadorCrear, session: SessionDep):
     session.add(jugador)
     session.commit()
     session.refresh(jugador)
+
     return jugador
 
 @router.get("/", response_model=list[Jugador])

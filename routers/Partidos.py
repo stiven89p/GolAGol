@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from modelos.Equipos import Equipo
 from modelos.Partidos import Partido, PartidoCrear, PartidoActualizar
+from modelos.Estadisticas_Equipos import Estadisticas_E
 from db import SessionDep
 
 router = APIRouter(prefix="/partidos", tags=["partidos"])
@@ -8,6 +9,8 @@ router = APIRouter(prefix="/partidos", tags=["partidos"])
 @router.post("/", response_model=Partido)
 async def create_partido(new_partido: PartidoCrear, session: SessionDep):
     partido = Partido.model_validate(new_partido)
+    estadistica_local = session.get(Estadisticas_E, partido.equipo_local_id)
+    estadistica_visitante = session.get(Estadisticas_E, partido.equipo_visitante_id)
 
     equipo_local = session.get(Equipo, partido.equipo_local_id)
     if not equipo_local:
@@ -18,10 +21,18 @@ async def create_partido(new_partido: PartidoCrear, session: SessionDep):
     if partido.equipo_local_id == partido.equipo_visitante_id:
         raise HTTPException(status_code=400, detail="Un equipo no puede jugar contra sí mismo")
 
-
     session.add(partido)
     session.commit()
     session.refresh(partido)
+
+    estadistica_local.partidos_jugados = (estadistica_local.partidos_jugados or 0) + 1
+    estadistica_visitante.partidos_jugados = (estadistica_visitante.partidos_jugados or 0) + 1
+    session.add(estadistica_local)
+    session.add(estadistica_visitante)
+    session.commit()
+    session.refresh(estadistica_local)
+    session.refresh(estadistica_visitante)
+
     return partido
 
 @router.get("/", response_model=list[Partido])

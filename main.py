@@ -6,12 +6,14 @@ import routers.Eventos
 import routers.Equipos
 import routers.Partidos
 import routers.Jugadores
+import routers.Temporadas
 from db import create_tables
 app = FastAPI(lifespan=create_tables, title="Gol a Gol API")
 app.include_router(routers.Equipos.router)
 app.include_router(routers.Partidos.router)
 app.include_router(routers.Eventos.router)
 app.include_router(routers.Jugadores.router)
+app.include_router(routers.Temporadas.router)
 
 
 
