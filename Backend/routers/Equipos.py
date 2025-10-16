@@ -1,8 +1,8 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
-from modelos.Equipos import Equipo, EquipoCrear, EquipoActualizar
-from modelos.Estadisticas_Equipos import Estadisticas_E
-from db import SessionDep
+from Backend.modelos.Equipos import Equipo, EquipoCrear, EquipoActualizar
+from Backend.modelos.Estadisticas_Equipos import Estadisticas_E
+from Backend.db import SessionDep
 
 router = APIRouter(prefix="/equipos", tags=["equipos"])
 

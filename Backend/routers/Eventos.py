@@ -1,12 +1,13 @@
 from fastapi import APIRouter, HTTPException
-from utils.enumeraciones import TipoEvento
-from modelos.Equipos import Equipo
-from modelos.Estadisticas_Jugadores import Estadisticas_J
-from modelos.Estadisticas_Equipos import Estadisticas_E
-from modelos.Partidos import Partido
-from modelos.Jugadores import Jugador
-from modelos.Eventos import Evento, EventoCrear
-from db import SessionDep
+from Backend.utils.enumeraciones import TipoEvento
+from Backend.utils.Fun_Eventos import *
+from Backend.modelos.Equipos import Equipo
+from Backend.modelos.Estadisticas_Jugadores import Estadisticas_J
+from Backend.modelos.Estadisticas_Equipos import Estadisticas_E
+from Backend.modelos.Partidos import Partido
+from Backend.modelos.Jugadores import Jugador
+from Backend.modelos.Eventos import Evento, EventoCrear
+from Backend.db import SessionDep
 
 router = APIRouter(prefix="/eventos", tags=["eventos"])
 
@@ -47,33 +48,7 @@ async def create_evento(new_evento: EventoCrear, session: SessionDep):
 
 
     if evento.tipo == TipoEvento.GOL:
-        if evento.equipo_id == partido.equipo_local_id:
-            partido.goles_local = (partido.goles_local or 0) + 1
-            estadistica = session.get(Estadisticas_E, partido.equipo_local_id)
-            estadistica_s = session.get(Estadisticas_E, partido.equipo_visitante_id)
-            estadistica.goles_favor = (estadistica.goles_favor or 0) + 1
-            estadistica_s.goles_contra = (estadistica_s.goles_contra or 0) + 1
-            session.add(estadistica)
-            session.commit()
-            session.refresh(estadistica)
-        else:
-            partido.goles_visitante = (partido.goles_visitante or 0) + 1
-            estadistica = session.get(Estadisticas_E, partido.equipo_visitante_id)
-            estadistica_s = session.get(Estadisticas_E, partido.equipo_local_id)
-            estadistica.goles_favor = (estadistica.goles_favor or 0) + 1
-            estadistica_s.goles_contra = (estadistica_s.goles_contra or 0) + 1
-            session.add(estadistica)
-            session.commit()
-            session.refresh(estadistica)
-        session.add(partido)
-        session.commit()
-        session.refresh(partido)
-
-        if estadistica_jugador:
-            estadistica_jugador.goles = (estadistica_jugador.goles or 0) + 1
-            session.add(estadistica_jugador)
-            session.commit()
-            session.refresh(estadistica_jugador)
+        procesar_gol(session, evento, partido, Estadisticas_E, estadistica_jugador)
 
     session.add(evento)
     session.commit()

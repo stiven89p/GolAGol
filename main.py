@@ -1,21 +1,40 @@
-from fastapi import FastAPI
-from db import SessionDep
+from fastapi import FastAPI, Request
+from Backend.db import SessionDep
 import time
 from sqlalchemy import text
-import routers.Eventos
-import routers.Equipos
-import routers.Partidos
-import routers.Jugadores
-import routers.Temporadas
-from db import create_tables
+import Backend.routers.Partidos
+import Backend.routers.Temporadas
+import Backend.routers.Equipos
+import Backend.routers.Eventos
+import Backend.routers.Jugadores
+from Backend.db import create_tables
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(lifespan=create_tables, title="Gol a Gol API")
-app.include_router(routers.Equipos.router)
-app.include_router(routers.Partidos.router)
-app.include_router(routers.Eventos.router)
-app.include_router(routers.Jugadores.router)
-app.include_router(routers.Temporadas.router)
 
+# 🔹 CORS habilitado para permitir peticiones desde el navegador
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # o ["http://127.0.0.1:5500"] si usas VS Code Live Server
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
+# 🔹 Rutas del proyecto
+app.include_router(Backend.routers.Equipos.router)
+app.include_router(Backend.routers.Partidos.router)
+app.include_router(Backend.routers.Eventos.router)
+app.include_router(Backend.routers.Jugadores.router)
+app.include_router(Backend.routers.Temporadas.router)
+
+templates = Jinja2Templates(directory="templates")
+
+@app.get("/", response_class=HTMLResponse)
+async def read_root(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
 
 @app.get("/health")
 async def health_check(session: SessionDep):

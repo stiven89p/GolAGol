@@ -1,11 +1,11 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
-from modelos.Temporada import Temporada, TemporadaCrear, TemporadaActualizar
-from modelos.Equipos import Equipo
-from modelos.Estadisticas_Equipos import Estadisticas_E
-from modelos.Jugadores import Jugador
-from modelos.Estadisticas_Jugadores import Estadisticas_J
-from db import SessionDep
+from Backend.modelos.Temporada import Temporada, TemporadaCrear
+from Backend.modelos.Equipos import Equipo
+from Backend.modelos.Estadisticas_Equipos import Estadisticas_E
+from Backend.modelos.Jugadores import Jugador
+from Backend.modelos.Estadisticas_Jugadores import Estadisticas_J
+from Backend.db import SessionDep
 
 router = APIRouter(prefix="/temporadas", tags=["temporadas"])
 

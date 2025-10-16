@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Seleccionar Equipo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      text-align: center;
+      padding: 40px;
+    }
+    select {
+      font-size: 16px;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      width: 250px;
+    }
+    .info {
+      margin-top: 30px;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      display: none;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+  <h1>⚽ Selecciona un Equipo</h1>
+
+  <select id="selector-equipos">
+    <option value="">-- Elige un equipo --</option>
+  </select>
+
+  <div class="info" id="info-equipo">
+    <h2 id="nombre"></h2>
+    <p><b>Ciudad:</b> <span id="ciudad"></span></p>
+    <p><b>Estadio:</b> <span id="estadio"></span></p>
+    <p><b>Año de fundación:</b> <span id="anio"></span></p>
+  </div>
+
+  <script>
+    const BASE_URL = "http://127.0.0.1:8000";
+    const select = document.getElementById("selector-equipos");
+    const infoDiv = document.getElementById("info-equipo");
+
+    async function cargarEquipos() {
+      try {
+        const res = await fetch(`${BASE_URL}/equipos`);
+        if (!res.ok) throw new Error("Error al obtener equipos");
+        const equipos = await res.json();
+
+        equipos.forEach(eq => {
+          const opt = document.createElement("option");
+          opt.value = eq.equipo_id;
+          opt.textContent = eq.nombre;
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        alert("No se pudieron cargar los equipos.");
+      }
+    }
+
+    select.addEventListener("change", async () => {
+      const id = select.value;
+      if (!id) {
+        infoDiv.style.display = "none";
+        return;
+      }
+
+      const res = await fetch(`${BASE_URL}/equipos/${id}`);
+      const equipo = await res.json();
+
+      document.getElementById("nombre").textContent = equipo.nombre;
+      document.getElementById("ciudad").textContent = equipo.ciudad;
+      document.getElementById("estadio").textContent = equipo.estadio;
+      document.getElementById("anio").textContent = equipo.anio_fundacion;
+
+      infoDiv.style.display = "block";
+    });
+
+    cargarEquipos();
+  </script>
+</body>
+</html>

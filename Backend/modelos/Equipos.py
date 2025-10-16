@@ -1,5 +1,6 @@
-from typing import Optional
+from typing import Optional, List
 from sqlmodel import SQLModel, Field, Relationship
+from Backend.modelos.Estadisticas_Equipos import Estadisticas_E
 
 class EquipoBase(SQLModel):
     nombre: str = Field(nullable=False, description="nombre del equipo")
@@ -7,9 +8,9 @@ class EquipoBase(SQLModel):
     estadio: str = Field(nullable=False, description="estadio del equipo")
     anio_fundacion: int = Field(nullable=False, description="año de fundación del equipo")
 
-
 class Equipo(EquipoBase, table=True):
     equipo_id: int | None = Field(default=None, primary_key=True)
+    estadisticas: list["Estadisticas_E"] = Relationship(back_populates="equipo")
 
 class EquipoCrear(EquipoBase):
     pass

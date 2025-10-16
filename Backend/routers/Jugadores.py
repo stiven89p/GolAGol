@@ -1,9 +1,8 @@
 from fastapi import APIRouter, HTTPException
-from datetime import date
-from modelos.Equipos import Equipo
-from modelos.Estadisticas_Jugadores import Estadisticas_J
-from modelos.Jugadores import Jugador, JugadorCrear, JugadorActualizar
-from db import SessionDep
+from Backend.modelos.Equipos import Equipo
+from Backend.modelos.Estadisticas_Jugadores import Estadisticas_J
+from Backend.modelos.Jugadores import Jugador, JugadorCrear, JugadorActualizar
+from Backend.db import SessionDep
 
 router = APIRouter(prefix="/jugadores", tags=["jugadores"])
 

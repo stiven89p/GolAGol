@@ -1,5 +1,6 @@
 from typing import Optional
-from sqlmodel import SQLModel, Field
+from sqlmodel import SQLModel, Field, Relationship
+#from Backend.modelos.Equipos import Equipo
 
 class Estadisticas_EBase(SQLModel):
     equipo_id: int = Field(foreign_key="equipo.equipo_id", nullable=False, description="ID del equipo asociado")
@@ -12,9 +13,9 @@ class Estadisticas_EBase(SQLModel):
     goles_contra: int = Field(default=0, nullable=False, description="Número de goles en contra en la temporada")
     puntos: int = Field(default=0, nullable=False, description="Número de puntos acumulados en la temporada")
 
-class Estadisticas_E(Estadisticas_EBase , table=True):
+class Estadisticas_E(Estadisticas_EBase, table=True):
     id_estadistica: Optional[int] = Field(default=None, primary_key=True)
-    pass
+    equipo: Optional["Equipo"] = Relationship(back_populates="estadisticas")
 
 class EstadisticasCrear(Estadisticas_EBase):
     pass

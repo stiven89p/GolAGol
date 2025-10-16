@@ -5,8 +5,29 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c908b9c-b3de-4969-adf8-2087551b374f" name="Changes" comment="Add models and routes for temporada, including validation for associated equipos and jugadores">
+      <change afterPath="$PROJECT_DIR$/Backend/routers/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/utils/Fun_Eventos.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Backend/utils/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Templates/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/routers/Eventos.py" beforeDir="false" afterPath="$PROJECT_DIR$/routers/Eventos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/db.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modelos/Equipos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/modelos/Equipos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modelos/Estadisticas_Equipos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/modelos/Estadisticas_Equipos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modelos/Estadisticas_Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/modelos/Estadisticas_Jugadores.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modelos/Eventos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/modelos/Eventos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modelos/Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/modelos/Jugadores.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modelos/Pantilla_partido.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modelos/Partidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/modelos/Partidos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modelos/Temporada.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/modelos/Temporada.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/modelos/__init__..py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/modelos/__init__.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/Equipos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Equipos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/Eventos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Eventos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Jugadores.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/Partidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Partidos.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/routers/Temporadas.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Temporadas.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/Fun_Eventos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/modelos/Plantilla_partido.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/enumeraciones.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/utils/enumeraciones.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,6 +40,7 @@
         <option value="FastAPI main" />
         <option value="FastAPI test_main" />
         <option value="Python Script" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -51,6 +73,8 @@
   </component>
   <component name="PropertiesComponent">{
   &quot;keyToString&quot;: {
+    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
+    &quot;FastAPI.GolAGol.executor&quot;: &quot;Run&quot;,
     &quot;HTTP Request.All in test_main.executor&quot;: &quot;Run&quot;,
     &quot;HTTP Request.test_main | #1.executor&quot;: &quot;Run&quot;,
     &quot;HTTP Request.test_main | #39.executor&quot;: &quot;Run&quot;,
@@ -86,7 +110,9 @@
       <recent name="D:\visual\GolAGol" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\visual\GolAGol\Backend" />
       <recent name="D:\visual\GolAGol" />
+      <recent name="D:\visual\GolAGol\modelos" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -96,9 +122,6 @@
           <value>
             <map>
               <entry key="All in test_main" value="STOPPED" />
-              <entry key="test_main | #39" value="STOPPED" />
-              <entry key="test_main | #46" value="STOPPED" />
-              <entry key="test_main | #47" value="STOPPED" />
             </map>
           </value>
         </entry>
@@ -107,18 +130,6 @@
   </component>
   <component name="RunManager" selected="FastAPI.GolAGol">
     <configuration name="All in test_main" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$PROJECT_DIR$/test_main.http">
-      <method v="2" />
-    </configuration>
-    <configuration name="test_main | #1" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test_main.http" executionIdentifier="#1" runType="Run single request">
-      <method v="2" />
-    </configuration>
-    <configuration name="test_main | #39" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test_main.http" executionIdentifier="#39" index="39" runType="Run single request">
-      <method v="2" />
-    </configuration>
-    <configuration name="test_main | #46" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test_main.http" executionIdentifier="#46" index="46" runType="Run single request">
-      <method v="2" />
-    </configuration>
-    <configuration name="test_main | #47" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/test_main.http" executionIdentifier="#47" index="47" runType="Run single request">
       <method v="2" />
     </configuration>
     <configuration name="GolAGol" type="Python.FastAPI">
@@ -139,10 +150,6 @@
     <recent_temporary>
       <list>
         <item itemvalue="HTTP Request.All in test_main" />
-        <item itemvalue="HTTP Request.test_main | #47" />
-        <item itemvalue="HTTP Request.test_main | #39" />
-        <item itemvalue="HTTP Request.test_main | #46" />
-        <item itemvalue="HTTP Request.test_main | #1" />
       </list>
     </recent_temporary>
   </component>
@@ -172,7 +179,18 @@
       <workItem from="1759965108322" duration="5021000" />
       <workItem from="1759973729901" duration="20786000" />
       <workItem from="1760059347788" duration="5282000" />
-      <workItem from="1760113760719" duration="622000" />
+      <workItem from="1760113760719" duration="1777000" />
+      <workItem from="1760127789674" duration="711000" />
+      <workItem from="1760130244988" duration="1451000" />
+      <workItem from="1760147868902" duration="406000" />
+      <workItem from="1760150595766" duration="30000" />
+      <workItem from="1760530878742" duration="5152000" />
+      <workItem from="1760543470220" duration="1114000" />
+      <workItem from="1760550340874" duration="4733000" />
+      <workItem from="1760621974892" duration="892000" />
+      <workItem from="1760624185800" duration="7000" />
+      <workItem from="1760624344538" duration="875000" />
+      <workItem from="1760625543755" duration="308000" />
     </task>
     <task id="LOCAL-00001" summary="Add initial FastAPI application and migration state configuration files">
       <option name="closed" value="true" />
@@ -238,7 +256,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760057498875</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="Add models and routes for temporada, including validation for associated equipos and jugadores">
+      <option name="closed" value="true" />
+      <created>1760114433188</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1760114433189</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -254,5 +280,8 @@
     <MESSAGE value="Refactor event model and validation logic to ensure player associations are correctly validated against participating teams" />
     <MESSAGE value="Add models and routes for temporada, including validation for associated equipos and jugadores" />
     <option name="LAST_COMMIT_MESSAGE" value="Add models and routes for temporada, including validation for associated equipos and jugadores" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/GolAGol$GolAGol.coverage" NAME="GolAGol Coverage Results" MODIFIED="1760550547244" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>
