@@ -15,6 +15,7 @@ class Partido(PartidoBase, table=True):
     partido_id: Optional[int] = Field(default=None, primary_key=True)
     goles_local: Optional[int] = Field(default=0, nullable=False, description="Goles del equipo local")
     goles_visitante: Optional[int] = Field(default=0, nullable=False, description="Goles del equipo visitante")
+    estado: str = Field(default="programado", nullable=False, description="Estado del partido (pendiente, en curso, finalizado)")
 
 
 class PartidoCrear(PartidoBase):

@@ -54,3 +54,17 @@ async def get_partidos_por_equipo(equipo_id: int, session: SessionDep):
     if not partidos:
         raise HTTPException(status_code=404, detail="No se encontraron partidos para este equipo")
     return partidos
+
+@router.patch("/{partido_id}", response_model=Partido)
+async def cambiar_estado_partido(partido_id: int, estado: str, session: SessionDep):
+    partido = session.get(Partido, partido_id)
+
+    if not partido:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+    if estado not in ["programado", "en curso", "finalizado", "suspendido", "cancelado"]:
+        raise HTTPException(status_code=400, detail="Estado inválido")
+    partido.estado = estado
+    session.add(partido)
+    session.commit()
+    session.refresh(partido)
+    return partido

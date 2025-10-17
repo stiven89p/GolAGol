@@ -2,7 +2,13 @@ from enum import Enum
 
 class TipoEvento(Enum):
     GOL = "gol"
-    ASISTENCIA = "asistencia"
     SUSTITUCION = "sustitucion"
     TARJETA_AMARILLA = "tarjeta_amarilla"
     TARJETA_ROJA = "tarjeta_roja"
+
+class EstadoPartidos(Enum):
+    PROGRAMADO = "programado"
+    EN_CURSO = "en curso"
+    FINALIZADO = "finalizado"
+    SUSPENDIDO = "suspendido"
+    CANCELADO = "cancelado"
