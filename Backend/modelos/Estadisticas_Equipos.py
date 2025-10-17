@@ -12,6 +12,8 @@ class Estadisticas_EBase(SQLModel):
     goles_favor: int = Field(default=0, nullable=False, description="Número de goles a favor en la temporada")
     goles_contra: int = Field(default=0, nullable=False, description="Número de goles en contra en la temporada")
     puntos: int = Field(default=0, nullable=False, description="Número de puntos acumulados en la temporada")
+    tarjetas_amarillas: int = Field(default=0, nullable=False, description="Número de tarjetas amarillas recibidas en la temporada")
+    tarjetas_rojas: int = Field(default=0, nullable=False, description="Número de tarjetas rojas recibidas en la temporada")
 
 class Estadisticas_E(Estadisticas_EBase, table=True):
     id_estadistica: Optional[int] = Field(default=None, primary_key=True)
