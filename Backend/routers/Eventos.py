@@ -65,7 +65,8 @@ async def create_evento(new_evento: EventoCrear, session: SessionDep):
     if evento.tipo == TipoEvento.GOL:
         if evento.jugador_asociado_id:
             procesar_gol(session, evento, partido, Estadisticas_E, estadistica_jugador, estadistica_jugador_asociado)
-        procesar_gol(session, evento, partido, Estadisticas_E, estadistica_jugador)
+        else:
+            procesar_gol(session, evento, partido, Estadisticas_E, estadistica_jugador)
     elif evento.tipo == TipoEvento.TARJETA_AMARILLA or evento.tipo == TipoEvento.TARJETA_ROJA:
         procesar_tarjeta(session, evento, partido, Estadisticas_E, TipoEvento , estadistica_jugador)
 

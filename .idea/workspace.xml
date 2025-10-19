@@ -4,15 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c908b9c-b3de-4969-adf8-2087551b374f" name="Changes" comment="Add tarjeta statistics to Estadisticas_Equipos and enhance event processing for tarjetas">
+    <list default="true" id="3c908b9c-b3de-4969-adf8-2087551b374f" name="Changes" comment="Add partido state management and new enumerations for event handling">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/modelos/Partidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/modelos/Partidos.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/routers/Eventos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Eventos.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Backend/routers/Partidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Partidos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/utils/enumeraciones.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/utils/enumeraciones.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/utils/test_targetas.http" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_targetas.http" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_eventos.http" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_eventos.http" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test_main.http" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_main.http" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/test_main.http" beforeDir="false" afterPath="$PROJECT_DIR$/tests/test_main.http" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -24,8 +22,8 @@
       <list>
         <option value="FastAPI main" />
         <option value="FastAPI test_main" />
-        <option value="Python Script" />
         <option value="HTML File" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -65,7 +63,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "DefaultHtmlFileTemplate": "HTML File",
-    "FastAPI.GolAGol.executor": "Run",
+    "FastAPI.GolAGol.executor": "Debug",
     "HTTP Request.All in http-requests-log.executor": "Run",
     "HTTP Request.All in test_eventos.executor": "Run",
     "HTTP Request.All in test_main (1).executor": "Run",
@@ -73,13 +71,20 @@
     "HTTP Request.All in test_targetas.executor": "Run",
     "HTTP Request.http-requests-log | #1.executor": "Run",
     "HTTP Request.http-requests-log | #3.executor": "Run",
+    "HTTP Request.test_eventos | #1.executor": "Run",
     "HTTP Request.test_eventos | #10.executor": "Run",
+    "HTTP Request.test_eventos | #2.executor": "Run",
+    "HTTP Request.test_eventos | #3.executor": "Run",
     "HTTP Request.test_eventos | #4.executor": "Run",
     "HTTP Request.test_eventos | #5.executor": "Run",
     "HTTP Request.test_eventos | #6.executor": "Run",
     "HTTP Request.test_eventos | #7.executor": "Run",
     "HTTP Request.test_eventos | #8.executor": "Run",
     "HTTP Request.test_main | #1.executor": "Run",
+    "HTTP Request.test_main | #33.executor": "Run",
+    "HTTP Request.test_main | #34.executor": "Run",
+    "HTTP Request.test_main | #35.executor": "Run",
+    "HTTP Request.test_main | #36.executor": "Run",
     "HTTP Request.test_main | #37.executor": "Run",
     "HTTP Request.test_main | #39.executor": "Run",
     "HTTP Request.test_main | #41.executor": "Run",
@@ -134,9 +139,9 @@
           <value>
             <map>
               <entry key="All in test_eventos" value="STOPPED" />
-              <entry key="All in test_main (1)" value="STOPPED" />
-              <entry key="All in test_targetas" value="STOPPED" />
-              <entry key="test_eventos | #10" value="STOPPED" />
+              <entry key="test_main | #34" value="STOPPED" />
+              <entry key="test_main | #35" value="STOPPED" />
+              <entry key="test_main | #36" value="STOPPED" />
               <entry key="test_main | #37" value="STOPPED" />
             </map>
           </value>
@@ -148,13 +153,13 @@
     <configuration name="All in test_eventos" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$PROJECT_DIR$/tests/test_eventos.http">
       <method v="2" />
     </configuration>
-    <configuration name="All in test_main (1)" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$PROJECT_DIR$/tests/test_main.http">
+    <configuration name="test_main | #34" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/tests/test_main.http" executionIdentifier="#34" index="34" runType="Run single request">
       <method v="2" />
     </configuration>
-    <configuration name="All in test_targetas" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" path="$PROJECT_DIR$/tests/test_targetas.http">
+    <configuration name="test_main | #35" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/tests/test_main.http" executionIdentifier="#35" index="35" runType="Run single request">
       <method v="2" />
     </configuration>
-    <configuration name="test_eventos | #10" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/tests/test_eventos.http" executionIdentifier="#10" index="10" runType="Run single request">
+    <configuration name="test_main | #36" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/tests/test_main.http" executionIdentifier="#36" index="36" runType="Run single request">
       <method v="2" />
     </configuration>
     <configuration name="test_main | #37" type="HttpClient.HttpRequestRunConfigurationType" factoryName="HTTP Request" temporary="true" nameIsGenerated="true" path="$PROJECT_DIR$/tests/test_main.http" executionIdentifier="#37" index="37" runType="Run single request">
@@ -177,11 +182,11 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="HTTP Request.test_eventos | #10" />
-        <item itemvalue="HTTP Request.All in test_main (1)" />
-        <item itemvalue="HTTP Request.test_main | #37" />
         <item itemvalue="HTTP Request.All in test_eventos" />
-        <item itemvalue="HTTP Request.All in test_targetas" />
+        <item itemvalue="HTTP Request.test_main | #37" />
+        <item itemvalue="HTTP Request.test_main | #36" />
+        <item itemvalue="HTTP Request.test_main | #35" />
+        <item itemvalue="HTTP Request.test_main | #34" />
       </list>
     </recent_temporary>
   </component>
@@ -224,7 +229,10 @@
       <workItem from="1760624344538" duration="875000" />
       <workItem from="1760625543755" duration="12294000" />
       <workItem from="1760666557183" duration="6506000" />
-      <workItem from="1760673488923" duration="1232000" />
+      <workItem from="1760673488923" duration="1533000" />
+      <workItem from="1760745845946" duration="8743000" />
+      <workItem from="1760754686657" duration="77000" />
+      <workItem from="1760832324329" duration="5244000" />
     </task>
     <task id="LOCAL-00001" summary="Add initial FastAPI application and migration state configuration files">
       <option name="closed" value="true" />
@@ -314,7 +322,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760660929954</updated>
     </task>
-    <option name="localTasksCounter" value="12" />
+    <task id="LOCAL-00012" summary="Add partido state management and new enumerations for event handling">
+      <option name="closed" value="true" />
+      <created>1760675702049</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1760675702049</updated>
+    </task>
+    <option name="localTasksCounter" value="13" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -331,9 +347,10 @@
     <MESSAGE value="Add models and routes for temporada, including validation for associated equipos and jugadores" />
     <MESSAGE value="Refactor project structure and update imports for consistency across models and routers" />
     <MESSAGE value="Add tarjeta statistics to Estadisticas_Equipos and enhance event processing for tarjetas" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add tarjeta statistics to Estadisticas_Equipos and enhance event processing for tarjetas" />
+    <MESSAGE value="Add partido state management and new enumerations for event handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add partido state management and new enumerations for event handling" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/GolAGol$GolAGol.coverage" NAME="GolAGol Coverage Results" MODIFIED="1760672343121" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
+    <SUITE FILE_PATH="coverage/GolAGol$GolAGol.coverage" NAME="GolAGol Coverage Results" MODIFIED="1760756033422" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
 </project>

@@ -6,6 +6,7 @@ class PartidoBase(SQLModel):
     fecha: date = Field(nullable=False, description="Fecha del partido")
     jornada: int = Field(nullable=False, description="Jornada del partido")
     estadio: str = Field(nullable=False, description="Estadio del partido")
+    temporada_id: int = Field(foreign_key="temporada.temporada_id", nullable=False, description="ID de la temporada")
     equipo_local_id: int = Field(foreign_key="equipo.equipo_id", nullable=False, description="ID del equipo local")
     equipo_visitante_id: int = Field(foreign_key="equipo.equipo_id", nullable=False, description="ID del equipo visitante")
 

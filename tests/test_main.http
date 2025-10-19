@@ -430,6 +430,7 @@ Content-Type: application/json
 {
   "fecha": "2024-08-10",
   "jornada": 1,
+  "temporada_id": 1,
   "estadio": "Estadio 1",
   "equipo_local_id": 1,
   "equipo_visitante_id": 2
@@ -443,6 +444,7 @@ Content-Type: application/json
 {
   "fecha": "2024-08-10",
   "jornada": 1,
+  "temporada_id": 1,
   "estadio": "Estadio 2",
   "equipo_local_id": 3,
   "equipo_visitante_id": 4
@@ -457,6 +459,7 @@ Content-Type: application/json
 {
   "fecha": "2024-08-17",
   "jornada": 2,
+  "temporada_id": 1,
   "estadio": "Estadio 3",
   "equipo_local_id": 2,
   "equipo_visitante_id": 5
@@ -470,6 +473,7 @@ Content-Type: application/json
 {
   "fecha": "2024-08-17",
   "jornada": 2,
+  "temporada_id": 1,
   "estadio": "Estadio 4",
   "equipo_local_id": 4,
   "equipo_visitante_id": 1
@@ -483,6 +487,7 @@ Content-Type: application/json
 {
   "fecha": "2024-08-17",
   "jornada": 2,
+  "temporada_id": 1,
   "estadio": "Estadio 5",
   "equipo_local_id": 5,
   "equipo_visitante_id": 3

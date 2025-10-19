@@ -7,6 +7,8 @@ import Backend.routers.Temporadas
 import Backend.routers.Equipos
 import Backend.routers.Eventos
 import Backend.routers.Jugadores
+import Backend.routers.Estadisticas_Equipos
+import Backend.routers.Estadisticas_Jugadores
 from Backend.db import create_tables
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
@@ -29,6 +31,9 @@ app.include_router(Backend.routers.Partidos.router)
 app.include_router(Backend.routers.Eventos.router)
 app.include_router(Backend.routers.Jugadores.router)
 app.include_router(Backend.routers.Temporadas.router)
+app.include_router(Backend.routers.Estadisticas_Equipos.router)
+app.include_router(Backend.routers.Estadisticas_Jugadores.router)
+
 
 templates = Jinja2Templates(directory="templates")
 
