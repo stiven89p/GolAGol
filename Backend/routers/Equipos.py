@@ -8,7 +8,7 @@ from Backend.db import SessionDep
 router = APIRouter(prefix="/equipos", tags=["equipos"])
 
 @router.post("/", response_model=Equipo)
-async def create_equipo(new_equipo: EquipoCrear, session: SessionDep):
+async def crear_equipo(new_equipo: EquipoCrear, session: SessionDep):
     equipo = Equipo.model_validate(new_equipo)
 
     session.add(equipo)
@@ -18,18 +18,18 @@ async def create_equipo(new_equipo: EquipoCrear, session: SessionDep):
     return equipo
 
 @router.get("/", response_model=List[Equipo])
-async def read_equipos(session: SessionDep):
+async def obtener_equipos(session: SessionDep):
     return session.query(Equipo).filter(Equipo.activo == True).all()
 
 @router.get("/{equipo_id}", response_model=Equipo)
-async def read_equipo(equipo_id: int, session: SessionDep):
+async def obtener_equipo(equipo_id: int, session: SessionDep):
     equipo = session.get(Equipo, equipo_id)
     if not equipo:
         raise HTTPException(status_code=404, detail="El equipo no existe")
     return equipo
 
 @router.delete("/{equipo_id}", response_model=Equipo)
-async def delete_equipo(equipo_id: int, session: SessionDep):
+async def eliminar_equipo(equipo_id: int, session: SessionDep):
     equipo = session.get(Equipo, equipo_id)
     if not equipo:
         raise HTTPException(status_code=404, detail="El equipo no existe")
@@ -39,7 +39,7 @@ async def delete_equipo(equipo_id: int, session: SessionDep):
     return equipo
 
 @router.patch("/{equipo_id}", response_model=Equipo)
-async def update_equipo(equipo_id: int, updated_equipo: EquipoActualizar, session: SessionDep):
+async def actualizar_equipo(equipo_id: int, updated_equipo: EquipoActualizar, session: SessionDep):
     equipo = session.get(Equipo, equipo_id)
     if not equipo:
         raise HTTPException(status_code=404, detail="El equipo no existe")

@@ -12,7 +12,7 @@ from Backend.db import SessionDep
 router = APIRouter(prefix="/eventos", tags=["eventos"])
 
 @router.post("/", response_model=Evento)
-async def create_evento(new_evento: EventoCrear, session: SessionDep):
+async def crear_evento(new_evento: EventoCrear, session: SessionDep):
     global estadistica_jugador_asociado
     evento = Evento.model_validate(new_evento)
     partido = session.get(Partido, evento.partido_id)
@@ -77,7 +77,7 @@ async def create_evento(new_evento: EventoCrear, session: SessionDep):
 
 
 @router.get("/", response_model=list[Evento])
-async def read_eventos(session: SessionDep):
+async def obtener_eventos(session: SessionDep):
     eventos = session.query(Evento).all()
     if not eventos:
         raise HTTPException(status_code=404, detail="No se encontraron eventos")
@@ -85,7 +85,7 @@ async def read_eventos(session: SessionDep):
 
 
 @router.get("/{evento}/", response_model=list[Evento])
-async def read_goles(session: SessionDep, evento: TipoEvento):
+async def obtener_eventos_tipo(session: SessionDep, evento: TipoEvento):
     if not evento in TipoEvento:
         raise HTTPException(status_code=400, detail="El tipo de evento no es válido")
     eventos = session.query(Evento).filter(Evento.tipo == evento).all()

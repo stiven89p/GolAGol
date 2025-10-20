@@ -7,7 +7,7 @@ from Backend.db import SessionDep
 router = APIRouter(prefix="/jugadores", tags=["jugadores"])
 
 @router.post("/", response_model=Jugador)
-async def create_jugador(new_jugador: JugadorCrear, session: SessionDep):
+async def crear_jugador(new_jugador: JugadorCrear, session: SessionDep):
     jugador = Jugador.model_validate(new_jugador)
 
     if jugador.equipo_id:
@@ -22,28 +22,28 @@ async def create_jugador(new_jugador: JugadorCrear, session: SessionDep):
     return jugador
 
 @router.get("/", response_model=list[Jugador])
-async def read_jugadores(session: SessionDep):
+async def obtener_jugadores(session: SessionDep):
     jugadores = session.query(Jugador).all()
     if not jugadores:
         raise HTTPException(status_code=404, detail="No se encontraron jugadores")
     return jugadores
 
 @router.get("/{jugador_id}", response_model=Jugador)
-async def get_jugador(jugador_id: int, session: SessionDep):
+async def obtener_jugador(jugador_id: int, session: SessionDep):
     jugador = session.get(Jugador, jugador_id)
     if not jugador:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
     return jugador
 
 @router.get("/{Posicion}/", response_model=list[Jugador])
-async def get_jugador(Posicion: PosicionJugador , session: SessionDep):
+async def obtener_jugador_posicion(Posicion: PosicionJugador , session: SessionDep):
     jugador = session.query(Jugador).filter(Jugador.posicion == Posicion).all()
     if not jugador:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
     return jugador
 
 @router.patch("/{jugador_id}", response_model=Jugador)
-async def update_jugador(jugador_id: int, jugador_update: JugadorActualizar, session: SessionDep):
+async def actualizar_jugador(jugador_id: int, jugador_update: JugadorActualizar, session: SessionDep):
     jugador = session.get(Jugador, jugador_id)
     if not jugador:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")

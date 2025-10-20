@@ -10,7 +10,7 @@ from Backend.db import SessionDep
 router = APIRouter(prefix="/temporadas", tags=["temporadas"])
 
 @router.post("/", response_model=Temporada)
-async def create_temporada(new_temporada: TemporadaCrear, session: SessionDep):
+async def crear_temporada(new_temporada: TemporadaCrear, session: SessionDep):
     temporada = Temporada.model_validate(new_temporada)
 
     existing_temporada = session.get(Temporada, temporada.temporada_id)
@@ -33,7 +33,7 @@ async def create_temporada(new_temporada: TemporadaCrear, session: SessionDep):
     return temporada
 
 @router.get("/", response_model=List[Temporada])
-async def read_temporadas(session: SessionDep):
+async def obtener_temporadas(session: SessionDep):
     temporadas = session.query(Estadisticas_E).all()
     if not temporadas:
         raise HTTPException(status_code=404, detail="No se encontraron temporadas")
