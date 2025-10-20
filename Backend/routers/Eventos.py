@@ -28,17 +28,17 @@ async def crear_evento(new_evento: EventoCrear, session: SessionDep):
     if not equipo:
         raise HTTPException(status_code=404, detail="El equipo no existe")
 
-    if partido.estado != "en curso":
-        if partido.estado == "programado":
+    if partido.estado != "EN_CURSO":
+        if partido.estado == "PROGRAMADO":
             raise HTTPException(status_code=400, detail="No se pueden agregar eventos a un partido programado")
 
-        if partido.estado == "finalizado":
+        if partido.estado == "FINALIZADO":
             raise HTTPException(status_code=400, detail="No se pueden agregar eventos a un partido finalizado")
 
-        if partido.estado == "suspendido":
+        if partido.estado == "SUSPENDIDO":
             raise HTTPException(status_code=400, detail="No se pueden agregar eventos a un partido suspendido")
 
-        if partido.estado == "cancelado":
+        if partido.estado == "CANCELADO":
             raise HTTPException(status_code=400, detail="No se pueden agregar eventos a un partido cancelado")
 
     if evento.equipo_id not in [partido.equipo_local_id, partido.equipo_visitante_id]:

@@ -4,15 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c908b9c-b3de-4969-adf8-2087551b374f" name="Changes" comment="Add player positions enumeration and update equipo and jugador models for active status">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Equipos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Equipos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Estadisticas_Equipos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Estadisticas_Equipos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Estadisticas_Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Estadisticas_Jugadores.py" afterDir="false" />
+    <list default="true" id="3c908b9c-b3de-4969-adf8-2087551b374f" name="Changes" comment="Rename functions for consistency and clarity in equipos, estadisticas, eventos, jugadores, partidos, and temporadas modules">
       <change beforePath="$PROJECT_DIR$/Backend/routers/Eventos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Eventos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Jugadores.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Partidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Partidos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Temporadas.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Temporadas.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -233,7 +226,7 @@
       <workItem from="1760832324329" duration="7093000" />
       <workItem from="1760895709650" duration="593000" />
       <workItem from="1760900349851" duration="22100000" />
-      <workItem from="1760933991246" duration="1391000" />
+      <workItem from="1760933991246" duration="1692000" />
     </task>
     <task id="LOCAL-00001" summary="Add initial FastAPI application and migration state configuration files">
       <option name="closed" value="true" />
@@ -347,7 +340,15 @@
       <option name="project" value="LOCAL" />
       <updated>1760930427812</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="Rename functions for consistency and clarity in equipos, estadisticas, eventos, jugadores, partidos, and temporadas modules">
+      <option name="closed" value="true" />
+      <created>1760935435195</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1760935435195</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -367,7 +368,8 @@
     <MESSAGE value="Add partido state management and new enumerations for event handling" />
     <MESSAGE value="Add endpoints for equipo and jugador statistics, including validation and error handling" />
     <MESSAGE value="Add player positions enumeration and update equipo and jugador models for active status" />
-    <option name="LAST_COMMIT_MESSAGE" value="Add player positions enumeration and update equipo and jugador models for active status" />
+    <MESSAGE value="Rename functions for consistency and clarity in equipos, estadisticas, eventos, jugadores, partidos, and temporadas modules" />
+    <option name="LAST_COMMIT_MESSAGE" value="Rename functions for consistency and clarity in equipos, estadisticas, eventos, jugadores, partidos, and temporadas modules" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/GolAGol$GolAGol.coverage" NAME="GolAGol Coverage Results" MODIFIED="1760756033422" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
