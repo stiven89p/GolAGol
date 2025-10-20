@@ -63,6 +63,13 @@ async def obtener_partidos_equipo(equipo_id: int, session: SessionDep):
         raise HTTPException(status_code=404, detail="No se encontraron partidos para este equipo")
     return partidos
 
+@router.get("/{estado}/", response_model=list[Partido])
+async def obtener_partidos_equipo(estado: EstadoPartidos, session: SessionDep):
+    partidos = session.query(Partido).filter(Partido.estado == estado).all()
+    if not partidos:
+        raise HTTPException(status_code=404, detail="No se encontraron partidos para este equipo")
+    return partidos
+
 @router.patch("/{partido_id}", response_model=Partido)
 async def cambiar_estado_partido(partido_id: int, estado:EstadoPartidos, session: SessionDep):
     partido = session.get(Partido, partido_id)

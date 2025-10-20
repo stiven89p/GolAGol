@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="3c908b9c-b3de-4969-adf8-2087551b374f" name="Changes" comment="Rename functions for consistency and clarity in equipos, estadisticas, eventos, jugadores, partidos, and temporadas modules">
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Eventos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Eventos.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Backend/routers/Partidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/Backend/routers/Partidos.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -227,6 +229,7 @@
       <workItem from="1760895709650" duration="593000" />
       <workItem from="1760900349851" duration="22100000" />
       <workItem from="1760933991246" duration="1692000" />
+      <workItem from="1760967483889" duration="1629000" />
     </task>
     <task id="LOCAL-00001" summary="Add initial FastAPI application and migration state configuration files">
       <option name="closed" value="true" />
