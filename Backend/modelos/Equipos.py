@@ -8,6 +8,7 @@ class EquipoBase(SQLModel):
     ciudad: str = Field(nullable=False, description="ciudad del equipo")
     estadio: str = Field(nullable=False, description="estadio del equipo")
     anio_fundacion: int = Field(nullable=False, description="año de fundación del equipo")
+    titulos: Optional[int] = Field(default=0, description="titulos del equipo")
 
 class Equipo(EquipoBase, table=True):
     equipo_id: int | None = Field(default=None, primary_key=True)

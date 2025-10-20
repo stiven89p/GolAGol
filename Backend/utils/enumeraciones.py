@@ -13,6 +13,11 @@ class EstadoPartidos(Enum):
     SUSPENDIDO = "suspendido"
     CANCELADO = "cancelado"
 
+class EstadoTemporada(Enum):
+    PROGRAMADO = "programado"
+    EN_CURSO = "en curso"
+    FINALIZADO = "finalizado"
+
 class PosicionJugador(Enum):
     PORTERO = "portero"
     DEFENSOR = "defensor"

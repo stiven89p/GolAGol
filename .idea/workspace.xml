@@ -229,7 +229,6 @@
       <workItem from="1760895709650" duration="593000" />
       <workItem from="1760900349851" duration="22100000" />
       <workItem from="1760933991246" duration="1692000" />
-      <workItem from="1760967483889" duration="1629000" />
     </task>
     <task id="LOCAL-00001" summary="Add initial FastAPI application and migration state configuration files">
       <option name="closed" value="true" />

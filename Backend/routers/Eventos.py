@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from typing import Optional
+from fastapi import APIRouter, HTTPException, Form
 from Backend.utils.enumeraciones import TipoEvento
 from Backend.utils.Fun_Eventos import *
 from Backend.modelos.Equipos import Equipo
@@ -12,7 +13,24 @@ from Backend.db import SessionDep
 router = APIRouter(prefix="/eventos", tags=["eventos"])
 
 @router.post("/", response_model=Evento)
-async def crear_evento(new_evento: EventoCrear, session: SessionDep):
+async def crear_evento(session: SessionDep,
+                       minuto: int = Form(...),
+                       tipo: TipoEvento = Form(...),
+                       descripcion: Optional[str] = Form(None),
+                       partido_id: int = Form(...),
+                       equipo_id: int = Form(...),
+                       jugador_id: int = Form(...),
+                       jugador_asociado_id: Optional[int] = Form(None)
+                       ):
+    new_evento = EventoCrear(
+        minuto=minuto,
+        tipo=tipo,
+        descripcion=descripcion,
+        partido_id=partido_id,
+        equipo_id=equipo_id,
+        jugador_id=jugador_id,
+        jugador_asociado_id=jugador_asociado_id
+    )
     global estadistica_jugador_asociado
     evento = Evento.model_validate(new_evento)
     partido = session.get(Partido, evento.partido_id)
@@ -64,11 +82,11 @@ async def crear_evento(new_evento: EventoCrear, session: SessionDep):
 
     if evento.tipo == TipoEvento.GOL:
         if evento.jugador_asociado_id:
-            procesar_gol(session, evento, partido, Estadisticas_E, estadistica_jugador, estadistica_jugador_asociado)
+            procesar_gol(session, evento, partido , Estadisticas_E, estadistica_jugador, estadistica_jugador_asociado)
         else:
             procesar_gol(session, evento, partido, Estadisticas_E, estadistica_jugador)
     elif evento.tipo == TipoEvento.TARJETA_AMARILLA or evento.tipo == TipoEvento.TARJETA_ROJA:
-        procesar_tarjeta(session, evento, partido, Estadisticas_E, TipoEvento , estadistica_jugador)
+        procesar_tarjeta(session, evento, partido, Estadisticas_E, TipoEvento, partido.temporada_id, estadistica_jugador)
 
     session.add(evento)
     session.commit()
@@ -92,3 +110,10 @@ async def obtener_eventos_tipo(session: SessionDep, evento: TipoEvento):
     if not eventos:
         raise HTTPException(status_code=404, detail="No se encontraron eventos")
     return eventos
+
+@router.delete("/{evento_id}/", response_model=list[Evento])
+async def anular_evento(session: SessionDep, evento_id: int):
+    evento = session.query(Evento).filter(Evento.id == evento_id).first()
+    if not evento:
+        raise HTTPException(status_code=404, detail="No se encontraron evento")
+

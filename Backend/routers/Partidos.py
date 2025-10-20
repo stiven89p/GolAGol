@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Form
+from datetime import date
 from Backend.modelos.Equipos import Equipo
 from Backend.modelos.Partidos import Partido, PartidoCrear
 from Backend.modelos.Estadisticas_Equipos import Estadisticas_E
@@ -9,13 +10,29 @@ from Backend.db import SessionDep
 router = APIRouter(prefix="/partidos", tags=["partidos"])
 
 @router.post("/", response_model=Partido)
-async def crear_partido(new_partido: PartidoCrear, session: SessionDep):
+async def crear_partido(
+        session: SessionDep,
+        fecha: date = Form(...),
+        jornada: int = Form(...),
+        temporada_id: int = Form(...),
+        estadio: str = Form(...),
+        equipo_local_id: int = Form(...),
+        equipo_visitante_id: int = Form(...)
+        ):
+    new_partido = PartidoCrear(
+        fecha=fecha,
+        jornada=jornada,
+        estadio=estadio,
+        equipo_local_id=equipo_local_id,
+        equipo_visitante_id=equipo_visitante_id,
+        temporada_id=temporada_id,
+    )
     partido = Partido.model_validate(new_partido)
     estadistica_local = session.get(Estadisticas_E, partido.equipo_local_id)
     estadistica_visitante = session.get(Estadisticas_E, partido.equipo_visitante_id)
-    temporado = session.get(Temporada, partido.temporada_id)
+    temporada= session.get(Temporada, partido.temporada_id)
 
-    if not temporado:
+    if not temporada:
         raise HTTPException(status_code=404, detail="La temporada no existe")
 
     equipo_local = session.get(Equipo, partido.equipo_local_id)
@@ -77,7 +94,7 @@ async def cambiar_estado_partido(partido_id: int, estado:EstadoPartidos, session
     if not partido:
         raise HTTPException(status_code=404, detail="Partido no encontrado")
 
-    if estado == "finalizado":
+    if estado == EstadoPartidos.FINALIZADO:
         estadistica = session.query(Estadisticas_E).filter_by(equipo_id=partido.equipo_local_id,temporada=partido.temporada_id).first()
         estadistica_rival = session.query(Estadisticas_E).filter_by(equipo_id=partido.equipo_visitante_id,temporada=partido.temporada_id).first()
 
@@ -105,3 +122,14 @@ async def cambiar_estado_partido(partido_id: int, estado:EstadoPartidos, session
     session.commit()
     session.refresh(partido)
     return partido
+
+@router.delete("/{partido_id}", response_model=Partido)
+async def eliminar_partido(partido_id: int, session: SessionDep):
+    partido = session.get(Partido, partido_id)
+    if not partido:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+
+    partido.estado = "CANCELADO"
+    session.add(partido)
+    session.commit()
+    session.refresh(partido)

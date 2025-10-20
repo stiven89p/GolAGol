@@ -1,4 +1,5 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Form
+from datetime import date
 from Backend.modelos.Equipos import Equipo
 from Backend.modelos.Jugadores import Jugador, JugadorCrear, JugadorActualizar
 from Backend.utils.enumeraciones import PosicionJugador
@@ -7,7 +8,22 @@ from Backend.db import SessionDep
 router = APIRouter(prefix="/jugadores", tags=["jugadores"])
 
 @router.post("/", response_model=Jugador)
-async def crear_jugador(new_jugador: JugadorCrear, session: SessionDep):
+async def crear_jugador(session: SessionDep,
+                        nombre: str = Form(...),
+                        apellido: str = Form(...),
+                        fecha_nacimiento: date = Form(...),
+                        posicion: PosicionJugador = Form(...),
+                        nacionalidad: str = Form(...),
+                        equipo_id: int = Form(...)
+                        ):
+    new_jugador = JugadorCrear(
+        nombre=nombre,
+        apellido=apellido,
+        fecha_nacimiento=fecha_nacimiento,
+        posicion=posicion,
+        nacionalidad=nacionalidad,
+        equipo_id=equipo_id,
+    )
     jugador = Jugador.model_validate(new_jugador)
 
     if jugador.equipo_id:

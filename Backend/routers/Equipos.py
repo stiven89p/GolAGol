@@ -1,5 +1,5 @@
 from typing import List
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Form
 from Backend.modelos.Equipos import Equipo, EquipoCrear, EquipoActualizar
 from datetime import datetime
 from Backend.modelos.Estadisticas_Equipos import Estadisticas_E
@@ -8,7 +8,20 @@ from Backend.db import SessionDep
 router = APIRouter(prefix="/equipos", tags=["equipos"])
 
 @router.post("/", response_model=Equipo)
-async def crear_equipo(new_equipo: EquipoCrear, session: SessionDep):
+async def crear_equipo(session: SessionDep,
+                       nombre: str = Form(...),
+                       ciudad: str = Form(...),
+                       estadio: str = Form(...),
+                       anio_fundacion: int = Form(...),
+                       titulos: int = Form(0)
+                       ):
+    new_equipo = EquipoCrear(
+        nombre=nombre,
+        ciudad=ciudad,
+        estadio=estadio,
+        anio_fundacion=anio_fundacion,
+        titulos=titulos or 0,
+    )
     equipo = Equipo.model_validate(new_equipo)
 
     session.add(equipo)
