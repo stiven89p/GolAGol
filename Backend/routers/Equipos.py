@@ -1,6 +1,7 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
 from Backend.modelos.Equipos import Equipo, EquipoCrear, EquipoActualizar
+from datetime import datetime
 from Backend.modelos.Estadisticas_Equipos import Estadisticas_E
 from Backend.db import SessionDep
 
@@ -18,7 +19,7 @@ async def create_equipo(new_equipo: EquipoCrear, session: SessionDep):
 
 @router.get("/", response_model=List[Equipo])
 async def read_equipos(session: SessionDep):
-    return session.query(Equipo).all()
+    return session.query(Equipo).filter(Equipo.activo == True).all()
 
 @router.get("/{equipo_id}", response_model=Equipo)
 async def read_equipo(equipo_id: int, session: SessionDep):
@@ -32,7 +33,8 @@ async def delete_equipo(equipo_id: int, session: SessionDep):
     equipo = session.get(Equipo, equipo_id)
     if not equipo:
         raise HTTPException(status_code=404, detail="El equipo no existe")
-    session.delete(equipo)
+
+    equipo.activo = False
     session.commit()
     return equipo
 

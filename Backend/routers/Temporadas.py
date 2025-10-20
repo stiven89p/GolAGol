@@ -21,7 +21,7 @@ async def create_temporada(new_temporada: TemporadaCrear, session: SessionDep):
     session.commit()
     session.refresh(temporada)
 
-    equipos = session.query(Equipo).all()
+    equipos = session.query(Equipo).filter(Equipo.activo == True).all()
     for equipo in equipos:
         nueva_estadistica = Estadisticas_E(equipo_id=equipo.equipo_id, temporada=temporada.temporada_id)
         session.add(nueva_estadistica)

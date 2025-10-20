@@ -72,7 +72,7 @@ Content-Type: application/json
   "nombre": "Jugador 1",
   "apellido": "Uno",
   "fecha_nacimiento": "2000-01-01",
-  "posicion": "Delantero",
+  "posicion": "delantero",
   "nacionalidad": "País 1",
   "equipo_id": 1
 }
@@ -86,7 +86,7 @@ Content-Type: application/json
   "nombre": "Jugador 2",
   "apellido": "Dos",
   "fecha_nacimiento": "2000-02-01",
-  "posicion": "Defensa",
+  "posicion": "defensor",
   "nacionalidad": "País 2",
   "equipo_id": 1
 }
@@ -100,7 +100,7 @@ Content-Type: application/json
   "nombre": "Jugador 3",
   "apellido": "Tres",
   "fecha_nacimiento": "2000-03-01",
-  "posicion": "Portero",
+  "posicion": "portero",
   "nacionalidad": "País 3",
   "equipo_id": 1
 }
@@ -114,7 +114,7 @@ Content-Type: application/json
   "nombre": "Jugador 4",
   "apellido": "Cuatro",
   "fecha_nacimiento": "2000-04-01",
-  "posicion": "Centrocampista",
+  "posicion": "mediocampista",
   "nacionalidad": "País 4",
   "equipo_id": 1
 }
@@ -128,7 +128,7 @@ Content-Type: application/json
   "nombre": "Jugador 5",
   "apellido": "Cinco",
   "fecha_nacimiento": "2000-05-01",
-  "posicion": "Delantero",
+  "posicion": "delantero",
   "nacionalidad": "País 5",
   "equipo_id": 1
 }
@@ -142,7 +142,7 @@ Content-Type: application/json
   "nombre": "Jugador 6",
   "apellido": "Seis",
   "fecha_nacimiento": "2001-01-01",
-  "posicion": "Delantero",
+  "posicion": "delantero",
   "nacionalidad": "País 1",
   "equipo_id": 2
 }
@@ -156,7 +156,7 @@ Content-Type: application/json
   "nombre": "Jugador 7",
   "apellido": "Siete",
   "fecha_nacimiento": "2001-02-01",
-  "posicion": "Defensa",
+  "posicion": "defensor",
   "nacionalidad": "País 2",
   "equipo_id": 2
 }
@@ -170,7 +170,7 @@ Content-Type: application/json
   "nombre": "Jugador 8",
   "apellido": "Ocho",
   "fecha_nacimiento": "2001-03-01",
-  "posicion": "Portero",
+  "posicion": "portero",
   "nacionalidad": "País 3",
   "equipo_id": 2
 }
@@ -184,7 +184,7 @@ Content-Type: application/json
   "nombre": "Jugador 9",
   "apellido": "Nueve",
   "fecha_nacimiento": "2001-04-01",
-  "posicion": "Centrocampista",
+  "posicion": "mediocampista",
   "nacionalidad": "País 4",
   "equipo_id": 2
 }
@@ -198,7 +198,7 @@ Content-Type: application/json
   "nombre": "Jugador 10",
   "apellido": "Diez",
   "fecha_nacimiento": "2001-05-01",
-  "posicion": "Delantero",
+  "posicion": "delantero",
   "nacionalidad": "País 5",
   "equipo_id": 2
 }
@@ -212,7 +212,7 @@ Content-Type: application/json
   "nombre": "Jugador 11",
   "apellido": "Once",
   "fecha_nacimiento": "2002-01-01",
-  "posicion": "Delantero",
+  "posicion": "delantero",
   "nacionalidad": "País 1",
   "equipo_id": 3
 }
@@ -226,7 +226,7 @@ Content-Type: application/json
   "nombre": "Jugador 12",
   "apellido": "Doce",
   "fecha_nacimiento": "2002-02-01",
-  "posicion": "Defensa",
+  "posicion": "defensor",
   "nacionalidad": "País 2",
   "equipo_id": 3
 }
@@ -240,7 +240,7 @@ Content-Type: application/json
   "nombre": "Jugador 13",
   "apellido": "Trece",
   "fecha_nacimiento": "2002-03-01",
-  "posicion": "Portero",
+  "posicion": "portero",
   "nacionalidad": "País 3",
   "equipo_id": 3
 }
@@ -254,7 +254,7 @@ Content-Type: application/json
   "nombre": "Jugador 14",
   "apellido": "Catorce",
   "fecha_nacimiento": "2002-04-01",
-  "posicion": "Centrocampista",
+  "posicion": "mediocampista",
   "nacionalidad": "País 4",
   "equipo_id": 3
 }
@@ -263,12 +263,12 @@ Content-Type: application/json
 
 POST http://127.0.0.1:8000/jugadores/
 Content-Type: application/json
-
+ 
 {
   "nombre": "Jugador 15",
   "apellido": "Quince",
   "fecha_nacimiento": "2002-05-01",
-  "posicion": "Delantero",
+  "posicion": "delantero",
   "nacionalidad": "País 5",
   "equipo_id": 3
 }
@@ -282,7 +282,7 @@ Content-Type: application/json
   "nombre": "Jugador 16",
   "apellido": "Dieciseis",
   "fecha_nacimiento": "2003-01-01",
-  "posicion": "Delantero",
+  "posicion": "delantero",
   "nacionalidad": "País 1",
   "equipo_id": 4
 }
@@ -296,7 +296,7 @@ Content-Type: application/json
   "nombre": "Jugador 17",
   "apellido": "Diecisiete",
   "fecha_nacimiento": "2003-02-01",
-  "posicion": "Defensa",
+  "posicion": "defensor",
   "nacionalidad": "País 2",
   "equipo_id": 4
 }
@@ -310,7 +310,7 @@ Content-Type: application/json
   "nombre": "Jugador 18",
   "apellido": "Dieciocho",
   "fecha_nacimiento": "2003-03-01",
-  "posicion": "Portero",
+  "posicion": "portero",
   "nacionalidad": "País 3",
   "equipo_id": 4
 }
@@ -324,7 +324,7 @@ Content-Type: application/json
   "nombre": "Jugador 19",
   "apellido": "Diecinueve",
   "fecha_nacimiento": "2003-04-01",
-  "posicion": "Centrocampista",
+  "posicion": "mediocampista",
   "nacionalidad": "País 4",
   "equipo_id": 4
 }
@@ -338,7 +338,7 @@ Content-Type: application/json
   "nombre": "Jugador 20",
   "apellido": "Veinte",
   "fecha_nacimiento": "2003-05-01",
-  "posicion": "Delantero",
+  "posicion": "delantero",
   "nacionalidad": "País 5",
   "equipo_id": 4
 }
@@ -352,7 +352,7 @@ Content-Type: application/json
   "nombre": "Jugador 21",
   "apellido": "Veintiuno",
   "fecha_nacimiento": "2004-01-01",
-  "posicion": "Delantero",
+  "posicion": "delantero",
   "nacionalidad": "País 1",
   "equipo_id": 5
 }
@@ -366,7 +366,7 @@ Content-Type: application/json
   "nombre": "Jugador 22",
   "apellido": "Veintidos",
   "fecha_nacimiento": "2004-02-01",
-  "posicion": "Defensa",
+  "posicion": "defensor",
   "nacionalidad": "País 2",
   "equipo_id": 5
 }
@@ -380,7 +380,7 @@ Content-Type: application/json
   "nombre": "Jugador 23",
   "apellido": "Veintitres",
   "fecha_nacimiento": "2004-03-01",
-  "posicion": "Portero",
+  "posicion": "portero",
   "nacionalidad": "País 3",
   "equipo_id": 5
 }
@@ -394,7 +394,7 @@ Content-Type: application/json
   "nombre": "Jugador 24",
   "apellido": "Veinticuatro",
   "fecha_nacimiento": "2004-04-01",
-  "posicion": "Centrocampista",
+  "posicion": "mediocampista",
   "nacionalidad": "País 4",
   "equipo_id": 5
 }
@@ -408,7 +408,7 @@ Content-Type: application/json
   "nombre": "Jugador 25",
   "apellido": "Veinticinco",
   "fecha_nacimiento": "2004-05-01",
-  "posicion": "Delantero",
+  "posicion": "delantero",
   "nacionalidad": "País 5",
   "equipo_id": 5
 }

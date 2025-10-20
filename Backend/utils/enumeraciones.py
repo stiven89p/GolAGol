@@ -12,3 +12,9 @@ class EstadoPartidos(Enum):
     FINALIZADO = "finalizado"
     SUSPENDIDO = "suspendido"
     CANCELADO = "cancelado"
+
+class PosicionJugador(Enum):
+    PORTERO = "portero"
+    DEFENSOR = "defensor"
+    MEDIOCAMPISTA = "mediocampista"
+    DELANTERO = "delantero"

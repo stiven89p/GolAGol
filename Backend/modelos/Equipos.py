@@ -1,4 +1,5 @@
 from typing import Optional, List
+from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
 from Backend.modelos.Estadisticas_Equipos import Estadisticas_E
 
@@ -11,6 +12,7 @@ class EquipoBase(SQLModel):
 class Equipo(EquipoBase, table=True):
     equipo_id: int | None = Field(default=None, primary_key=True)
     estadisticas: list["Estadisticas_E"] = Relationship(back_populates="equipo")
+    activo: bool = Field(default=True, description="Indica si el equipo está activo")
 
 class EquipoCrear(EquipoBase):
     pass

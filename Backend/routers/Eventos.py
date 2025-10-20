@@ -84,9 +84,11 @@ async def read_eventos(session: SessionDep):
     return eventos
 
 
-@router.get("/goles/", response_model=list[Evento])
-async def read_goles(session: SessionDep):
-    eventos = session.query(Evento).filter(Evento.tipo == TipoEvento.GOL).all()
+@router.get("/{evento}/", response_model=list[Evento])
+async def read_goles(session: SessionDep, evento: TipoEvento):
+    if not evento in TipoEvento:
+        raise HTTPException(status_code=400, detail="El tipo de evento no es válido")
+    eventos = session.query(Evento).filter(Evento.tipo == evento).all()
     if not eventos:
         raise HTTPException(status_code=404, detail="No se encontraron eventos")
     return eventos

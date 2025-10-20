@@ -9,9 +9,17 @@ router = APIRouter(prefix="/estadisticas_equipos", tags=["estadisticas_equipos"]
 async def read_equipos(session: SessionDep):
     return session.query(Estadisticas_E).all()
 
-@router.get("/{id_estadistica}", response_model=Estadisticas_E)
-async def read_estadistica_equipo(id_estadistica: int, session: SessionDep):
-    estadistica = session.get(Estadisticas_E, id_estadistica)
+@router.get("/eqipo/{equipo_id}", response_model=List[Estadisticas_E])
+async def read_estadistica_equipo(equipo_id: int, session: SessionDep):
+    estadistica = session.query(Estadisticas_E).filter(Estadisticas_E.equipo_id == equipo_id).all()
     if not estadistica:
         raise HTTPException(status_code=404, detail="La estadística del equipo no existe")
     return estadistica
+
+@router.get("/eqipo/{equipo_id}/{temporada}", response_model=List[Estadisticas_E])
+async def read_estadistica_equipo_temporada(equipo_id: int,temporada: int , session: SessionDep):
+    estadistica = session.query(Estadisticas_E).filter(Estadisticas_E.equipo_id == equipo_id, Estadisticas_E.temporada == temporada)
+    if not estadistica:
+        raise HTTPException(status_code=404, detail="La estadística del equipo no existe")
+    return estadistica
+
