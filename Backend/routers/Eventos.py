@@ -117,3 +117,7 @@ async def anular_evento(session: SessionDep, evento_id: int):
     if not evento:
         raise HTTPException(status_code=404, detail="No se encontraron evento")
 
+    if evento.tipo == TipoEvento.GOL:
+        anular_gol(session, evento, session.get(Partido, evento.partido_id), Estadisticas_E, session.get(Estadisticas_J, evento.jugador_id), session.get(Estadisticas_J, evento.jugador_asociado_id) if evento.jugador_asociado_id else None)
+    elif evento.tipo == TipoEvento.TARJETA_AMARILLA or evento.tipo == TipoEvento.TARJETA_ROJA:
+        anular_tarjeta(session, evento, session.get(Partido, evento.partido_id), Estadisticas_E, session.get(Estadisticas_J, evento.jugador_id))

@@ -68,7 +68,7 @@ async def finalizar_temporada(temporada_id: int, session: SessionDep):
 
 @router.get("/", response_model=List[Temporada])
 async def obtener_temporadas(session: SessionDep):
-    temporadas = session.query(Estadisticas_E).all()
+    temporadas = session.query(Temporada).all()
     if not temporadas:
         raise HTTPException(status_code=404, detail="No se encontraron temporadas")
     return temporadas

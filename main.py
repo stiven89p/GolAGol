@@ -1,6 +1,9 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, UploadFile, File, Form
+from jinja2.bccache import Bucket
 from Backend.db import SessionDep
+from fastapi.staticfiles import StaticFiles
 import time
+from Backend.utils.bucket import upload_file
 from sqlalchemy import text
 import Backend.routers.Partidos
 import Backend.routers.Temporadas
@@ -16,14 +19,18 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI(lifespan=create_tables, title="Gol a Gol API")
 
-# 🔹 CORS habilitado para permitir peticiones desde el navegador
+from fastapi.middleware.cors import CORSMiddleware
+
+app = FastAPI()
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # o ["http://127.0.0.1:5500"] si usas VS Code Live Server
+    allow_origins=["http://localhost:5173"],  # tu frontend
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # 🔹 Rutas del proyecto
 app.include_router(Backend.routers.Equipos.router)
@@ -39,7 +46,13 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_root(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse("PartidosProgramados.jsx", {"request": request})
+
+@app.post("/bucket")
+async def create_bucket(file: UploadFile = File(...) ):
+    result = await upload_file(file)
+    return result
+
 
 @app.get("/health")
 async def health_check(session: SessionDep):
