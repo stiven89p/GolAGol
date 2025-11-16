@@ -1,6 +1,6 @@
 from typing import Optional
 from sqlmodel import SQLModel, Field
-from Backend.utils.enumeraciones import TipoEvento
+from backend.utils.enumeraciones import TipoEvento
 
 class EventoBase(SQLModel):
     minuto: int = Field(nullable=False, description="Minuto del evento")

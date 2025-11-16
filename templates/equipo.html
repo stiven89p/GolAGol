@@ -1,10 +1,98 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ equipo.nombre if equipo else 'Equipo' }} - Livescore</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
 </head>
 <body>
-$END$
+  {% set logo_url = url_for('static', path='img/default_logo.png') %}
+  {% if equipo and equipo.logo %}
+    {% if equipo.logo.startswith('http') or equipo.logo.startswith('/') %}
+      {% set logo_url = equipo.logo %}
+    {% else %}
+      {% set logo_url = url_for('static', path=equipo.logo) %}
+    {% endif %}
+  {% endif %}
+
+  <!-- Encabezado del equipo -->
+  <header class="team-header">
+    <img src="{{ logo_url }}" alt="Logo {{ equipo.nombre if equipo else 'Equipo' }}" class="team-logo">
+    <div class="team-info">
+      <h1>{{ equipo.nombre if equipo else 'Equipo' }}</h1>
+      {% if equipo %}
+        <p>🏙️ {{ equipo.ciudad }} | 📅 Fundado en {{ equipo.anio_fundacion }}</p>
+      {% else %}
+        <p>Información del equipo no disponible</p>
+      {% endif %}
+    </div>
+  </header>
+
+  <!-- Contenido -->
+  <main class="team-content">
+    <section class="panel resultados">
+      <h2>Últimos Resultados</h2>
+      {% if resultados %}
+        {% for r in resultados %}
+          <div class="match-card">
+            <span class="eq-name">{{ equipo.nombre }}</span>
+            <strong class="resultado">{{ r.resultado }}</strong>
+            <span class="oponente">{{ r.oponente }}</span>
+            <small class="fecha">{{ r.fecha }}</small>
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>No hay resultados recientes.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel proximos">
+      <h2>Próximos Partidos</h2>
+      {% if proximos %}
+        {% for p in proximos %}
+          <div class="match-card next">
+            <span class="eq-name">{{ equipo.nombre }}</span>
+            <span class="vs">vs</span>
+            <span class="oponente">{{ p.oponente }}</span>
+            <small class="fecha-hora">{{ p.fecha }}{% if p.hora %} - {{ p.hora }}{% endif %}</small>
+            {% if p.lugar %}
+              <p class="lugar">📍 {{ p.lugar }}</p>
+            {% endif %}
+          </div>
+        {% endfor %}
+      {% else %}
+        <p>No hay próximos partidos programados.</p>
+      {% endif %}
+    </section>
+
+    <section class="panel estadisticas">
+      <h2>Estadísticas</h2>
+      {% if estadisticas %}
+        {% for s in estadisticas %}
+          <article class="estadistica-item">
+            <h3>Temporada: {{ s.temporada }}</h3>
+            <table class="stats-table">
+              <tbody>
+                <tr><th>Partidos jugados</th><td>{{ s.partidos_jugados }}</td></tr>
+                <tr><th>Victorias</th><td>{{ s.victorias }}</td></tr>
+                <tr><th>Empates</th><td>{{ s.empates }}</td></tr>
+                <tr><th>Derrotas</th><td>{{ s.derrotas }}</td></tr>
+                <tr><th>Goles a favor</th><td>{{ s.goles_favor }}</td></tr>
+                <tr><th>Goles en contra</th><td>{{ s.goles_contra }}</td></tr>
+                <tr><th>Puntos</th><td>{{ s.puntos }}</td></tr>
+                <tr><th>Tarjetas amarillas</th><td>{{ s.tarjetas_amarillas }}</td></tr>
+                <tr><th>Tarjetas rojas</th><td>{{ s.tarjetas_rojas }}</td></tr>
+              </tbody>
+            </table>
+          </article>
+        {% endfor %}
+      {% else %}
+        <p>No hay estadísticas disponibles.</p>
+      {% endif %}
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', path='js/equipo.js') }}"></script>
 </body>
 </html>

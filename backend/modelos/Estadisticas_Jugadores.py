@@ -13,7 +13,7 @@ class Estadisticas_JBase(SQLModel):
 
 class Estadisticas_J(Estadisticas_JBase , table=True):
     id_estadistica: Optional[int] = Field(default=None, primary_key=True)
-    pass
+
 
 class EstadisticasCrear(Estadisticas_JBase):
     pass

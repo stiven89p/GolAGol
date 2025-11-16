@@ -1,7 +1,7 @@
 from typing import Optional
 from datetime import date
 from sqlmodel import SQLModel, Field
-from Backend.utils.enumeraciones import EstadoTemporada
+from backend.utils.enumeraciones import EstadoTemporada
 
 class TemporadaBase(SQLModel):
     nombre: str = Field(nullable=False, description="Nombre de la temporada (e.g., '2023/2024')")

@@ -1,7 +1,7 @@
 from typing import List
 from fastapi import APIRouter, HTTPException
-from Backend.modelos.Estadisticas_Jugadores import Estadisticas_J
-from Backend.db import SessionDep
+from backend.modelos.Estadisticas_Jugadores import Estadisticas_J
+from backend.db import SessionDep
 
 router = APIRouter(prefix="/estadisticas_jugadores", tags=["estadisticas_jugadores"])
 

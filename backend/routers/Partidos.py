@@ -1,11 +1,12 @@
 from fastapi import APIRouter, HTTPException, Form
-from datetime import date
-from Backend.modelos.Equipos import Equipo
-from Backend.modelos.Partidos import Partido, PartidoCrear
-from Backend.modelos.Estadisticas_Equipos import Estadisticas_E
-from Backend.modelos.Temporada import Temporada
-from Backend.utils.enumeraciones import EstadoPartidos
-from Backend.db import SessionDep
+from sqlalchemy.orm import aliased
+from datetime import date, time
+from backend.modelos.Equipos import Equipo
+from backend.modelos.Partidos import Partido, PartidoCrear, PartidoDTO
+from backend.modelos.Estadisticas_Equipos import Estadisticas_E
+from backend.modelos.Temporada import Temporada
+from backend.utils.enumeraciones import EstadoPartidos
+from backend.db import SessionDep
 
 router = APIRouter(prefix="/partidos", tags=["partidos"])
 
@@ -13,6 +14,7 @@ router = APIRouter(prefix="/partidos", tags=["partidos"])
 async def crear_partido(
         session: SessionDep,
         fecha: date = Form(...),
+        hora: time = Form(...),
         jornada: int = Form(...),
         temporada_id: int = Form(...),
         estadio: str = Form(...),
@@ -21,6 +23,7 @@ async def crear_partido(
         ):
     new_partido = PartidoCrear(
         fecha=fecha,
+        hora=hora,
         jornada=jornada,
         estadio=estadio,
         equipo_local_id=equipo_local_id,
@@ -60,25 +63,81 @@ async def crear_partido(
 
     return partido
 
-@router.get("/", response_model=list[Partido])
+# python
+@router.get("/", response_model=list[PartidoDTO])
 async def obtener_partidos(session: SessionDep):
-    return session.query(Partido).all()
+    equipo_local = aliased(Equipo)
+    equipo_visitante = aliased(Equipo)
+
+    rows = (
+        session.query(Partido, equipo_local, equipo_visitante)
+        .join(equipo_local, Partido.equipo_local_id == equipo_local.equipo_id)
+        .join(equipo_visitante, Partido.equipo_visitante_id == equipo_visitante.equipo_id)
+        .order_by(Partido.fecha.asc())
+        .all()
+    )
+
+    if not rows:
+        raise HTTPException(status_code=404, detail="No se encontraron partidos programados")
+
+    dto_list: list[PartidoDTO] = []
+    for partido, el, ev in rows:
+        dto = PartidoDTO(
+            partido_id=partido.partido_id,
+            equipo_local_nombre=getattr(el, "nombre", "") if el else "",
+            equipo_local_logo=getattr(el, "logo", None) if el else None,
+            equipo_visitante_nombre=getattr(ev, "nombre", "") if ev else "",
+            equipo_visitante_logo=getattr(ev, "logo", None) if ev else None,
+            fecha=partido.fecha,
+            hora=partido.hora.strftime("%H:%M") if partido.hora else None,
+            lugar=partido.estadio,
+            estado=partido.estado,
+            goles_local=partido.goles_local,
+            goles_visitante=partido.goles_visitante,
+        )
+        dto_list.append(dto)
+
+    return dto_list
 
 
-@router.get("/{partido_id}", response_model=Partido)
-async def obtener_partido(partido_id: int, session: SessionDep):
-    partido = session.get(Partido, partido_id)
-    if not partido:
-        raise HTTPException(status_code=404, detail="Partido no encontrado")
-    return partido
-
-
-@router.get("/equipo/{equipo_id}", response_model=list[Partido])
+@router.get("/equipo/{equipo_id}", response_model=list[PartidoDTO])
 async def obtener_partidos_equipo(equipo_id: int, session: SessionDep):
-    partidos = session.query(Partido).filter((Partido.equipo_local_id == equipo_id) | (Partido.equipo_visitante_id == equipo_id)).all()
-    if not partidos:
+    equipo_local = aliased(Equipo)
+    equipo_visitante = aliased(Equipo)
+
+    rows = (
+        session.query(Partido, equipo_local, equipo_visitante)
+        .join(equipo_local, Partido.equipo_local_id == equipo_local.equipo_id)
+        .join(equipo_visitante, Partido.equipo_visitante_id == equipo_visitante.equipo_id)
+        .filter(
+            ((Partido.equipo_local_id == equipo_id) | (Partido.equipo_visitante_id == equipo_id))
+            & (Partido.estado == EstadoPartidos.PROGRAMADO)
+        )
+        .order_by(Partido.fecha.asc())
+        .all()
+    )
+
+    if not rows:
         raise HTTPException(status_code=404, detail="No se encontraron partidos para este equipo")
-    return partidos
+
+    dto_list: list[PartidoDTO] = []
+    for partido, el, ev in rows:
+        dto = PartidoDTO(
+            partido_id=partido.partido_id,
+            equipo_local_nombre=getattr(el, "nombre", "") if el else "",
+            equipo_local_logo=getattr(el, "logo", None) if el else None,
+            equipo_visitante_nombre=getattr(ev, "nombre", "") if ev else "",
+            equipo_visitante_logo=getattr(ev, "logo", None) if ev else None,
+            fecha=partido.fecha,
+            hora=partido.hora.strftime("%H:%M") if partido.hora else None,
+            lugar=partido.estadio,
+            estado=partido.estado,
+            goles_local=partido.goles_local,
+            goles_visitante=partido.goles_visitante,
+        )
+        dto_list.append(dto)
+
+    return dto_list
 
 @router.get("/{estado}/", response_model=list[Partido])
 async def obtener_partidos_equipo(estado: EstadoPartidos, session: SessionDep):
@@ -86,6 +145,7 @@ async def obtener_partidos_equipo(estado: EstadoPartidos, session: SessionDep):
     if not partidos:
         raise HTTPException(status_code=404, detail="No se encontraron partidos para este equipo")
     return partidos
+
 
 @router.patch("/{partido_id}", response_model=Partido)
 async def cambiar_estado_partido(partido_id: int, estado:EstadoPartidos, session: SessionDep):

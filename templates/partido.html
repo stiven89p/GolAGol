@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ partido.equipo_local_nombre }} vs {{ partido.equipo_visitante_nombre }} - Detalle</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div class="detail-layout">
+        <aside class="sidebar">
+            <section id="partidos" class="panel">
+                <h2>Partidos</h2>
+                <div id="partidos-lista" data-active-id="{{ partido.partido_id }}">
+                    <p class="loading">Cargando partidos...</p>
+                </div>
+            </section>
+        </aside>
+
+        <main class="match-detail">
+        <header class="match-detail-header">
+            <div class="team-block left">
+                <img src="{{ partido.equipo_local_logo }}" alt="{{ partido.equipo_local_nombre }}" class="team-logo">
+                <h2 class="team-name">{{ partido.equipo_local_nombre }}</h2>
+            </div>
+
+            <div class="center-block">
+                {% if partido.estado == 'FINALIZADO' %}
+                    <div class="score">
+                        <span class="score-num">{{ partido.goles_local }}</span>
+                        <span class="score-sep">-</span>
+                        <span class="score-num">{{ partido.goles_visitante }}</span>
+                    </div>
+                    <small class="meta">Finalizado</small>
+                {% else %}
+                    <div class="status-upcoming">{{ partido.hora or '' }}</div>
+                    <small class="meta">{{ partido.fecha }}{% if partido.lugar %} • {{ partido.lugar }}{% endif %}</small>
+                {% endif %}
+            </div>
+
+            <div class="team-block right">
+                <img src="{{ partido.equipo_visitante_logo }}" alt="{{ partido.equipo_visitante_nombre }}" class="team-logo">
+                <h2 class="team-name">{{ partido.equipo_visitante_nombre }}</h2>
+            </div>
+        </header>
+
+        <section class="panel">
+            <h2>Partido</h2>
+            <p class="lugar">📍 {{ partido.lugar }}</p>
+            <p class="fecha-hora">{{ partido.fecha }}{% if partido.hora %} - {{ partido.hora }}{% endif %}</p>
+            <p class="estado">Estado: {{ partido.estado }}</p>
+        </section>
+    </main>
+    </div>
+    <script src="/static/js/partidos_programados.js"></script>
+</body>
+</html>

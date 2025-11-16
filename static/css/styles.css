@@ -1,0 +1,403 @@
+/* ===============================
+   🎨 ESTILOS GENERALES
+================================ */
+body {
+    background-color: #0d1117;
+    color: #c9d1d9;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3 {
+    color: #58a6ff;
+    margin: 0;
+}
+
+/* ===============================
+   LAYOUT PRINCIPAL (2 COLUMNAS)
+================================ */
+.main-layout {
+    display: grid;
+    grid-template-columns: 400px 1fr;
+    gap: 30px;
+    margin: 20px;
+}
+
+/* ===============================
+      TABLA DE POSICIONES
+================================ */
+#tabla-posiciones {
+    background-color: #161b22;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    height: fit-content;
+}
+
+#tabla-posiciones h2 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    text-transform: lowercase;
+    margin-bottom: 20px;
+    color: #58a6ff;
+    border-bottom: 1px solid #30363d;
+    padding-bottom: 0.5rem;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px 8px;
+    text-align: center;
+    border-bottom: 1px solid #30363d;
+    color: #c9d1d9;
+    font-size: 15px;
+}
+
+th {
+    background-color: #1e2329;
+    font-weight: bold;
+    color: #58a6ff;
+}
+
+/* ===============================
+            PARTIDOS
+================================ */
+#partidos {
+    background-color: #161b22;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+#partidos h2 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-transform: lowercase;
+    color: #58a6ff;
+    border-bottom: 1px solid #30363d;
+    padding-bottom: 0.5rem;
+}
+
+/* Caja del partido */
+.match-card {
+    margin-bottom: 20px;
+    padding: 16px;
+    background-color: #1e2329;
+    border-radius: 8px;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+.match-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+/* Escudos de equipos */
+.escudo {
+    width: 65px;
+    height: 65px;
+    object-fit: contain;
+    flex-shrink: 0;
+}
+
+.local {
+    order: 1;
+}
+
+.visitante {
+    order: 3;
+}
+
+/* Marcador */
+.marcador {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    order: 2;
+    min-width: 0;
+}
+
+.eq-name {
+    font-size: 18px;
+    font-weight: bold;
+    text-transform: lowercase;
+    color: #c9d1d9;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+}
+
+.resultado {
+    font-size: 28px;
+    font-weight: bold;
+    color: #58a6ff;
+    flex-shrink: 0;
+    padding: 0 10px;
+}
+
+/* Fecha y lugar */
+.fecha-hora {
+    display: block;
+    text-align: center;
+    margin-bottom: 5px;
+    font-size: 14px;
+    color: #8b949e;
+}
+
+.lugar {
+    text-align: center;
+    margin: 0;
+    font-size: 14px;
+    color: #8b949e;
+}
+
+/* ===============================
+        TEXTO DE CARGA
+================================ */
+.loading {
+    text-align: center;
+    font-size: 16px;
+    padding: 20px;
+    color: #58a6ff;
+}
+
+/* ===============================
+   🏟️ PÁGINA DE EQUIPO
+================================ */
+
+/* Header del equipo */
+.team-header {
+    display: flex;
+    align-items: center;
+    background-color: #161b22;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    border-bottom: 1px solid #30363d;
+}
+
+.team-logo {
+    width: 90px;
+    height: 90px;
+    object-fit: contain;
+    margin-right: 20px;
+}
+
+.team-info h1 {
+    color: #58a6ff;
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 600;
+}
+
+.team-info p {
+    color: #c9d1d9;
+    margin: 5px 0 0;
+    font-size: 1rem;
+}
+
+/* Contenido general */
+.team-content {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Paneles (Resultados, Próximos, Estadísticas) */
+.panel {
+    background-color: #161b22;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.panel h2 {
+    color: #58a6ff;
+    border-bottom: 1px solid #30363d;
+    padding-bottom: 0.5rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1.5rem;
+}
+
+/* Secciones específicas */
+.resultados, .proximos, .estadisticas {
+    background-color: #161b22;
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.resultados h2, .proximos h2, .estadisticas h2 {
+    color: #58a6ff;
+    border-bottom: 1px solid #30363d;
+    padding-bottom: 0.5rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+}
+
+/* Tarjetas de partidos en página de equipo */
+.match-card.next {
+    border-left: 4px solid #58a6ff;
+}
+
+.match-card .vs {
+    color: #8b949e;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.match-card .oponente {
+    color: #e6edf3;
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.match-card .fecha {
+    font-size: 0.9rem;
+    color: #8b949e;
+    display: block;
+    text-align: center;
+}
+
+/* Tabla de estadísticas */
+.stats-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.stats-table th,
+.stats-table td {
+    padding: 10px;
+    border-bottom: 1px solid #30363d;
+    text-align: left;
+}
+
+.stats-table th {
+    color: #58a6ff;
+    font-weight: 600;
+}
+
+.stats-table td {
+    color: #c9d1d9;
+}
+
+.estadistica-item {
+    margin-bottom: 2rem;
+}
+
+.estadistica-item h3 {
+    color: #58a6ff;
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+}
+
+.no-stats {
+    color: #8b949e;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .main-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .team-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        padding: 1rem;
+    }
+    
+    .team-logo {
+        margin-bottom: 10px;
+        margin-right: 0;
+    }
+    
+    .team-info h1 {
+        font-size: 1.6rem;
+    }
+    
+    .team-content {
+        padding: 1rem;
+    }
+    
+    .eq-name {
+        max-width: 120px;
+        font-size: 14px;
+    }
+    
+    .resultado {
+        font-size: 20px;
+    }
+    
+    .escudo {
+        width: 50px;
+        height: 50px;
+    }
+}
+
+/* ===============================
+   🔎 DETALLE DE PARTIDO
+================================ */
+.match-detail {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.match-detail-header {
+    background: #161b22;
+    border-radius: 12px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+    margin-bottom: 20px;
+}
+
+.team-block { text-align: center; }
+.team-block .team-name { margin-top: 8px; }
+.team-block .team-logo { width: 90px; height: 90px; object-fit: contain; }
+
+.center-block { text-align: center; }
+.score { display: inline-flex; align-items: baseline; gap: 10px; }
+.score-num { font-size: 42px; font-weight: 800; color: #e6edf3; }
+.score-sep { font-size: 28px; color: #8b949e; }
+.status-upcoming { font-size: 28px; font-weight: 700; color: #58a6ff; }
+.meta { display: block; margin-top: 6px; color: #8b949e; }
+
+/* Lateral con lista de partidos en el detalle */
+.detail-layout {
+    display: grid;
+    grid-template-columns: 340px 1fr;
+    gap: 24px;
+}
+
+.sidebar { position: sticky; top: 12px; height: fit-content; }
+.sidebar #partidos { padding: 12px 12px 6px; }
+.sidebar .match-card { padding: 10px; margin-bottom: 12px; }
+.sidebar .eq-name { max-width: 140px; font-size: 14px; }
+.sidebar .resultado { font-size: 22px; }
+.sidebar .escudo { width: 44px; height: 44px; }
+.sidebar .match-card.active { outline: 2px solid #58a6ff; }

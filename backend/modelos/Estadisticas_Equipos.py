@@ -1,6 +1,6 @@
 from typing import Optional
 from sqlmodel import SQLModel, Field, Relationship
-#from Backend.modelos.Equipos import Equipo
+
 
 class Estadisticas_EBase(SQLModel):
     equipo_id: int = Field(foreign_key="equipo.equipo_id", nullable=False, description="ID del equipo asociado")
@@ -32,3 +32,20 @@ class EstadisticasActualizar(SQLModel):
     goles_favor: Optional[int] = None
     goles_contra: Optional[int] = None
     puntos: Optional[int] = None
+
+class Estadisticas_EDTO(SQLModel):
+    equipo_id: int = Field(foreign_key="equipo.equipo_id", nullable=False, description="ID del equipo asociado")
+    equipo_logo: Optional[str] = Field(None, description="URL o ruta del logo del equipo")
+    temporada: int = Field(foreign_key="temporada.temporada_id", description="Temporada de la estadística (e.g., '2023/2024')")
+    partidos_jugados: int = Field(default=0, nullable=False, description="Número de partidos jugados en la temporada")
+    victorias: int = Field(default=0, nullable=False, description="Número de victorias en la temporada")
+    empates: int = Field(default=0, nullable=False, description="Número de empates en la temporada")
+    derrotas: int = Field(default=0, nullable=False, description="Número de derrotas en la temporada")
+    goles_favor: int = Field(default=0, nullable=False, description="Número de goles a favor en la temporada")
+    goles_contra: int = Field(default=0, nullable=False, description="Número de goles en contra en la temporada")
+    puntos: int = Field(default=0, nullable=False, description="Número de puntos acumulados en la temporada")
+    tarjetas_amarillas: int = Field(default=0, nullable=False, description="Número de tarjetas amarillas recibidas en la temporada")
+    tarjetas_rojas: int = Field(default=0, nullable=False, description="Número de tarjetas rojas recibidas en la temporada")
+
+
+from ..modelos.Equipos import (Equipo)

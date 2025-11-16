@@ -1,9 +1,11 @@
-from fastapi import APIRouter, HTTPException, Form
+from fastapi import APIRouter, HTTPException, Form, UploadFile, File
 from datetime import date
-from Backend.modelos.Equipos import Equipo
-from Backend.modelos.Jugadores import Jugador, JugadorCrear, JugadorActualizar
-from Backend.utils.enumeraciones import PosicionJugador
-from Backend.db import SessionDep
+from backend.modelos.Equipos import Equipo
+from backend.modelos.Jugadores import Jugador, JugadorCrear, JugadorActualizar
+from backend.utils.enumeraciones import PosicionJugador
+from backend.utils.bucket import upload_file
+from backend.db import SessionDep
+
 
 router = APIRouter(prefix="/jugadores", tags=["jugadores"])
 
@@ -14,8 +16,11 @@ async def crear_jugador(session: SessionDep,
                         fecha_nacimiento: date = Form(...),
                         posicion: PosicionJugador = Form(...),
                         nacionalidad: str = Form(...),
-                        equipo_id: int = Form(...)
+                        equipo_id: int = Form(...),
+                        foto: UploadFile = File(0)
                         ):
+    foto = await upload_file(foto)
+
     new_jugador = JugadorCrear(
         nombre=nombre,
         apellido=apellido,
@@ -23,6 +28,7 @@ async def crear_jugador(session: SessionDep,
         posicion=posicion,
         nacionalidad=nacionalidad,
         equipo_id=equipo_id,
+        foto=foto["file_name"]
     )
     jugador = Jugador.model_validate(new_jugador)
 

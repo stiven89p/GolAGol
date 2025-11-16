@@ -1,14 +1,14 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Form
-from Backend.utils.enumeraciones import TipoEvento
-from Backend.utils.Fun_Eventos import *
-from Backend.modelos.Equipos import Equipo
-from Backend.modelos.Estadisticas_Jugadores import Estadisticas_J
-from Backend.modelos.Estadisticas_Equipos import Estadisticas_E
-from Backend.modelos.Partidos import Partido
-from Backend.modelos.Jugadores import Jugador
-from Backend.modelos.Eventos import Evento, EventoCrear
-from Backend.db import SessionDep
+from backend.utils.enumeraciones import TipoEvento
+from backend.utils.Fun_Eventos import *
+from backend.modelos.Equipos import Equipo
+from backend.modelos.Estadisticas_Jugadores import Estadisticas_J
+from backend.modelos.Estadisticas_Equipos import Estadisticas_E
+from backend.modelos.Partidos import Partido
+from backend.modelos.Jugadores import Jugador
+from backend.modelos.Eventos import Evento, EventoCrear
+from backend.db import SessionDep
 
 router = APIRouter(prefix="/eventos", tags=["eventos"])
 

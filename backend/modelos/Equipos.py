@@ -1,7 +1,7 @@
 from typing import Optional, List
 from datetime import datetime
 from sqlmodel import SQLModel, Field, Relationship
-from Backend.modelos.Estadisticas_Equipos import Estadisticas_E
+
 
 class EquipoBase(SQLModel):
     nombre: str = Field(nullable=False, description="nombre del equipo")
@@ -9,6 +9,7 @@ class EquipoBase(SQLModel):
     estadio: str = Field(nullable=False, description="estadio del equipo")
     anio_fundacion: int = Field(nullable=False, description="año de fundación del equipo")
     titulos: Optional[int] = Field(default=0, description="titulos del equipo")
+    logo: Optional[str] = Field(default=None, description="URL del logo del equipo")
 
 class Equipo(EquipoBase, table=True):
     equipo_id: int | None = Field(default=None, primary_key=True)
@@ -23,3 +24,7 @@ class EquipoActualizar(SQLModel):
     ciudad: Optional[str] = None
     estadio: Optional[str] = None
     anio_fundacion: Optional[int] = None
+    titulos: Optional[int] = None
+    logo: Optional[str] = None
+
+from ..modelos.Estadisticas_Equipos import Estadisticas_E

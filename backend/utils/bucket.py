@@ -2,7 +2,7 @@ import os
 import uuid
 from pathlib import Path
 from fastapi import UploadFile
-STORE_DIR = "bucket"
+STORE_DIR = "static"
 
 Path(STORE_DIR).mkdir(parents=True, exist_ok=True)
 
