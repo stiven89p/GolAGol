@@ -57,6 +57,13 @@ async def obtener_jugador(jugador_id: int, session: SessionDep):
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
     return jugador
 
+@router.get("/equipo/{equipo_id}", response_model=list[Jugador])
+async def obtener_jugadores_equipo(equipo_id: int, session: SessionDep):
+    jugadores = session.query(Jugador).filter(Jugador.equipo_id == equipo_id).all()
+    if not jugadores:
+        return []
+    return jugadores
+
 @router.get("/{Posicion}/", response_model=list[Jugador])
 async def obtener_jugador_posicion(Posicion: PosicionJugador , session: SessionDep):
     jugador = session.query(Jugador).filter(Jugador.posicion == Posicion).all()

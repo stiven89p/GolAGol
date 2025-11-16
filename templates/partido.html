@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/static/css/styles.css">
 </head>
 <body>
+    {% include 'partials/header.html' %}
     <div class="detail-layout">
         <aside class="sidebar">
             <section id="partidos" class="panel">
@@ -19,10 +20,10 @@
 
         <main class="match-detail">
         <header class="match-detail-header">
-            <div class="team-block left">
+            <a href="/equipo/{{ partido.equipo_local_id }}" class="team-block left team-link">
                 <img src="{{ partido.equipo_local_logo }}" alt="{{ partido.equipo_local_nombre }}" class="team-logo">
                 <h2 class="team-name">{{ partido.equipo_local_nombre }}</h2>
-            </div>
+            </a>
 
             <div class="center-block">
                 {% if partido.estado == 'FINALIZADO' %}
@@ -38,10 +39,10 @@
                 {% endif %}
             </div>
 
-            <div class="team-block right">
+            <a href="/equipo/{{ partido.equipo_visitante_id }}" class="team-block right team-link">
                 <img src="{{ partido.equipo_visitante_logo }}" alt="{{ partido.equipo_visitante_nombre }}" class="team-logo">
                 <h2 class="team-name">{{ partido.equipo_visitante_nombre }}</h2>
-            </div>
+            </a>
         </header>
 
         <section class="panel">

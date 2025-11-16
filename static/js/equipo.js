@@ -102,6 +102,160 @@
     }
   };
 
+  // Renderiza jugadores por posición
+  const renderJugadoresPorPosicion = (jugadores) => {
+    const porterosList = document.getElementById('porteros-lista');
+    const defensasList = document.getElementById('defensas-lista');
+    const mediocampistasList = document.getElementById('mediocampistas-lista');
+    const delanterosList = document.getElementById('delanteros-lista');
+
+    if (!porterosList || !defensasList || !mediocampistasList || !delanterosList) return;
+
+    const porteros = jugadores.filter(j => j.posicion === 'portero');
+    const defensas = jugadores.filter(j => j.posicion === 'defensor');
+    const mediocampistas = jugadores.filter(j => j.posicion === 'mediocampista');
+    const delanteros = jugadores.filter(j => j.posicion === 'delantero');
+
+    const renderGrupo = (lista, jugadoresGrupo) => {
+      lista.innerHTML = '';
+      if (jugadoresGrupo.length === 0) {
+        const p = document.createElement('p');
+        p.textContent = 'No hay jugadores en esta posición';
+        p.className = 'no-jugadores';
+        lista.appendChild(p);
+        return;
+      }
+
+      jugadoresGrupo.forEach(j => {
+        const div = document.createElement('div');
+        div.className = 'jugador-card';
+
+        const img = document.createElement('img');
+        img.src = j.foto ? `/static/img/${j.foto}` : '/static/img/default.png';
+        img.alt = `${j.nombre} ${j.apellido}`;
+        img.className = 'jugador-foto';
+        img.onerror = function() {
+          if (this.src !== '/static/img/default.png') {
+            this.src = '/static/img/default.png';
+          }
+        };
+
+        const nombre = document.createElement('p');
+        nombre.className = 'jugador-nombre';
+        nombre.textContent = `${j.nombre} ${j.apellido}`;
+
+        const edad = document.createElement('small');
+        edad.className = 'jugador-edad';
+        if (j.fecha_nacimiento) {
+          const nacimiento = new Date(j.fecha_nacimiento);
+          const hoy = new Date();
+          let edadCalculada = hoy.getFullYear() - nacimiento.getFullYear();
+          const m = hoy.getMonth() - nacimiento.getMonth();
+          if (m < 0 || (m === 0 && hoy.getDate() < nacimiento.getDate())) {
+            edadCalculada--;
+          }
+          edad.textContent = `${edadCalculada} años`;
+        }
+
+        div.append(img, nombre, edad);
+        lista.appendChild(div);
+      });
+    };
+
+    renderGrupo(porterosList, porteros);
+    renderGrupo(defensasList, defensas);
+    renderGrupo(mediocampistasList, mediocampistas);
+    renderGrupo(delanterosList, delanteros);
+  };
+
+  // Fetch de jugadores del equipo
+  const fetchAndRenderJugadores = async (equipoId) => {
+    if (!equipoId) return;
+    try {
+      const res = await fetch(`/jugadores/equipo/${encodeURIComponent(equipoId)}`);
+      if (!res.ok) {
+        console.warn('No se pudieron obtener jugadores:', res.status);
+        renderJugadoresPorPosicion([]);
+        return;
+      }
+      const datos = await res.json();
+      renderJugadoresPorPosicion(Array.isArray(datos) ? datos : []);
+    } catch (err) {
+      console.error('Error al cargar jugadores:', err);
+      renderJugadoresPorPosicion([]);
+    }
+  };
+
+  // Renderizar goleadores del equipo en el resumen
+  const renderGoleadoresEquipo = (goleadores) => {
+    const lista = document.getElementById('goleadores-equipo-lista');
+    if (!lista) return;
+
+    lista.innerHTML = '';
+
+    if (!goleadores || goleadores.length === 0) {
+      const p = document.createElement('p');
+      p.textContent = 'No hay goleadores registrados';
+      p.className = 'no-goleadores';
+      lista.appendChild(p);
+      return;
+    }
+
+    goleadores.forEach(g => {
+      const div = document.createElement('div');
+      div.className = 'jugador-card goleador-item';
+
+      const img = document.createElement('img');
+      img.src = g.jugador_foto ? `/static/img/${g.jugador_foto}` : '/static/img/default.png';
+      img.alt = `${g.jugador_nombre} ${g.jugador_apellido}`;
+      img.className = 'jugador-foto';
+      img.onerror = function() {
+        if (this.src !== '/static/img/default.png') {
+          this.src = '/static/img/default.png';
+        }
+      };
+
+      const info = document.createElement('div');
+      info.className = 'jugador-info';
+
+      const nombre = document.createElement('p');
+      nombre.className = 'jugador-nombre';
+      nombre.textContent = `${g.jugador_nombre} ${g.jugador_apellido}`;
+
+      const posicion = document.createElement('small');
+      posicion.className = 'jugador-posicion';
+      posicion.textContent = `#${g.posicion}`;
+
+      info.append(nombre, posicion);
+
+      const goles = document.createElement('div');
+      goles.className = 'jugador-goles';
+      goles.innerHTML = `<strong>${g.goles}</strong> <small>goles</small>`;
+
+      div.append(img, info, goles);
+      lista.appendChild(div);
+    });
+  };
+
+  // Fetch de goleadores del equipo
+  const fetchAndRenderGoleadores = async (equipoId) => {
+    if (!equipoId) return;
+    try {
+      // Asumiendo temporada_id = 1 (puedes hacerlo dinámico)
+      const res = await fetch(`/estadisticas_jugadores/temporada/1/${encodeURIComponent(equipoId)}/goleadores?limit=5`);
+      if (!res.ok) {
+        console.warn('No se pudieron obtener goleadores:', res.status);
+        renderGoleadoresEquipo([]);
+        return;
+      }
+      const datos = await res.json();
+      renderGoleadoresEquipo(Array.isArray(datos) ? datos : []);
+    } catch (err) {
+      console.error('Error al cargar goleadores:', err);
+      renderGoleadoresEquipo([]);
+    }
+  };
+
   // Crea una tarjeta DOM para un partido
   const createMatchCard = (p, isNext, equipoNombre) => {
       const div = document.createElement('div');
@@ -116,19 +270,23 @@
       const localLogo = document.createElement('img');
       localLogo.className = 'escudo local';
       localLogo.alt = `Escudo ${p.equipo_local_nombre || 'Local'}`;
-      localLogo.src = p.equipo_local_logo
-        ? `/static/${encodeURIComponent(p.equipo_local_logo)}`
-        : '/static/img/default_logo.png';
-      localLogo.onerror = () => { localLogo.src = '/static/img/default_logo.png'; };
+      localLogo.src = p.equipo_local_logo ? `/static/img/${p.equipo_local_logo}` : '/static/img/default_logo.png';
+      localLogo.onerror = function() { 
+        if (this.src !== '/static/img/default_logo.png') {
+          this.src = '/static/img/default_logo.png'; 
+        }
+      };
 
       // 🟥 Escudo visitante
       const visitanteLogo = document.createElement('img');
       visitanteLogo.className = 'escudo visitante';
       visitanteLogo.alt = `Escudo ${p.equipo_visitante_nombre || 'Visitante'}`;
-      visitanteLogo.src = p.equipo_visitante_logo
-        ? `/static/${encodeURIComponent(p.equipo_visitante_logo)}`
-        : '/static/img/default_logo.png';
-      visitanteLogo.onerror = () => { visitanteLogo.src = '/static/img/default_logo.png'; };
+      visitanteLogo.src = p.equipo_visitante_logo ? `/static/img/${p.equipo_visitante_logo}` : '/static/img/default_logo.png';
+      visitanteLogo.onerror = function() { 
+        if (this.src !== '/static/img/default_logo.png') {
+          this.src = '/static/img/default_logo.png'; 
+        }
+      };
 
       // ⚽ marcador central
       const marcadorDiv = document.createElement('div');
@@ -166,57 +324,61 @@
       if (p.lugar) lugar.textContent = `📍 ${p.lugar}`;
 
       div.append(matchRow, fecha, lugar);
+      
+      // Hacer la tarjeta clicable para ir al detalle del partido
+      if (p.partido_id) {
+        div.style.cursor = 'pointer';
+        div.addEventListener('click', () => {
+          window.location.href = `/partido/${encodeURIComponent(p.partido_id)}`;
+        });
+      }
+      
       return div;
   };
 
 
   // Renderiza proximos y jugados
   const renderMatches = (matches, equipoId) => {
-    const proximosSection = document.querySelector('.proximos');
-    const resultadosSection = document.querySelector('.resultados');
-    if (!proximosSection && !resultadosSection) return;
+    const proximosLista = document.getElementById('proximos-lista');
+    const resultadosLista = document.getElementById('resultados-lista');
 
     // separar por estado
     const próximos = matches.filter(m => m.estado === 'PROGRAMADO');
-    const jugados = matches.filter(m => m.estado === 'FINALIZADO' || m.estado === 'FINALIZADO' /* por si hay variantes */ || m.estado === 'FINALIZADO'.toString());
+    const jugados = matches.filter(m => m.estado === 'FINALIZADO');
 
     // ordenar
     próximos.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
     jugados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
 
-    // helper para limpiar dejando <h2>
-    const cleanSection = (section) => {
-      if (!section) return;
-      const title = section.querySelector('h2');
-      section.innerHTML = '';
-      if (title) section.appendChild(title);
-    };
-
-    cleanSection(proximosSection);
-    cleanSection(resultadosSection);
-
     const equipoNombre = document.querySelector('header h1')?.textContent?.trim() ?? '';
 
-    if (proximosSection) {
+    // Renderizar resumen (destacados)
+    renderResumen(matches);
+
+    // Renderizar lista completa de próximos
+    if (proximosLista) {
+      proximosLista.innerHTML = '';
       if (próximos.length === 0) {
         const p = document.createElement('p');
         p.textContent = 'No hay próximos partidos programados.';
-        proximosSection.appendChild(p);
+        proximosLista.appendChild(p);
       } else {
         próximos.forEach(p => {
-          proximosSection.appendChild(createMatchCard(p, true, equipoNombre));
+          proximosLista.appendChild(createMatchCard(p, true, equipoNombre));
         });
       }
     }
 
-    if (resultadosSection) {
+    // Renderizar lista completa de resultados
+    if (resultadosLista) {
+      resultadosLista.innerHTML = '';
       if (jugados.length === 0) {
         const p = document.createElement('p');
         p.textContent = 'No hay resultados recientes.';
-        resultadosSection.appendChild(p);
+        resultadosLista.appendChild(p);
       } else {
         jugados.forEach(p => {
-          resultadosSection.appendChild(createMatchCard(p, false, equipoNombre));
+          resultadosLista.appendChild(createMatchCard(p, false, equipoNombre));
         });
       }
     }
@@ -265,7 +427,67 @@
     });
   };
 
+  // Manejo de pestañas
+  const setupTabs = () => {
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.dataset.tab;
+        
+        // Remover active de todos
+        tabBtns.forEach(b => b.classList.remove('active'));
+        tabContents.forEach(c => c.classList.remove('active'));
+        
+        // Activar el seleccionado
+        btn.classList.add('active');
+        const targetContent = document.getElementById(`tab-${targetTab}`);
+        if (targetContent) targetContent.classList.add('active');
+      });
+    });
+  };
+
+  // Renderizar resumen destacado
+  const renderResumen = (partidos) => {
+    const proximoDestacado = document.getElementById('proximo-destacado');
+    const ultimoDestacado = document.getElementById('ultimo-destacado');
+
+    if (!proximoDestacado || !ultimoDestacado) return;
+
+    const programados = partidos.filter(p => p.estado === 'PROGRAMADO');
+    const finalizados = partidos.filter(p => p.estado === 'FINALIZADO');
+
+    programados.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+    finalizados.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+    // Próximo partido
+    if (programados.length > 0) {
+      const p = programados[0];
+      const card = createMatchCard(p, true, '');
+      card.classList.add('partido-destacado');
+      proximoDestacado.innerHTML = '';
+      proximoDestacado.appendChild(card);
+    } else {
+      proximoDestacado.innerHTML = '<p>No hay próximos partidos</p>';
+    }
+
+    // Último resultado
+    if (finalizados.length > 0) {
+      const p = finalizados[0];
+      const card = createMatchCard(p, false, '');
+      card.classList.add('partido-destacado');
+      ultimoDestacado.innerHTML = '';
+      ultimoDestacado.appendChild(card);
+    } else {
+      ultimoDestacado.innerHTML = '<p>No hay resultados recientes</p>';
+    }
+  };
+
   document.addEventListener('DOMContentLoaded', () => {
+    // Setup tabs
+    setupTabs();
+
     // Reemplaza imágenes rotas o vacías por el logo por defecto
     document.querySelectorAll('img').forEach(img => {
       const srcAttr = img.getAttribute('src');
@@ -294,18 +516,12 @@
       }
     }
 
-    // Manejo de partidos: solo fetch si falta contenido en alguna sección
-    const proximosSection = document.querySelector('.proximos');
-    const resultadosSection = document.querySelector('.resultados');
-    const hasProximos = proximosSection && proximosSection.querySelectorAll('.card.next').length > 0;
-    const hasResultados = resultadosSection && resultadosSection.querySelectorAll('.card').length > 0;
-
-    if (!hasProximos || !hasResultados) {
-      const equipoId = detectEquipoId();
+    // Siempre cargar partidos desde la API para tener datos completos y tarjetas clicables
+    const equipoId = detectEquipoId();
+    if (equipoId) {
       fetchAndRenderMatches(equipoId);
-    } else {
-      // si ya hay contenido, asegurar que las tarjetas sean clicables
-      makeCardsClickable();
+      fetchAndRenderJugadores(equipoId);
+      fetchAndRenderGoleadores(equipoId);
     }
   });
 })();

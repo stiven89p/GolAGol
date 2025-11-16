@@ -7,12 +7,13 @@
   <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
 </head>
 <body>
+  {% include 'partials/header.html' %}
   {% set logo_url = url_for('static', path='img/default_logo.png') %}
   {% if equipo and equipo.logo %}
     {% if equipo.logo.startswith('http') or equipo.logo.startswith('/') %}
       {% set logo_url = equipo.logo %}
     {% else %}
-      {% set logo_url = url_for('static', path=equipo.logo) %}
+      {% set logo_url = url_for('static', path='img/' + equipo.logo) %}
     {% endif %}
   {% endif %}
 
@@ -29,67 +30,120 @@
     </div>
   </header>
 
+  <!-- Navegación por pestañas -->
+  <nav class="tabs-nav">
+    <button class="tab-btn active" data-tab="resumen">Resumen</button>
+    <button class="tab-btn" data-tab="partidos">Partidos</button>
+    <button class="tab-btn" data-tab="estadisticas">Estadísticas</button>
+    <button class="tab-btn" data-tab="plantilla">Plantilla</button>
+  </nav>
+
   <!-- Contenido -->
   <main class="team-content">
-    <section class="panel resultados">
-      <h2>Últimos Resultados</h2>
-      {% if resultados %}
-        {% for r in resultados %}
-          <div class="match-card">
-            <span class="eq-name">{{ equipo.nombre }}</span>
-            <strong class="resultado">{{ r.resultado }}</strong>
-            <span class="oponente">{{ r.oponente }}</span>
-            <small class="fecha">{{ r.fecha }}</small>
+    <!-- Tab: Resumen -->
+    <section class="tab-content active" id="tab-resumen">
+      <div class="resumen-grid">
+        <div class="panel proximos-destacados">
+          <h2>Próximo Partido</h2>
+          <div id="proximo-destacado">
+            <p class="loading">Cargando...</p>
           </div>
-        {% endfor %}
-      {% else %}
-        <p>No hay resultados recientes.</p>
-      {% endif %}
+        </div>
+        
+        <div class="panel ultimos-destacados">
+          <h2>Último Resultado</h2>
+          <div id="ultimo-destacado">
+            <p class="loading">Cargando...</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel goleadores-equipo">
+        <h2>Goleadores del Equipo</h2>
+        <div id="goleadores-equipo-lista">
+          <p class="loading">Cargando...</p>
+        </div>
+      </div>
     </section>
 
-    <section class="panel proximos">
-      <h2>Próximos Partidos</h2>
-      {% if proximos %}
-        {% for p in proximos %}
-          <div class="match-card next">
-            <span class="eq-name">{{ equipo.nombre }}</span>
-            <span class="vs">vs</span>
-            <span class="oponente">{{ p.oponente }}</span>
-            <small class="fecha-hora">{{ p.fecha }}{% if p.hora %} - {{ p.hora }}{% endif %}</small>
-            {% if p.lugar %}
-              <p class="lugar">📍 {{ p.lugar }}</p>
-            {% endif %}
-          </div>
-        {% endfor %}
-      {% else %}
-        <p>No hay próximos partidos programados.</p>
-      {% endif %}
+    <!-- Tab: Partidos -->
+    <section class="tab-content" id="tab-partidos">
+      <div class="panel resultados">
+        <h2>Últimos Partidos</h2>
+        <div id="resultados-lista">
+          <p class="loading">Cargando...</p>
+        </div>
+      </div>
+
+      <div class="panel proximos">
+        <h2>Próximos Partidos</h2>
+        <div id="proximos-lista">
+          <p class="loading">Cargando...</p>
+        </div>
+      </div>
     </section>
 
-    <section class="panel estadisticas">
-      <h2>Estadísticas</h2>
-      {% if estadisticas %}
-        {% for s in estadisticas %}
-          <article class="estadistica-item">
-            <h3>Temporada: {{ s.temporada }}</h3>
-            <table class="stats-table">
-              <tbody>
-                <tr><th>Partidos jugados</th><td>{{ s.partidos_jugados }}</td></tr>
-                <tr><th>Victorias</th><td>{{ s.victorias }}</td></tr>
-                <tr><th>Empates</th><td>{{ s.empates }}</td></tr>
-                <tr><th>Derrotas</th><td>{{ s.derrotas }}</td></tr>
-                <tr><th>Goles a favor</th><td>{{ s.goles_favor }}</td></tr>
-                <tr><th>Goles en contra</th><td>{{ s.goles_contra }}</td></tr>
-                <tr><th>Puntos</th><td>{{ s.puntos }}</td></tr>
-                <tr><th>Tarjetas amarillas</th><td>{{ s.tarjetas_amarillas }}</td></tr>
-                <tr><th>Tarjetas rojas</th><td>{{ s.tarjetas_rojas }}</td></tr>
-              </tbody>
-            </table>
-          </article>
-        {% endfor %}
-      {% else %}
-        <p>No hay estadísticas disponibles.</p>
-      {% endif %}
+    <!-- Tab: Estadísticas -->
+    <section class="tab-content" id="tab-estadisticas">
+      <div class="panel estadisticas">
+        <h2>Estadísticas por Temporada</h2>
+        <div id="estadisticas-lista">
+          {% if estadisticas %}
+            {% for s in estadisticas %}
+              <article class="estadistica-item">
+                <h3>Temporada: {{ s.temporada }}</h3>
+                <table class="stats-table">
+                  <tbody>
+                    <tr><th>Partidos jugados</th><td>{{ s.partidos_jugados }}</td></tr>
+                    <tr><th>Victorias</th><td>{{ s.victorias }}</td></tr>
+                    <tr><th>Empates</th><td>{{ s.empates }}</td></tr>
+                    <tr><th>Derrotas</th><td>{{ s.derrotas }}</td></tr>
+                    <tr><th>Goles a favor</th><td>{{ s.goles_favor }}</td></tr>
+                    <tr><th>Goles en contra</th><td>{{ s.goles_contra }}</td></tr>
+                    <tr><th>Puntos</th><td>{{ s.puntos }}</td></tr>
+                    <tr><th>Tarjetas amarillas</th><td>{{ s.tarjetas_amarillas }}</td></tr>
+                    <tr><th>Tarjetas rojas</th><td>{{ s.tarjetas_rojas }}</td></tr>
+                  </tbody>
+                </table>
+              </article>
+            {% endfor %}
+          {% else %}
+            <p>No hay estadísticas disponibles.</p>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab: Plantilla -->
+    <section class="tab-content" id="tab-plantilla">
+      <div class="panel plantilla">
+        <div class="plantilla-container">
+          <div class="posicion-grupo">
+            <h3>⚽ Porteros</h3>
+            <div class="jugadores-lista" id="porteros-lista">
+              <p class="loading">Cargando...</p>
+            </div>
+          </div>
+          <div class="posicion-grupo">
+            <h3>🛡️ Defensas</h3>
+            <div class="jugadores-lista" id="defensas-lista">
+              <p class="loading">Cargando...</p>
+            </div>
+          </div>
+          <div class="posicion-grupo">
+            <h3>⚡ Mediocampistas</h3>
+            <div class="jugadores-lista" id="mediocampistas-lista">
+              <p class="loading">Cargando...</p>
+            </div>
+          </div>
+          <div class="posicion-grupo">
+            <h3>🎯 Delanteros</h3>
+            <div class="jugadores-lista" id="delanteros-lista">
+              <p class="loading">Cargando...</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
   </main>
 

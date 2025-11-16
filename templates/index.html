@@ -4,45 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liga Colombiana – Partidos y Tabla</title>
-    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}?v={{ cache_bust }}">
 </head>
 <body>
+    {% include 'partials/header.html' %}
     <div class="main-layout">
-        <!-- Tabla de posiciones -->
-        <section id="tabla-posiciones">
-            <h2>Tabla de Posiciones</h2>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Pos</th>
-                        <th>Equipo</th>
-                        <th>PJ</th>
-                        <th>G</th>
-                        <th>E</th>
-                        <th>P</th>
-                        <th>GF</th>
-                        <th>GC</th>
-                        <th>Pts</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-body">
-                    <tr>
-                        <td colspan="9" class="loading">Cargando tabla de posiciones...</td>
-                    </tr>
-                </tbody>
-            </table>
-        </section>
-
         <!-- Partidos programados -->
         <section id="partidos">
             <h2>Partidos Programados</h2>
             <div id="partidos-lista">
                 <p class="loading">Cargando partidos...</p>
             </div>
+            <div style="margin-top: 12px;">
+                <button id="toggle-partidos" type="button">Ver todos</button>
+            </div>
+
+            <h2 style="margin-top:20px;">Últimos Resultados</h2>
+            <div id="ultimos-lista">
+                <p class="loading">Cargando últimos partidos...</p>
+            </div>
         </section>
+
+
+        <!-- Contenedor derecho con tablas -->
+        <div class="right-panel">
+            <!-- Tabla de posiciones -->
+            <section id="tabla-posiciones">
+                <h2>Tabla de Posiciones</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pos</th>
+                            <th>Equipo</th>
+                            <th>PJ</th>
+                            <th>G</th>
+                            <th>E</th>
+                            <th>P</th>
+                            <th>GF</th>
+                            <th>GC</th>
+                            <th>Pts</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-body">
+                        <tr>
+                            <td colspan="9" class="loading">Cargando tabla de posiciones...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <!-- Tabla de Goleadores -->
+            <section id="goleadores">
+                <h2>Goleadores</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Pos</th>
+                            <th>Jugador</th>
+                            <th>Equipo</th>
+                            <th>Goles</th>
+                        </tr>
+                    </thead>
+                    <tbody id="goleadores-body">
+                        <tr>
+                            <td colspan="4" class="loading">Cargando goleadores...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </div>
     </div>
 
-    <script src="/static/js/tabla_posiciones.js"></script>
-    <script src="/static/js/partidos_programados.js"></script>
+    <script src="{{ url_for('static', path='/js/tabla_posiciones.js') }}?v={{ cache_bust }}"></script>
+    <script src="{{ url_for('static', path='/js/goleadores.js') }}?v={{ cache_bust }}"></script>
+    <script src="{{ url_for('static', path='/js/partidos_programados.js') }}?v={{ cache_bust }}"></script>
 </body>
 </html>

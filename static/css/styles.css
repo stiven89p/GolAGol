@@ -9,6 +9,38 @@ body {
     padding: 0;
 }
 
+/* ===============================
+   ENCABEZADO COMPARTIDO
+================================ */
+.site-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    background-color: #161b22;
+    border-bottom: 1px solid #30363d;
+    padding: 10px 16px;
+}
+
+.site-header a { color: #c9d1d9; text-decoration: none; }
+
+.home-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #0d1117;
+    border: 1px solid #30363d;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: border-color .2s ease, color .2s ease, transform .1s ease;
+}
+.home-link:hover { border-color: #58a6ff; color: #58a6ff; transform: translateY(-1px); }
+
+.brand { font-weight: 700; color: #58a6ff; }
+
 h1, h2, h3 {
     color: #58a6ff;
     margin: 0;
@@ -19,9 +51,15 @@ h1, h2, h3 {
 ================================ */
 .main-layout {
     display: grid;
-    grid-template-columns: 400px 1fr;
+    grid-template-columns: 1fr 400px;
     gap: 30px;
     margin: 20px;
+}
+
+.right-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 /* ===============================
@@ -33,9 +71,32 @@ h1, h2, h3 {
     border-radius: 10px;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     height: fit-content;
+    margin-bottom: 20px;
 }
 
 #tabla-posiciones h2 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    text-transform: lowercase;
+    margin-bottom: 20px;
+    color: #58a6ff;
+    border-bottom: 1px solid #30363d;
+    padding-bottom: 0.5rem;
+}
+
+/* ===============================
+      TABLA DE GOLEADORES
+================================ */
+#goleadores {
+    background-color: #161b22;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    height: fit-content;
+}
+
+#goleadores h2 {
     text-align: center;
     font-size: 22px;
     font-weight: bold;
@@ -93,6 +154,30 @@ th {
     background-color: #1e2329;
     border-radius: 8px;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.25);
+}
+
+/* Botón Ver todos / Ver menos */
+#toggle-partidos {
+    background-color: #21262d;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease, transform .05s ease;
+}
+#toggle-partidos:hover {
+    background-color: #30363d;
+    border-color: #58a6ff;
+    color: #e6edf3;
+}
+#toggle-partidos:active {
+    transform: translateY(1px);
+}
+#toggle-partidos:focus-visible {
+    outline: 2px solid #58a6ff;
+    outline-offset: 2px;
 }
 
 .match-row {
@@ -216,6 +301,50 @@ th {
     margin: 0 auto;
 }
 
+/* ===============================
+   TABS DE NAVEGACIÓN
+================================ */
+.tabs-nav {
+    display: flex;
+    gap: 0.5rem;
+    background-color: #161b22;
+    padding: 1rem;
+    border-radius: 10px;
+    margin: 1.5rem 0;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.tab-btn {
+    flex: 1;
+    padding: 0.75rem 1.5rem;
+    background-color: transparent;
+    color: #8b949e;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.tab-btn:hover {
+    background-color: #21262d;
+    color: #c9d1d9;
+}
+
+.tab-btn.active {
+    background-color: #58a6ff;
+    color: #fff;
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
 /* Paneles (Resultados, Próximos, Estadísticas) */
 .panel {
     background-color: #161b22;
@@ -253,6 +382,11 @@ th {
 
 /* Tarjetas de partidos en página de equipo */
 .match-card.next {
+    border-left: 4px solid #58a6ff;
+}
+
+/* Destacar tarjeta activa en listados */
+.match-card.active {
     border-left: 4px solid #58a6ff;
 }
 
@@ -380,6 +514,22 @@ th {
 .team-block .team-name { margin-top: 8px; }
 .team-block .team-logo { width: 90px; height: 90px; object-fit: contain; }
 
+.team-link {
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    cursor: pointer;
+}
+
+.team-link:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.team-link:hover .team-name {
+    color: #58a6ff;
+}
+
 .center-block { text-align: center; }
 .score { display: inline-flex; align-items: baseline; gap: 10px; }
 .score-num { font-size: 42px; font-weight: 800; color: #e6edf3; }
@@ -401,3 +551,176 @@ th {
 .sidebar .resultado { font-size: 22px; }
 .sidebar .escudo { width: 44px; height: 44px; }
 .sidebar .match-card.active { outline: 2px solid #58a6ff; }
+
+/* ===============================
+   PLANTILLA DE JUGADORES
+================================ */
+.plantilla-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.posicion-grupo {
+    background-color: #0d1117;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #30363d;
+}
+
+.posicion-grupo h3 {
+    color: #58a6ff;
+    font-size: 1.2rem;
+    margin-top: 0;
+    margin-bottom: 1rem;
+    text-align: center;
+    border-bottom: 2px solid #30363d;
+    padding-bottom: 0.5rem;
+}
+
+.jugadores-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.jugador-card {
+    background-color: #161b22;
+    padding: 0.75rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    transition: all 0.2s ease;
+    border: 1px solid transparent;
+}
+
+.jugador-card:hover {
+    border-color: #58a6ff;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(88, 166, 255, 0.2);
+}
+
+.jugador-foto {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #30363d;
+}
+
+.jugador-nombre {
+    margin: 0;
+    color: #e6edf3;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.jugador-edad {
+    color: #8b949e;
+    font-size: 0.85rem;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.no-jugadores, .loading {
+    color: #8b949e;
+    text-align: center;
+    padding: 1rem;
+    font-style: italic;
+}
+
+/* ===============================
+   RESUMEN DEL EQUIPO
+================================ */
+.resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.partido-destacado {
+    background-color: #0d1117;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border: 2px solid #30363d;
+    text-align: center;
+}
+
+.partido-destacado .match-row {
+    justify-content: center;
+    padding: 1rem 0;
+}
+
+.partido-destacado .escudo {
+    width: 64px !important;
+    height: 64px !important;
+}
+
+.partido-destacado .resultado {
+    font-size: 2rem;
+    margin: 0 1.5rem;
+}
+
+.partido-destacado .eq-name {
+    font-size: 1.1rem;
+}
+
+.goleadores-equipo .jugador-card {
+    background-color: #0d1117;
+}
+
+.goleador-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background-color: #0d1117;
+    border-radius: 8px;
+    border: 1px solid #30363d;
+    transition: all 0.2s ease;
+}
+
+.goleador-item:hover {
+    border-color: #58a6ff;
+    transform: translateX(4px);
+}
+
+.goleador-item .jugador-info {
+    flex: 1;
+}
+
+.goleador-item .jugador-goles {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #161b22;
+    border-radius: 6px;
+    border: 1px solid #30363d;
+}
+
+.goleador-item .jugador-goles strong {
+    font-size: 1.5rem;
+    color: #58a6ff;
+    line-height: 1;
+}
+
+.goleador-item .jugador-goles small {
+    color: #8b949e;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+}
+
+.goleador-item .jugador-posicion {
+    color: #58a6ff;
+    font-weight: 600;
+}
+
+#goleadores-equipo-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}

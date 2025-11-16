@@ -110,10 +110,9 @@ async def obtener_partidos_equipo(equipo_id: int, session: SessionDep):
         .join(equipo_local, Partido.equipo_local_id == equipo_local.equipo_id)
         .join(equipo_visitante, Partido.equipo_visitante_id == equipo_visitante.equipo_id)
         .filter(
-            ((Partido.equipo_local_id == equipo_id) | (Partido.equipo_visitante_id == equipo_id))
-            & (Partido.estado == EstadoPartidos.PROGRAMADO)
+            (Partido.equipo_local_id == equipo_id) | (Partido.equipo_visitante_id == equipo_id)
         )
-        .order_by(Partido.fecha.asc())
+        .order_by(Partido.fecha.desc())
         .all()
     )
 
