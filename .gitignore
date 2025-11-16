@@ -18,6 +18,7 @@ env/
 # IDE
 .vscode/
 .idea/
+!.idea/runConfigurations/
 *.swp
 *.swo
 *~
@@ -62,7 +63,12 @@ dmypy.json
 # pytype static type analyzer
 .pytype/
 
-# Uploads (ajusta según necesites)
-# uploads/
-# static/img/*.jpg
-# static/img/*.png
+# Uploads - imágenes subidas dinámicamente
+static/img/*.png
+static/img/*.jpg
+static/img/*.jpeg
+static/img/*.gif
+static/img/*.webp
+
+# Mantener solo el logo por defecto
+!static/img/default_logo.png
