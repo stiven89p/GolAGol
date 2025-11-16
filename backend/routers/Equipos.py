@@ -3,6 +3,7 @@ from fastapi import APIRouter, HTTPException, Form, UploadFile, File
 from backend.modelos.Equipos import Equipo, EquipoCrear, EquipoActualizar
 from backend.db import SessionDep
 from backend.utils.bucket import upload_file
+from sqlmodel import select
 
 router = APIRouter(prefix="/equipos", tags=["equipos"])
 
@@ -38,7 +39,7 @@ async def crear_equipo(session: SessionDep,
 
 @router.get("/", response_model=List[Equipo])
 async def obtener_equipos(session: SessionDep):
-    return session.query(Equipo).filter(Equipo.activo == True).all()
+    return session.exec(select(Equipo).where(Equipo.activo == True)).all()
 
 @router.get("/{equipo_id}", response_model=Equipo)
 async def obtener_equipo(equipo_id: int, session: SessionDep):

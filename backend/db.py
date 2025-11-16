@@ -3,6 +3,7 @@ from sqlmodel import SQLModel, create_engine, Session
 from typing import Annotated
 from dotenv import load_dotenv
 import os
+from contextlib import asynccontextmanager
 
 load_dotenv()  # Carga el archivo .env
 
@@ -19,10 +20,14 @@ db_url = f"postgresql+psycopg://{db_user}:{db_password}@{db_host}:{db_port}/{db_
 # Crea el engine de SQLAlchemy/SQLModel
 engine = create_engine(db_url, echo=True, connect_args={"client_encoding": "utf8"})
 
-# Crear las tablas cuando se inicia la app
-def create_tables(app: FastAPI):
+# Crear las tablas cuando se inicia la app (lifespan asynccontextmanager)
+@asynccontextmanager
+async def create_tables(app: FastAPI):
     SQLModel.metadata.create_all(engine)
-    yield
+    try:
+        yield
+    finally:
+        pass
 
 # Sesión de base de datos
 def get_session() -> Session:
