@@ -1,4 +1,10 @@
 <nav class="site-header">
-  <a href="{{ url_for('home') }}" class="home-link" aria-label="Volver al inicio">← Inicio</a>
-  <a href="{{ url_for('home') }}" class="brand" aria-label="Ir a la página principal">Gol a Gol</a>
+  <a href="{{ url_for('home') }}" class="brand" aria-label="Ir a la página principal">
+    <img
+      src="{{ url_for('static', path='/img/logo.png') }}"
+      alt="GolAGol"
+      class="site-logo"
+      loading="eager"
+    />
+  </a>
 </nav>
