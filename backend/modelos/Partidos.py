@@ -18,6 +18,8 @@ class Partido(PartidoBase, table=True):
     goles_local: Optional[int] = Field(default=0, nullable=False, description="Goles del equipo local")
     goles_visitante: Optional[int] = Field(default=0, nullable=False, description="Goles del equipo visitante")
     estado: str = Field(default="PROGRAMADO", nullable=False, description="Estado del partido (pendiente, en curso, finalizado)")
+    formacion_local_id: Optional[int] = Field(default=None, foreign_key="formacion.formacion_id", description="Formación asignada al equipo local")
+    formacion_visitante_id: Optional[int] = Field(default=None, foreign_key="formacion.formacion_id", description="Formación asignada al equipo visitante")
 
 
 class PartidoCrear(PartidoBase):
@@ -43,3 +45,5 @@ class PartidoDTO(SQLModel):
     estado: str = Field(..., description="Estado del partido (PROGRAMADO, EN_CURSO, FINALIZADO, etc.)")
     goles_local: Optional[int] = Field(0, description="Goles del equipo local")
     goles_visitante: Optional[int] = Field(0, description="Goles del equipo visitante")
+    formacion_local_id: Optional[int] = Field(None, description="ID de la formación del equipo local si asignada")
+    formacion_visitante_id: Optional[int] = Field(None, description="ID de la formación del equipo visitante si asignada")
