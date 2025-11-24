@@ -78,9 +78,13 @@ function renderEventos(eventos) {
             case 'SUSTITUCION':
                 icono = '🔄';
                 className += ' evento-sustitucion';
-                descripcion = `${evento.jugador_nombre || 'Jugador'} sale`;
+                const saleFoto = evento.jugador_foto ? `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto jugador-sale">` : '';
+                const entraFoto = evento.jugador_asociado_foto ? `<img src="${evento.jugador_asociado_foto}" alt="${evento.jugador_asociado_nombre}" class="evento-jugador-foto jugador-entra">` : '';
+                
+                fotoHTML = `<div class="sustitucion-fotos">${saleFoto}${entraFoto}</div>`;
+                descripcion = `<span class="jugador-sale-nombre">${evento.jugador_nombre || 'Jugador'}</span> sale`;
                 if (evento.jugador_asociado_nombre) {
-                    descripcion += ` → ${evento.jugador_asociado_nombre} entra`;
+                    descripcion += ` → <span class="jugador-entra-nombre">${evento.jugador_asociado_nombre}</span> entra`;
                 }
                 break;
             case 'tarjeta_amarilla':
