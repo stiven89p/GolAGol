@@ -450,3 +450,145 @@ async def equipo(request: Request, equipo_id: int, session: SessionDep):
         "proximos": proximos,
         "estadisticas": estadisticas
     })
+
+
+@app.get("/jugadores/{equipo_id}", response_class=HTMLResponse)
+async def jugadores_equipo(request: Request, equipo_id: int, session: SessionDep):
+    equipo = session.get(Equipo, equipo_id)
+    if not equipo:
+        raise HTTPException(status_code=404, detail="Equipo no encontrado")
+    
+    def logo_url(logo_val: str|None):
+        if not logo_val:
+            return "/static/img/default_logo.png"
+        if str(logo_val).startswith("http") or str(logo_val).startswith("/static/"):
+            return str(logo_val)
+        path = str(logo_val)
+        if not path.startswith("img/"):
+            path = f"img/{path}"
+        return f"/static/{path}"
+    
+    equipo_data = {
+        "equipo_id": equipo.equipo_id,
+        "nombre": equipo.nombre,
+        "logo": logo_url(equipo.logo)
+    }
+    
+    return templates.TemplateResponse("jugadores.html", {
+        "request": request,
+        "equipo": equipo_data
+    })
+
+
+@app.get("/jugador/{jugador_id}", response_class=HTMLResponse)
+async def jugador_perfil(request: Request, jugador_id: int, session: SessionDep):
+    from backend.modelos.Jugadores import Jugador
+    from backend.modelos.Estadisticas_Jugadores import Estadisticas_J
+    from datetime import date
+    
+    jugador = session.get(Jugador, jugador_id)
+    if not jugador:
+        raise HTTPException(status_code=404, detail="Jugador no encontrado")
+    
+    # Obtener equipo
+    equipo = session.get(Equipo, jugador.equipo_id)
+    
+    def logo_url(logo_val: str|None):
+        if not logo_val:
+            return "/static/img/default-player.png"
+        if str(logo_val).startswith("http") or str(logo_val).startswith("/static/"):
+            return str(logo_val)
+        path = str(logo_val)
+        if not path.startswith("img/"):
+            path = f"img/{path}"
+        return f"/static/{path}"
+    
+    # Calcular edad
+    def calcular_edad(fecha_nacimiento):
+        hoy = date.today()
+        edad = hoy.year - fecha_nacimiento.year
+        if hoy.month < fecha_nacimiento.month or (hoy.month == fecha_nacimiento.month and hoy.day < fecha_nacimiento.day):
+            edad -= 1
+        return edad
+    
+    # Formatear fecha
+    def formatear_fecha(fecha):
+        meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 
+                 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']
+        return f"{fecha.day} de {meses[fecha.month-1]} de {fecha.year}"
+    
+    # Formatear posición
+    posiciones = {
+        'PORTERO': 'Portero',
+        'DEFENSOR': 'Defensa',
+        'MEDIOCAMPISTA': 'Mediocampista',
+        'DELANTERO': 'Delantero'
+    }
+    
+    jugador_data = {
+        "jugador_id": jugador.jugador_id,
+        "nombre": jugador.nombre,
+        "apellido": jugador.apellido,
+        "numero_camiseta": jugador.numero_camiseta,
+        "posicion": jugador.posicion.name if hasattr(jugador.posicion, 'name') else str(jugador.posicion),
+        "posicion_texto": posiciones.get(jugador.posicion.name if hasattr(jugador.posicion, 'name') else str(jugador.posicion), str(jugador.posicion)),
+        "nacionalidad": jugador.nacionalidad,
+        "edad": calcular_edad(jugador.fecha_nacimiento),
+        "fecha_nacimiento_texto": formatear_fecha(jugador.fecha_nacimiento),
+        "foto": logo_url(jugador.foto),
+        "equipo_id": jugador.equipo_id,
+        "equipo_nombre": equipo.nombre if equipo else "Sin equipo"
+    }
+    
+    # Obtener estadísticas
+    estadisticas = session.query(Estadisticas_J).filter(
+        Estadisticas_J.jugador_id == jugador_id
+    ).all()
+    
+    estadisticas_data = []
+    for est in estadisticas:
+        estadisticas_data.append({
+            "temporada": est.temporada,
+            "temporada_nombre": f"Temporada {est.temporada}",
+            "partidos_jugados": est.partidos_jugados or 0,
+            "goles": est.goles or 0,
+            "asistencias": est.asistencias or 0,
+            "tarjetas_amarillas": est.tarjetas_amarillas or 0,
+            "tarjetas_rojas": est.tarjetas_rojas or 0
+        })
+    
+    # Obtener otros jugadores del mismo equipo
+    otros_jugadores = session.query(Jugador).filter(
+        Jugador.equipo_id == jugador.equipo_id,
+        Jugador.jugador_id != jugador_id
+    ).order_by(Jugador.posicion, Jugador.apellido).all()
+    
+    otros_jugadores_data = []
+    for j in otros_jugadores:
+        otros_jugadores_data.append({
+            "jugador_id": j.jugador_id,
+            "nombre": j.nombre,
+            "apellido": j.apellido,
+            "nombre_completo": f"{j.nombre} {j.apellido}",
+            "numero_camiseta": j.numero_camiseta,
+            "posicion": j.posicion.name if hasattr(j.posicion, 'name') else str(j.posicion),
+            "posicion_texto": posiciones.get(j.posicion.name if hasattr(j.posicion, 'name') else str(j.posicion), str(j.posicion)),
+            "foto": logo_url(j.foto),
+            "edad": calcular_edad(j.fecha_nacimiento)
+        })
+    
+    # Datos del equipo
+    equipo_data = {
+        "equipo_id": equipo.equipo_id,
+        "nombre": equipo.nombre,
+        "logo": logo_url(equipo.logo)
+    } if equipo else None
+    
+    return templates.TemplateResponse("jugador.html", {
+        "request": request,
+        "jugador": jugador_data,
+        "estadisticas": estadisticas_data,
+        "otros_jugadores": otros_jugadores_data,
+        "equipo": equipo_data
+    })
+

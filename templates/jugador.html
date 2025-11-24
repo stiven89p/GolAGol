@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ jugador.nombre }} {{ jugador.apellido }} - Perfil</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    
+    <div class="jugadores-layout">
+        <!-- Sidebar izquierdo: Lista de jugadores del equipo -->
+        <aside class="jugadores-sidebar">
+            <div class="panel">
+                {% if equipo %}
+                <div class="equipo-header">
+                    <img src="{{ equipo.logo }}" alt="{{ equipo.nombre }}" class="equipo-logo-small">
+                    <h2>{{ equipo.nombre }}</h2>
+                </div>
+                {% endif %}
+                
+                <h3 style="color: #58a6ff; margin: 16px 0 12px 0; font-size: 0.95rem;">Plantilla</h3>
+                
+                <div class="jugadores-lista-scroll">
+                    {% if otros_jugadores %}
+                        {% for j in otros_jugadores %}
+                        <a href="/jugador/{{ j.jugador_id }}" class="jugador-item-link-sidebar">
+                            <div class="jugador-item-sidebar">
+                                <img src="{{ j.foto }}" alt="{{ j.nombre_completo }}" class="jugador-foto-small">
+                                <div class="jugador-item-info">
+                                    <strong class="jugador-nombre-item">{{ j.nombre_completo }}</strong>
+                                    <div class="jugador-meta">
+                                        <span class="jugador-numero">#{{ j.numero_camiseta or '-' }}</span>
+                                        <span class="jugador-posicion-small">{{ j.posicion_texto }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    {% else %}
+                        <p class="no-data">No hay otros jugadores</p>
+                    {% endif %}
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Contenido principal: Perfil del jugador -->
+        <main class="jugador-detalle">
+            <div class="jugador-perfil-container">
+            <!-- Perfil del jugador -->
+            <div class="jugador-perfil panel">
+                <div class="jugador-header-perfil">
+                    <img src="{{ jugador.foto }}" alt="{{ jugador.nombre }} {{ jugador.apellido }}" class="jugador-foto-grande">
+                    <div class="jugador-datos-principales">
+                        <h1 class="jugador-nombre-grande">{{ jugador.nombre }} {{ jugador.apellido }}</h1>
+                        <div class="jugador-numero-grande">#{{ jugador.numero_camiseta or '-' }}</div>
+                        <div class="jugador-info-basica">
+                            <div class="info-item">
+                                <span class="info-label">Posición</span>
+                                <span class="info-value">{{ jugador.posicion_texto }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Edad</span>
+                                <span class="info-value">{{ jugador.edad }} años</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Fecha de Nacimiento</span>
+                                <span class="info-value">{{ jugador.fecha_nacimiento_texto }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Nacionalidad</span>
+                                <span class="info-value">{{ jugador.nacionalidad }}</span>
+                            </div>
+                            <div class="info-item">
+                                <span class="info-label">Equipo</span>
+                                <span class="info-value">
+                                    <a href="/equipo/{{ jugador.equipo_id }}" class="equipo-link">
+                                        {{ jugador.equipo_nombre }}
+                                    </a>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Estadísticas -->
+            <div class="jugador-estadisticas panel">
+                <h2>📊 Estadísticas</h2>
+                {% if estadisticas %}
+                    {% for est in estadisticas %}
+                    <div class="estadistica-temporada">
+                        <h3>Temporada {{ est.temporada_nombre or est.temporada }}</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-valor">{{ est.partidos_jugados or 0 }}</div>
+                                <div class="stat-label">Partidos</div>
+                            </div>
+                            <div class="stat-card destacado">
+                                <div class="stat-valor">{{ est.goles or 0 }}</div>
+                                <div class="stat-label">⚽ Goles</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-valor">{{ est.asistencias or 0 }}</div>
+                                <div class="stat-label">🎯 Asistencias</div>
+                            </div>
+                            <div class="stat-card amarilla">
+                                <div class="stat-valor">{{ est.tarjetas_amarillas or 0 }}</div>
+                                <div class="stat-label">🟨 T. Amarillas</div>
+                            </div>
+                            <div class="stat-card roja">
+                                <div class="stat-valor">{{ est.tarjetas_rojas or 0 }}</div>
+                                <div class="stat-label">🟥 T. Rojas</div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="no-data">No hay estadísticas disponibles para este jugador</p>
+                {% endif %}
+            </div>
+            
+            <!-- Historial de eventos -->
+            <div class="jugador-eventos panel">
+                <h2>📋 Últimos Eventos</h2>
+                <div id="eventos-jugador">
+                    <p class="loading">Cargando eventos...</p>
+                </div>
+            </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        var jugadorId = {{ jugador.jugador_id }};
+    </script>
+    <script src="/static/js/jugador_perfil.js"></script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jugadores - {{ equipo.nombre }}</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    
+    <div class="jugadores-layout">
+        <!-- Columna izquierda: Lista de jugadores -->
+        <aside class="jugadores-sidebar">
+            <div class="panel">
+                <div class="equipo-header">
+                    <img src="{{ equipo.logo }}" alt="{{ equipo.nombre }}" class="equipo-logo-small">
+                    <h2>{{ equipo.nombre }}</h2>
+                </div>
+                
+                <div class="jugadores-filtro">
+                    <button class="filtro-btn active" data-filter="todos">Todos</button>
+                    <button class="filtro-btn" data-filter="PORTERO">Porteros</button>
+                    <button class="filtro-btn" data-filter="DEFENSOR">Defensas</button>
+                    <button class="filtro-btn" data-filter="MEDIOCAMPISTA">Mediocampistas</button>
+                    <button class="filtro-btn" data-filter="DELANTERO">Delanteros</button>
+                </div>
+                
+                <div id="jugadores-lista" class="jugadores-lista-scroll">
+                    <p class="loading">Cargando jugadores...</p>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Columna derecha: Información del jugador -->
+        <main class="jugador-detalle">
+            <div id="jugador-info">
+                <div class="empty-state">
+                    <p>👈 Selecciona un jugador para ver su información</p>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script>
+        var equipoId = {{ equipo.equipo_id }};
+    </script>
+    <script src="/static/js/jugadores.js"></script>
+</body>
+</html>

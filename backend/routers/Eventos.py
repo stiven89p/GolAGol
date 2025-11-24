@@ -172,6 +172,66 @@ async def obtener_eventos_partido(partido_id: int, session: SessionDep):
 
     return respuesta
 
+
+@router.get("/jugador/{jugador_id}")
+async def obtener_eventos_jugador(session: SessionDep, jugador_id: int):
+    """Obtiene todos los eventos en los que participó un jugador"""
+    from sqlalchemy.orm import aliased
+    
+    jugador = session.get(Jugador, jugador_id)
+    if not jugador:
+        raise HTTPException(status_code=404, detail="Jugador no encontrado")
+    
+    # Obtener eventos donde el jugador es protagonista o asociado
+    eventos = (
+        session.query(Evento)
+        .filter(
+            (Evento.jugador_id == jugador_id) | 
+            (Evento.jugador_asociado_id == jugador_id)
+        )
+        .order_by(Evento.id_evento.desc())
+        .limit(50)  # Últimos 50 eventos
+        .all()
+    )
+    
+    respuesta = []
+    for e in eventos:
+        # Obtener información del partido
+        partido = session.get(Partido, e.partido_id)
+        if not partido:
+            continue
+        
+        equipo_local = aliased(Equipo, name="equipo_local")
+        equipo_visitante = aliased(Equipo, name="equipo_visitante")
+        
+        partido_info = (
+            session.query(Partido, equipo_local, equipo_visitante)
+            .select_from(Partido)
+            .join(equipo_local, Partido.equipo_local_id == equipo_local.equipo_id)
+            .join(equipo_visitante, Partido.equipo_visitante_id == equipo_visitante.equipo_id)
+            .filter(Partido.partido_id == e.partido_id)
+            .first()
+        )
+        
+        if not partido_info:
+            continue
+        
+        _, el, ev = partido_info
+        
+        respuesta.append({
+            "id_evento": e.id_evento,
+            "minuto": e.minuto,
+            "tipo": e.tipo.value if hasattr(e.tipo, 'value') else str(e.tipo),
+            "descripcion": e.descripcion,
+            "partido_id": e.partido_id,
+            "partido_fecha": str(partido.fecha) if partido.fecha else None,
+            "partido_local": el.nombre if el else "Local",
+            "partido_visitante": ev.nombre if ev else "Visitante"
+        })
+    
+    return respuesta
+
+
 @router.delete("/{evento_id}/", response_model=list[Evento])
 async def anular_evento(session: SessionDep, evento_id: int):
     evento = session.query(Evento).filter(Evento.id == evento_id).first()

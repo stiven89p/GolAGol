@@ -751,12 +751,626 @@ th {
 .evento-tarjeta-roja { background: #3b0d12; border-color: #c4002b; }
 .evento-sustitucion { background: #14261d; border-color: #1b8f58; }
 
+/* Sustituciones: colores para quien sale y quien entra */
+.sustitucion-fotos {
+    display: flex;
+    gap: 8px;
+}
+
+.evento-jugador-foto.jugador-sale {
+    border: 3px solid #dc3545;
+    box-shadow: 0 0 8px rgba(220, 53, 69, 0.5);
+}
+
+.evento-jugador-foto.jugador-entra {
+    border: 3px solid #28a745;
+    box-shadow: 0 0 8px rgba(40, 167, 69, 0.5);
+}
+
+.jugador-sale-nombre {
+    color: #ff6b6b;
+    font-weight: 600;
+}
+
+.jugador-entra-nombre {
+    color: #51cf66;
+    font-weight: 600;
+}
+
 /* Indicador de descanso */
 .descanso-marker { text-align: center; font-weight: 600; color: #8b949e; background:#0d1117; border:1px solid #30363d; padding:6px 10px; border-radius:6px; margin:20px auto; width:160px; }
 .tiempo-section > h3 { margin:0 0 6px; font-size:14px; color:#8b949e; font-weight:600; letter-spacing:.5px; text-transform:uppercase; }
+
+/* ===============================
+   ALINEACIONES EN PARTIDO
+================================ */
+.alineacion {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.alineacion li {
+    list-style: none;
+    background-color: #0d1117;
+    border-radius: 8px;
+    border: 1px solid #30363d;
+    transition: all 0.2s ease;
+}
+
+.alineacion li:hover {
+    border-color: #58a6ff;
+    transform: translateX(4px);
+}
+
+.alineacion .jugador-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    width: 100%;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.alineacion .jugador-foto {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #30363d;
+}
+
+.alineacion .jugador-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.alineacion .jugador-info strong {
+    color: #e6edf3;
+    font-size: 1rem;
+}
+
+.alineacion .jugador-info span {
+    color: #c9d1d9;
+    font-size: 0.95rem;
+}
+
+.alineacion .jugador-posicion {
+    color: #8b949e;
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+.alineacion.suplentes li {
+    opacity: 0.85;
+    background-color: #161b22;
+}
+
+/* ===============================
+   PÁGINA DE JUGADORES
+================================ */
+.jugadores-layout {
+    display: grid;
+    grid-template-columns: 380px 1fr;
+    gap: 24px;
+    padding: 20px;
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+.jugadores-sidebar {
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+    max-height: calc(100vh - 40px);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.jugadores-sidebar .panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: calc(100vh - 40px);
+}
+
+.equipo-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid #30363d;
+    margin-bottom: 16px;
+}
+
+.equipo-logo-small {
+    width: 50px;
+    height: 50px;
+    object-fit: contain;
+}
+
+.equipo-header h2 {
+    margin: 0;
+    font-size: 1.3rem;
+}
+
+.jugadores-filtro {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+}
+
+.filtro-btn {
+    padding: 6px 12px;
+    background-color: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 6px;
+    color: #c9d1d9;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.85rem;
+}
+
+.filtro-btn:hover {
+    border-color: #58a6ff;
+    color: #58a6ff;
+}
+
+.filtro-btn.active {
+    background-color: #58a6ff;
+    border-color: #58a6ff;
+    color: #ffffff;
+}
+
+.jugadores-lista-scroll {
+    overflow-y: auto;
+    flex: 1;
+    padding-right: 8px;
+}
+
+.jugadores-lista-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+
+.jugadores-lista-scroll::-webkit-scrollbar-track {
+    background: #0d1117;
+    border-radius: 4px;
+}
+
+.jugadores-lista-scroll::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 4px;
+}
+
+.jugadores-lista-scroll::-webkit-scrollbar-thumb:hover {
+    background: #58a6ff;
+}
+
+.posicion-grupo-jugadores {
+    margin-bottom: 20px;
+}
+
+.posicion-titulo {
+    font-size: 0.9rem;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 10px 0;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #30363d;
+}
+
+.jugador-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    background-color: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.jugador-item:hover {
+    border-color: #58a6ff;
+    transform: translateX(4px);
+}
+
+.jugador-item.active {
+    background-color: #1c2938;
+    border-color: #58a6ff;
+    box-shadow: 0 0 12px rgba(88, 166, 255, 0.3);
+}
+
+.jugador-foto-small {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid #30363d;
+}
+
+.jugador-item.active .jugador-foto-small {
+    border-color: #58a6ff;
+}
+
+.jugador-item-info {
+    flex: 1;
+}
+
+.jugador-nombre-item {
+    display: block;
+    color: #e6edf3;
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+}
+
+.jugador-meta {
+    display: flex;
+    gap: 10px;
+    font-size: 0.8rem;
+}
+
+.jugador-numero {
+    color: #58a6ff;
+    font-weight: 600;
+}
+
+.jugador-edad-item {
+    color: #8b949e;
+}
+
+/* Detalle del jugador */
+.jugador-detalle {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    color: #8b949e;
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.jugador-perfil {
+    background: linear-gradient(135deg, #161b22 0%, #0d1117 100%);
+}
+
+.jugador-header-perfil {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+}
+
+.jugador-foto-grande {
+    width: 180px;
+    height: 180px;
+    border-radius: 12px;
+    object-fit: cover;
+    border: 4px solid #30363d;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
+
+.jugador-datos-principales {
+    flex: 1;
+}
+
+.jugador-nombre-grande {
+    font-size: 2.5rem;
+    margin: 0 0 8px 0;
+    color: #58a6ff;
+}
+
+.jugador-numero-grande {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #58a6ff;
+    opacity: 0.3;
+    margin-bottom: 16px;
+}
+
+.jugador-info-basica {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.info-label {
+    font-size: 0.8rem;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    font-size: 1.1rem;
+    color: #e6edf3;
+    font-weight: 500;
+}
+
+/* Estadísticas */
+.jugador-estadisticas h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.estadistica-temporada {
+    margin-bottom: 24px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid #30363d;
+}
+
+.estadistica-temporada:last-child {
+    border-bottom: none;
+}
+
+.estadistica-temporada h3 {
+    font-size: 1.2rem;
+    color: #c9d1d9;
+    margin: 0 0 16px 0;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 12px;
+}
+
+.stat-card {
+    background-color: #0d1117;
+    padding: 16px;
+    border-radius: 8px;
+    border: 2px solid #30363d;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.stat-card.destacado {
+    border-color: #58a6ff;
+    background: linear-gradient(135deg, #0d1117 0%, #10253b 100%);
+}
+
+.stat-card.amarilla {
+    border-color: #b3a000;
+}
+
+.stat-card.roja {
+    border-color: #c4002b;
+}
+
+.stat-valor {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #58a6ff;
+    margin-bottom: 4px;
+}
+
+.stat-card.amarilla .stat-valor {
+    color: #ffd700;
+}
+
+.stat-card.roja .stat-valor {
+    color: #ff4444;
+}
+
+.stat-label {
+    font-size: 0.85rem;
+    color: #8b949e;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
 @media (max-width: 640px) {
     .evento-item { max-width: 100%; }
     .evento-minuto { font-size: 16px; }
     .evento-icono { font-size: 20px; }
+}
+
+/* Enlace de jugador */
+.jugador-item-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.jugador-item-link-sidebar {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.jugador-item-sidebar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #0d1117;
+    border: 1px solid #30363d;
+    margin-bottom: 8px;
+    transition: all 0.2s ease;
+}
+
+.jugador-item-sidebar:hover {
+    border-color: #58a6ff;
+    background-color: #161b22;
+    transform: translateX(4px);
+}
+
+.jugador-posicion-small {
+    color: #8b949e;
+    font-size: 0.85rem;
+}
+
+/* ===============================
+   PÁGINA DE PERFIL DE JUGADOR
+================================ */
+.jugador-perfil-layout {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.jugador-perfil-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.equipo-link {
+    color: #58a6ff;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.equipo-link:hover {
+    color: #79c0ff;
+    text-decoration: underline;
+}
+
+/* Eventos del jugador */
+.jugador-eventos h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+.eventos-lista {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.evento-jugador-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background-color: #0d1117;
+    border: 1px solid #30363d;
+    border-left: 4px solid #30363d;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.evento-jugador-item:hover {
+    transform: translateX(4px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.evento-jugador-item.evento-gol {
+    border-left-color: #58a6ff;
+    background: linear-gradient(90deg, #0d1117, #10253b);
+}
+
+.evento-jugador-item.evento-tarjeta-amarilla {
+    border-left-color: #ffd700;
+    background: linear-gradient(90deg, #0d1117, #2e2a00);
+}
+
+.evento-jugador-item.evento-tarjeta-roja {
+    border-left-color: #ff4444;
+    background: linear-gradient(90deg, #0d1117, #3b0d12);
+}
+
+.evento-jugador-item.evento-sustitucion {
+    border-left-color: #28a745;
+    background: linear-gradient(90deg, #0d1117, #14261d);
+}
+
+.evento-icono-grande {
+    font-size: 32px;
+    line-height: 1;
+}
+
+.evento-info {
+    flex: 1;
+}
+
+.evento-partido {
+    margin-bottom: 6px;
+}
+
+.evento-partido strong {
+    color: #e6edf3;
+    font-size: 1rem;
+}
+
+.evento-detalles-jugador {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 4px;
+}
+
+.evento-minuto-small {
+    color: #58a6ff;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.evento-descripcion-small {
+    color: #c9d1d9;
+    font-size: 0.9rem;
+}
+
+.evento-jugador-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.evento-jugador-link:hover .evento-jugador-item {
+    transform: translateX(8px);
+}
+.evento-fecha {
+    color: #8b949e;
+    font-size: 0.85rem;
+}
+
+@media (max-width: 1024px) {
+    .jugadores-layout {
+        grid-template-columns: 1fr;
+    }
+    
+    .jugadores-sidebar {
+        position: static;
+        max-height: 400px;
+    }
+    
+    .jugador-header-perfil {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .jugador-info-basica {
+        grid-template-columns: 1fr;
+    }
 }
