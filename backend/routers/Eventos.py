@@ -117,6 +117,61 @@ async def obtener_eventos_tipo(session: SessionDep, evento: TipoEvento):
         raise HTTPException(status_code=404, detail="No se encontraron eventos")
     return eventos
 
+@router.get("/partido/{partido_id}")
+async def obtener_eventos_partido(partido_id: int, session: SessionDep):
+    """Devuelve los eventos de un partido enriquecidos con nombres de jugadores.
+
+    Formato de respuesta por evento:
+    {
+        id_evento, minuto, tipo, descripcion, equipo_id,
+        jugador_id, jugador_nombre, jugador_asociado_id, jugador_asociado_nombre
+    }
+    """
+    partido = session.get(Partido, partido_id)
+    if not partido:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+
+    eventos = (
+        session.query(Evento)
+        .filter(Evento.partido_id == partido_id)
+        .order_by(Evento.minuto.asc(), Evento.id_evento.asc())
+        .all()
+    )
+    if not eventos:
+        raise HTTPException(status_code=404, detail="No hay eventos para este partido")
+
+    respuesta = []
+    for e in eventos:
+        jugador = session.get(Jugador, e.jugador_id)
+        jugador_asociado = session.get(Jugador, e.jugador_asociado_id) if e.jugador_asociado_id else None
+        
+        # Construir URLs completas para las fotos
+        jugador_foto_url = None
+        if jugador:
+            jugador_foto_url = f"/static/img/{jugador.foto}" if jugador.foto else "/static/img/default-player.png"
+        
+        jugador_asociado_foto_url = None
+        if jugador_asociado:
+            jugador_asociado_foto_url = f"/static/img/{jugador_asociado.foto}" if jugador_asociado.foto else "/static/img/default-player.png"
+        
+        respuesta.append({
+            "id_evento": e.id_evento,
+            "minuto": e.minuto,
+            # Usamos directamente el value para coincidir con el JS (gol, sustitucion, tarjeta_amarilla, ...)
+            "tipo": e.tipo.value if hasattr(e.tipo, 'value') else str(e.tipo),
+            "descripcion": e.descripcion,
+            "partido_id": e.partido_id,
+            "equipo_id": e.equipo_id,
+            "jugador_id": e.jugador_id,
+            "jugador_nombre": jugador.nombre if jugador else None,
+            "jugador_foto": jugador_foto_url,
+            "jugador_asociado_id": e.jugador_asociado_id,
+            "jugador_asociado_nombre": jugador_asociado.nombre if jugador_asociado else None,
+            "jugador_asociado_foto": jugador_asociado_foto_url
+        })
+
+    return respuesta
+
 @router.delete("/{evento_id}/", response_model=list[Evento])
 async def anular_evento(session: SessionDep, evento_id: int):
     evento = session.query(Evento).filter(Evento.id == evento_id).first()
