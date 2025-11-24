@@ -10,6 +10,7 @@ class JugadorBase(SQLModel):
     fecha_nacimiento: date = Field(nullable=False, description="Fecha de nacimiento del jugador")
     posicion: PosicionJugador = Field(nullable=False, description="Posición del jugador")
     nacionalidad: str = Field(nullable=False, description="Nacionalidad del jugador")
+    numero_camiseta: Optional[int] = Field(default=None, description="Número de camiseta del jugador")
     equipo_id: int = Field(foreign_key="equipo.equipo_id", nullable=False, description="ID del equipo al que pertenece el jugador")
     foto: Optional[str] = Field(default=None, description="URL de la foto del jugador")
 

@@ -16,10 +16,14 @@ async def crear_jugador(session: SessionDep,
                         fecha_nacimiento: date = Form(...),
                         posicion: PosicionJugador = Form(...),
                         nacionalidad: str = Form(...),
+                        numero_camiseta: int = Form(...),
                         equipo_id: int = Form(...),
-                        foto: UploadFile = File(0)
+                        foto: UploadFile = File(None)
                         ):
-    foto = await upload_file(foto)
+    foto_name = None
+    if foto:
+        uploaded = await upload_file(foto)
+        foto_name = uploaded["file_name"]
 
     new_jugador = JugadorCrear(
         nombre=nombre,
@@ -27,8 +31,9 @@ async def crear_jugador(session: SessionDep,
         fecha_nacimiento=fecha_nacimiento,
         posicion=posicion,
         nacionalidad=nacionalidad,
+        numero_camiseta=numero_camiseta,
         equipo_id=equipo_id,
-        foto=foto["file_name"]
+        foto=foto_name
     )
     jugador = Jugador.model_validate(new_jugador)
 
@@ -72,20 +77,42 @@ async def obtener_jugador_posicion(Posicion: PosicionJugador , session: SessionD
     return jugador
 
 @router.patch("/{jugador_id}", response_model=Jugador)
-async def actualizar_jugador(jugador_id: int, jugador_update: JugadorActualizar, session: SessionDep):
+async def actualizar_jugador(jugador_id: int,
+                            session: SessionDep,
+                            nombre: str = Form(None),
+                            apellido: str = Form(None),
+                            fecha_nacimiento: date = Form(None),
+                            posicion: PosicionJugador = Form(None),
+                            nacionalidad: str = Form(None),
+                            numero_camiseta: int = Form(None),
+                            equipo_id: int = Form(None),
+                            foto: UploadFile = File(None)
+                            ):
     jugador = session.get(Jugador, jugador_id)
     if not jugador:
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
 
-    jugador_data = jugador_update.model_dump(exclude_unset=True)
+    if foto:
+        uploaded = await upload_file(foto)
+        jugador.foto = uploaded["file_name"]
 
-    if "equipo_id" in jugador_data and jugador_data["equipo_id"] is not None:
-        equipo = session.get(Equipo, jugador_data["equipo_id"])
+    if nombre is not None:
+        jugador.nombre = nombre
+    if apellido is not None:
+        jugador.apellido = apellido
+    if fecha_nacimiento is not None:
+        jugador.fecha_nacimiento = fecha_nacimiento
+    if posicion is not None:
+        jugador.posicion = posicion
+    if nacionalidad is not None:
+        jugador.nacionalidad = nacionalidad
+    if numero_camiseta is not None:
+        jugador.numero_camiseta = numero_camiseta
+    if equipo_id is not None:
+        equipo = session.get(Equipo, equipo_id)
         if not equipo:
             raise HTTPException(status_code=404, detail="El equipo no existe")
-
-    for key, value in jugador_data.items():
-        setattr(jugador, key, value)
+        jugador.equipo_id = equipo_id
 
     session.add(jugador)
     session.commit()
