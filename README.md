@@ -10,7 +10,7 @@ Plataforma web para gestionar y visualizar equipos, jugadores, partidos y estad√
 [![SQLModel](https://img.shields.io/badge/SQLModel-%20-1E7B85)](https://sqlmodel.tiangolo.com/)
 [![Uvicorn](https://img.shields.io/badge/Uvicorn-%20-000000)](https://www.uvicorn.org/)
 
-<img src="static/img/default_logo.png" alt="Gol a Gol" width="90" />
+<img src="static/img/logo.png" alt="Gol a Gol" width="90" />
 
 </div>
 
