@@ -1,0 +1,147 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Gestión de Partidos - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <div class="section-header">
+        <h2>Gestión de Partidos</h2>
+        <button class="btn btn-primary" onclick="mostrarFormulario()">+ Nuevo Partido</button>
+    </div>
+    
+    <div id="formulario-partido" class="form-modal" style="display: none;">
+        <div class="form-modal-content large">
+            <span class="close" onclick="cerrarFormulario()">&times;</span>
+            <h3 id="form-title">Crear Partido</h3>
+            <form id="partido-form">
+                <input type="hidden" id="partido_id" name="partido_id">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="fecha">Fecha *</label>
+                        <input type="date" id="fecha" name="fecha" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="hora">Hora *</label>
+                        <input type="time" id="hora" name="hora" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="jornada">Jornada *</label>
+                        <input type="number" id="jornada" name="jornada" min="1" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="equipo_local_id">Equipo Local *</label>
+                        <select id="equipo_local_id" name="equipo_local_id" required>
+                            <option value="">Seleccione...</option>
+                            {% for equipo in equipos %}
+                            <option value="{{ equipo.equipo_id }}">{{ equipo.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="equipo_visitante_id">Equipo Visitante *</label>
+                        <select id="equipo_visitante_id" name="equipo_visitante_id" required>
+                            <option value="">Seleccione...</option>
+                            {% for equipo in equipos %}
+                            <option value="{{ equipo.equipo_id }}">{{ equipo.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="estadio">Estadio *</label>
+                        <input type="text" id="estadio" name="estadio" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="temporada_id">Temporada *</label>
+                        <select id="temporada_id" name="temporada_id" required>
+                            <option value="">Seleccione...</option>
+                            {% for temporada in temporadas %}
+                            <option value="{{ temporada.temporada_id }}">{{ temporada.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="estado">Estado</label>
+                        <select id="estado" name="estado">
+                            <option value="PROGRAMADO">Programado</option>
+                            <option value="EN_CURSO">En Curso</option>
+                            <option value="FINALIZADO">Finalizado</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="goles_local">Goles Local</label>
+                        <input type="number" id="goles_local" name="goles_local" min="0" value="0">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="goles_visitante">Goles Visitante</label>
+                        <input type="number" id="goles_visitante" name="goles_visitante" min="0" value="0">
+                    </div>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarFormulario()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Fecha</th>
+                <th>Local</th>
+                <th>Resultado</th>
+                <th>Visitante</th>
+                <th>Jornada</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="partidos-tbody">
+            {% for partido in partidos %}
+            <tr>
+                <td>{{ partido.partido_id }}</td>
+                <td>{{ partido.fecha }}<br><small>{{ partido.hora }}</small></td>
+                <td>{{ partido.equipo_local }}</td>
+                <td class="resultado">{{ partido.goles_local }} - {{ partido.goles_visitante }}</td>
+                <td>{{ partido.equipo_visitante }}</td>
+                <td>{{ partido.jornada }}</td>
+                <td><span class="badge badge-{{ partido.estado|lower }}">{{ partido.estado }}</span></td>
+                <td>
+                    {% if partido.estado == 'PROGRAMADO' %}
+                        <button class="btn-sm btn-success" onclick="iniciarPartido({{ partido.partido_id }})">▶ Iniciar</button>
+                        <a href="/admin/partidos/{{ partido.partido_id }}/formaciones" class="btn-sm">Formaciones</a>
+                    {% elif partido.estado == 'EN_CURSO' %}
+                        <button class="btn-sm btn-edit" onclick="editarPartido({{ partido.partido_id }})">Editar</button>
+                        <a href="/admin/partidos/{{ partido.partido_id }}/eventos" class="btn-sm">Eventos</a>
+                    {% else %}
+                        <a href="/partido/{{ partido.partido_id }}" class="btn-sm">Ver</a>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin/partidos.js"></script>
+{% endblock %}

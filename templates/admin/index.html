@@ -1,0 +1,61 @@
+{% extends "admin/layout.html" %}
+
+{% block content %}
+<div class="admin-dashboard">
+    <h2>Dashboard</h2>
+    
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h3>Equipos</h3>
+            <p class="stat-number">{{ stats.total_equipos }}</p>
+            <a href="/admin/equipos" class="stat-link">Gestionar →</a>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Jugadores</h3>
+            <p class="stat-number">{{ stats.total_jugadores }}</p>
+            <a href="/admin/jugadores" class="stat-link">Gestionar →</a>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Partidos</h3>
+            <p class="stat-number">{{ stats.total_partidos }}</p>
+            <a href="/admin/partidos" class="stat-link">Gestionar →</a>
+        </div>
+        
+        <div class="stat-card">
+            <h3>Formaciones</h3>
+            <p class="stat-number">{{ stats.total_formaciones }}</p>
+            <a href="/admin/formaciones" class="stat-link">Gestionar →</a>
+        </div>
+    </div>
+    
+    <div class="recent-section">
+        <h3>Próximos Partidos</h3>
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Local</th>
+                    <th>Visitante</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for partido in proximos_partidos %}
+                <tr>
+                    <td>{{ partido.fecha }} {{ partido.hora }}</td>
+                    <td>{{ partido.equipo_local }}</td>
+                    <td>{{ partido.equipo_visitante }}</td>
+                    <td><span class="badge badge-{{ partido.estado|lower }}">{{ partido.estado }}</span></td>
+                    <td>
+                        <a href="/admin/partidos/{{ partido.partido_id }}" class="btn-sm">Editar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

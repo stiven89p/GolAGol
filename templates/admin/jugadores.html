@@ -1,0 +1,145 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Gestión de Jugadores - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <div class="section-header">
+        <h2>Gestión de Jugadores</h2>
+        <button class="btn btn-primary" onclick="mostrarFormulario()">+ Nuevo Jugador</button>
+    </div>
+    
+    <div class="filters">
+        <select id="filtro-equipo">
+            <option value="">Todos los equipos</option>
+            {% for equipo in equipos %}
+            <option value="{{ equipo.equipo_id }}">{{ equipo.nombre }}</option>
+            {% endfor %}
+        </select>
+        
+        <select id="filtro-posicion">
+            <option value="">Todas las posiciones</option>
+            <option value="portero">Portero</option>
+            <option value="defensor">Defensor</option>
+            <option value="mediocampista">Mediocampista</option>
+            <option value="delantero">Delantero</option>
+        </select>
+        
+        <button class="btn btn-primary" onclick="aplicarFiltros()" style="margin-left: 10px;">
+            <i class="fas fa-search"></i> Buscar
+        </button>
+        <button class="btn btn-secondary" onclick="limpiarFiltros()" style="margin-left: 5px;">
+            <i class="fas fa-times"></i> Limpiar
+        </button>
+    </div>
+    
+    <div id="formulario-jugador" class="form-modal" style="display: none;">
+        <div class="form-modal-content">
+            <span class="close" onclick="cerrarFormulario()">&times;</span>
+            <h3 id="form-title">Crear Jugador</h3>
+            <form id="jugador-form" autocomplete="off">
+                <input type="hidden" id="jugador_id" name="jugador_id">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombre">Nombre *</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="apellido">Apellido *</label>
+                        <input type="text" id="apellido" name="apellido" required>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="equipo_id">Equipo *</label>
+                        <select id="equipo_id" name="equipo_id" required>
+                            <option value="">Seleccione...</option>
+                            {% for equipo in equipos %}
+                            <option value="{{ equipo.equipo_id }}">{{ equipo.nombre }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="posicion">Posición *</label>
+                        <select id="posicion" name="posicion" required>
+                            <option value="">Seleccione...</option>
+                            <option value="portero">Portero</option>
+                            <option value="defensor">Defensor</option>
+                            <option value="mediocampista">Mediocampista</option>
+                            <option value="delantero">Delantero</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="numero_camiseta">Número *</label>
+                        <input type="number" id="numero_camiseta" name="numero_camiseta" min="1" max="99" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="fecha_nacimiento">Fecha de Nacimiento *</label>
+                        <input type="date" id="fecha_nacimiento" name="fecha_nacimiento" required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="nacionalidad">Nacionalidad *</label>
+                    <input type="text" id="nacionalidad" name="nacionalidad" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="foto_file">Foto del Jugador</label>
+                    <input type="file" id="foto_file" name="foto_file" accept="image/*">
+                    <p class="help">Sube una imagen del jugador (JPG, PNG, etc.)</p>
+                </div>
+                
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarFormulario()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Foto</th>
+                <th>#</th>
+                <th>Nombre</th>
+                <th>Equipo</th>
+                <th>Posición</th>
+                <th>Edad</th>
+                <th>Nacionalidad</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="jugadores-tbody">
+            {% for jugador in jugadores %}
+            <tr>
+                <td><img src="{{ jugador.foto }}" alt="{{ jugador.nombre }}" class="mini-logo" style="width: 40px; height: 40px; object-fit: cover; border-radius: 50%;"></td>
+                <td>{{ jugador.numero_camiseta }}</td>
+                <td>{{ jugador.nombre }} {{ jugador.apellido }}</td>
+                <td>{{ jugador.equipo_nombre }}</td>
+                <td>{{ jugador.posicion }}</td>
+                <td>{{ jugador.edad }}</td>
+                <td>{{ jugador.nacionalidad }}</td>
+                <td>
+                    <button class="btn-sm btn-edit" onclick="editarJugador({{ jugador.jugador_id }})">Editar</button>
+                    <button class="btn-sm btn-danger" onclick="eliminarJugador({{ jugador.jugador_id }})">Eliminar</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin/jugadores.js"></script>
+{% endblock %}

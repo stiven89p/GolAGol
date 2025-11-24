@@ -1,0 +1,109 @@
+{% extends "admin/layout.html" %}
+{% block title %}Gestión de Formaciones - Admin{% endblock %}
+{% block content %}
+<div class="admin-section">
+  <div class="section-header">
+    <h2>Gestión de Formaciones</h2>
+    <button class="btn btn-primary" onclick="mostrarFormulario()">+ Nueva Formación</button>
+  </div>
+
+  <div class="filters" style="margin-bottom:1rem;">
+    <select id="filtro-equipo">
+      <option value="">Todos los equipos</option>
+      {% for equipo in equipos %}
+      <option value="{{ equipo.equipo_id }}">{{ equipo.nombre }}</option>
+      {% endfor %}
+    </select>
+    <button class="btn btn-primary" onclick="aplicarFiltroFormaciones()"><i class="fas fa-search"></i> Buscar</button>
+    <button class="btn btn-secondary" onclick="limpiarFiltroFormaciones()"><i class="fas fa-times"></i> Limpiar</button>
+  </div>
+
+  <table class="admin-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Equipo</th>
+        <th>Estructura</th>
+        <th>Portero</th>
+        <th>Titulares</th>
+        <th>Suplentes</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for f in formaciones %}
+      <tr>
+        <td>{{ f.formacion_id }}</td>
+        <td>{{ f.equipo_id }}</td>
+        <td>{{ f.defensas }}-{{ f.mediocampistas }}-{{ f.delanteros }}</td>
+        <td>{{ f.portero_id }}</td>
+        <td>
+          {% for t in f.titulares %}
+            <span class="tag">{{ t }}</span>
+          {% endfor %}
+        </td>
+        <td>
+          {% for s in f.suplentes %}
+            <span class="tag is-dark">{{ s }}</span>
+          {% endfor %}
+        </td>
+        <td>
+          <button class="btn-sm btn-primary" onclick="verFormacion({{ f.formacion_id }})">Ver</button>
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div id="formulario-formacion" class="form-modal" style="display:none;">
+  <div class="form-modal-content large">
+    <span class="close" onclick="cerrarFormulario()">&times;</span>
+    <h3 id="form-title">Crear Formación</h3>
+    <form id="formacion-form">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="equipo_id">Equipo *</label>
+          <select id="equipo_id" name="equipo_id" required>
+            <option value="">Seleccione...</option>
+            {% for equipo in equipos %}
+            <option value="{{ equipo.equipo_id }}">{{ equipo.nombre }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="portero_id">Portero *</label>
+          <select id="portero_id" name="portero_id" required></select>
+        </div>
+        <div class="form-group">
+          <label for="defensas">Defensas *</label>
+          <input type="number" id="defensas" name="defensas" min="0" max="10" required>
+        </div>
+        <div class="form-group">
+          <label for="mediocampistas">Mediocampistas *</label>
+          <input type="number" id="mediocampistas" name="mediocampistas" min="0" max="10" required>
+        </div>
+        <div class="form-group">
+          <label for="delanteros">Delanteros *</label>
+          <input type="number" id="delanteros" name="delanteros" min="0" max="10" required>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Titulares (11) *</label>
+        <div id="titulares-container" class="multi-select"></div>
+      </div>
+      <div class="form-group">
+        <label>Suplentes (9) *</label>
+        <div id="suplentes-container" class="multi-select"></div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="cerrarFormulario()">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/admin/formaciones.js"></script>
+{% endblock %}

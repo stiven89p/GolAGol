@@ -47,13 +47,220 @@ async def create_bucket(file: UploadFile = File(...) ):
 async def home(request: Request):
     return templates.TemplateResponse("index.html", {"request": request, "cache_bust": int(time.time())})
 
+# ========== RUTAS ADMIN ==========
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_dashboard(request: Request, session: SessionDep):
+    from backend.modelos.Jugadores import Jugador
+    from backend.modelos.Formaciones import Formacion
+    from backend.utils.enumeraciones import EstadoPartidos
+    from datetime import datetime
+    
+    # Estadísticas
+    stats = {
+        "total_equipos": session.query(Equipo).count(),
+        "total_jugadores": session.query(Jugador).count(),
+        "total_partidos": session.query(Partido).count(),
+        "total_formaciones": session.query(Formacion).count()
+    }
+    
+    # Próximos partidos
+    el = aliased(Equipo, name="equipo_local")
+    ev = aliased(Equipo, name="equipo_visitante")
+    
+    partidos = (
+        session.query(Partido, el, ev)
+        .select_from(Partido)
+        .join(el, Partido.equipo_local_id == el.equipo_id)
+        .join(ev, Partido.equipo_visitante_id == ev.equipo_id)
+        .filter(Partido.estado == EstadoPartidos.PROGRAMADO)
+        .order_by(Partido.fecha.asc())
+        .limit(10)
+        .all()
+    )
+    
+    proximos_partidos = []
+    for partido, eq_local, eq_visitante in partidos:
+        proximos_partidos.append({
+            "partido_id": partido.partido_id,
+            "fecha": partido.fecha.strftime("%d/%m/%Y"),
+            "hora": partido.hora.strftime("%H:%M") if partido.hora else "",
+            "equipo_local": eq_local.nombre,
+            "equipo_visitante": eq_visitante.nombre,
+            "estado": partido.estado
+        })
+    
+    return templates.TemplateResponse("admin/index.html", {
+        "request": request,
+        "stats": stats,
+        "proximos_partidos": proximos_partidos
+    })
+
+@app.get("/admin/equipos", response_class=HTMLResponse)
+async def admin_equipos(request: Request, session: SessionDep):
+    def logo_url(logo_val: str|None):
+        if not logo_val:
+            return "/static/img/default_logo.png"
+        if str(logo_val).startswith("http") or str(logo_val).startswith("/static/"):
+            return str(logo_val)
+        path = str(logo_val)
+        if not path.startswith("img/"):
+            path = f"img/{path}"
+        return f"/static/{path}"
+    
+    equipos_raw = session.query(Equipo).all()
+    equipos = []
+    for eq in equipos_raw:
+        equipos.append({
+            "equipo_id": eq.equipo_id,
+            "nombre": eq.nombre,
+            "ciudad": eq.ciudad,
+            "estadio": eq.estadio,
+            "anio_fundacion": eq.anio_fundacion,
+            "titulos": eq.titulos,
+            "activo": eq.activo,
+            "logo": logo_url(eq.logo)
+        })
+    
+    return templates.TemplateResponse("admin/equipos.html", {
+        "request": request,
+        "equipos": equipos
+    })
+
+@app.get("/admin/jugadores", response_class=HTMLResponse)
+async def admin_jugadores(request: Request, session: SessionDep, equipo_id: int = None, posicion: str = None):
+    from backend.modelos.Jugadores import Jugador
+    from datetime import datetime
+    
+    query = session.query(Jugador, Equipo).join(Equipo, Jugador.equipo_id == Equipo.equipo_id)
+    
+    if equipo_id:
+        query = query.filter(Jugador.equipo_id == equipo_id)
+    if posicion:
+        query = query.filter(Jugador.posicion == posicion)
+    
+    rows = query.all()
+    
+    jugadores = []
+    for jugador, equipo in rows:
+        edad = datetime.now().year - jugador.fecha_nacimiento.year
+        foto_url = f"/static/img/{jugador.foto}" if jugador.foto else "/static/img/default-player.png"
+        posicion_value = jugador.posicion.value if hasattr(jugador.posicion, 'value') else str(jugador.posicion)
+        jugadores.append({
+            "jugador_id": jugador.jugador_id,
+            "nombre": jugador.nombre,
+            "apellido": jugador.apellido,
+            "numero_camiseta": jugador.numero_camiseta,
+            "equipo_nombre": equipo.nombre,
+            "posicion": posicion_value,  # raw lowercase enum value
+            "edad": edad,
+            "nacionalidad": jugador.nacionalidad,
+            "foto": foto_url
+        })
+    
+    equipos = session.query(Equipo).all()
+    
+    return templates.TemplateResponse("admin/jugadores.html", {
+        "request": request,
+        "jugadores": jugadores,
+        "equipos": equipos
+    })
+
+@app.get("/admin/partidos", response_class=HTMLResponse)
+async def admin_partidos(request: Request, session: SessionDep):
+    from backend.modelos.Temporada import Temporada
+    
+    el = aliased(Equipo, name="equipo_local")
+    ev = aliased(Equipo, name="equipo_visitante")
+    
+    rows = (
+        session.query(Partido, el, ev)
+        .select_from(Partido)
+        .join(el, Partido.equipo_local_id == el.equipo_id)
+        .join(ev, Partido.equipo_visitante_id == ev.equipo_id)
+        .order_by(Partido.fecha.desc())
+        .all()
+    )
+    
+    partidos = []
+    for partido, eq_local, eq_visitante in rows:
+        partidos.append({
+            "partido_id": partido.partido_id,
+            "fecha": partido.fecha.strftime("%d/%m/%Y"),
+            "hora": partido.hora.strftime("%H:%M") if partido.hora else "",
+            "equipo_local": eq_local.nombre,
+            "equipo_visitante": eq_visitante.nombre,
+            "goles_local": partido.goles_local,
+            "goles_visitante": partido.goles_visitante,
+            "jornada": partido.jornada,
+            "estado": partido.estado
+        })
+    
+    equipos = session.query(Equipo).filter(Equipo.activo == True).all()
+    temporadas = session.query(Temporada).all()
+    
+    return templates.TemplateResponse("admin/partidos.html", {
+        "request": request,
+        "partidos": partidos,
+        "equipos": equipos,
+        "temporadas": temporadas
+    })
+
+@app.get("/admin/formaciones", response_class=HTMLResponse)
+async def admin_formaciones(request: Request, session: SessionDep, equipo_id: int = None):
+    from backend.modelos.Formaciones import Formacion, FormacionJugador
+    from backend.modelos.Jugadores import Jugador
+
+    query = session.query(Formacion).order_by(Formacion.formacion_id.desc())
+    if equipo_id:
+        query = query.filter(Formacion.equipo_id == equipo_id)
+    formaciones_rows = query.all()
+
+    formaciones = []
+    for f in formaciones_rows:
+        jugadores_rel = session.query(FormacionJugador).filter(FormacionJugador.formacion_id == f.formacion_id).all()
+        titulares_ids = [jr.jugador_id for jr in jugadores_rel if jr.titular]
+        suplentes_ids = [jr.jugador_id for jr in jugadores_rel if not jr.titular]
+        # cargar nombres
+        if titulares_ids:
+            titulares_objs = session.query(Jugador).filter(Jugador.jugador_id.in_(titulares_ids)).all()
+        else:
+            titulares_objs = []
+        if suplentes_ids:
+            suplentes_objs = session.query(Jugador).filter(Jugador.jugador_id.in_(suplentes_ids)).all()
+        else:
+            suplentes_objs = []
+        formaciones.append({
+            "formacion_id": f.formacion_id,
+            "equipo_id": f.equipo_id,
+            "portero_id": f.portero_id,
+            "defensas": f.defensas,
+            "mediocampistas": f.mediocampistas,
+            "delanteros": f.delanteros,
+            "titulares": [f"{j.nombre} {j.apellido}" for j in titulares_objs],
+            "suplentes": [f"{j.nombre} {j.apellido}" for j in suplentes_objs],
+            "total": 11
+        })
+
+    equipos = session.query(Equipo).filter(Equipo.activo == True).all()
+
+    return templates.TemplateResponse("admin/formaciones.html", {
+        "request": request,
+        "formaciones": formaciones,
+        "equipos": equipos
+    })
+
 @app.get("/partido/{partido_id}", response_class=HTMLResponse)
 async def partido_detalle(request: Request, partido_id: int, session: SessionDep):
-    el = aliased(Equipo)
-    ev = aliased(Equipo)
+    from backend.modelos.Formaciones import Formacion, FormacionJugador
+    from backend.modelos.Jugadores import Jugador
+    
+    el = aliased(Equipo, name="equipo_local")
+    ev = aliased(Equipo, name="equipo_visitante")
 
     row = (
         session.query(Partido, el, ev)
+        .select_from(Partido)
         .join(el, Partido.equipo_local_id == el.equipo_id)
         .join(ev, Partido.equipo_visitante_id == ev.equipo_id)
         .filter(Partido.partido_id == partido_id)
