@@ -305,8 +305,10 @@ async def partido_detalle(request: Request, partido_id: int, session: SessionDep
             jugador = jugadores_dict.get(fj.jugador_id)
             if jugador:
                 info = {
+                    "jugador_id": jugador.jugador_id,
                     "nombre": f"{jugador.nombre} {jugador.apellido}",
-                    "posicion": fj.posicion
+                    "posicion": fj.posicion.name if hasattr(fj.posicion, 'name') else str(fj.posicion),
+                    "foto": logo_url(jugador.foto)
                 }
                 if fj.titular:
                     titulares.append(info)

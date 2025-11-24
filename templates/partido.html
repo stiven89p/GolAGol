@@ -70,17 +70,33 @@
             <section class="panel">
                 <h2>Formación Local</h2>
                 {% if partido.formacion_local %}
-                    <p>{{ partido.formacion_local.defensas }}-{{ partido.formacion_local.mediocampistas }}-{{ partido.formacion_local.delanteros }} (Portero ID {{ partido.formacion_local.portero_id }})</p>
+                    <p>{{ partido.formacion_local.defensas }}-{{ partido.formacion_local.mediocampistas }}-{{ partido.formacion_local.delanteros }}</p>
                     <h3>Titulares</h3>
                     <ul class="alineacion">
                     {% for j in partido.formacion_local.titulares %}
-                        <li><strong>{{ j.nombre }}</strong> - {{ j.posicion }}</li>
+                        <li>
+                            <a href="/jugador/{{ j.jugador_id }}" class="jugador-link">
+                                <img src="{{ j.foto }}" alt="{{ j.nombre }}" class="jugador-foto">
+                                <div class="jugador-info">
+                                    <strong>{{ j.nombre }}</strong>
+                                    <span class="jugador-posicion">{{ j.posicion }}</span>
+                                </div>
+                            </a>
+                        </li>
                     {% endfor %}
                     </ul>
                     <h3>Suplentes</h3>
                     <ul class="alineacion suplentes">
                     {% for j in partido.formacion_local.suplentes %}
-                        <li>{{ j.nombre }} - {{ j.posicion }}</li>
+                        <li>
+                            <a href="/jugador/{{ j.jugador_id }}" class="jugador-link">
+                                <img src="{{ j.foto }}" alt="{{ j.nombre }}" class="jugador-foto">
+                                <div class="jugador-info">
+                                    <span>{{ j.nombre }}</span>
+                                    <span class="jugador-posicion">{{ j.posicion }}</span>
+                                </div>
+                            </a>
+                        </li>
                     {% endfor %}
                     </ul>
                 {% else %}
@@ -91,17 +107,33 @@
             <section class="panel">
                 <h2>Formación Visitante</h2>
                 {% if partido.formacion_visitante %}
-                    <p>{{ partido.formacion_visitante.defensas }}-{{ partido.formacion_visitante.mediocampistas }}-{{ partido.formacion_visitante.delanteros }} (Portero ID {{ partido.formacion_visitante.portero_id }})</p>
+                    <p>{{ partido.formacion_visitante.defensas }}-{{ partido.formacion_visitante.mediocampistas }}-{{ partido.formacion_visitante.delanteros }}</p>
                     <h3>Titulares</h3>
                     <ul class="alineacion">
                     {% for j in partido.formacion_visitante.titulares %}
-                        <li><strong>{{ j.nombre }}</strong> - {{ j.posicion }}</li>
+                        <li>
+                            <a href="/jugador/{{ j.jugador_id }}" class="jugador-link">
+                                <img src="{{ j.foto }}" alt="{{ j.nombre }}" class="jugador-foto">
+                                <div class="jugador-info">
+                                    <strong>{{ j.nombre }}</strong>
+                                    <span class="jugador-posicion">{{ j.posicion }}</span>
+                                </div>
+                            </a>
+                        </li>
                     {% endfor %}
                     </ul>
                     <h3>Suplentes</h3>
                     <ul class="alineacion suplentes">
                     {% for j in partido.formacion_visitante.suplentes %}
-                        <li>{{ j.nombre }} - {{ j.posicion }}</li>
+                        <li>
+                            <a href="/jugador/{{ j.jugador_id }}" class="jugador-link">
+                                <img src="{{ j.foto }}" alt="{{ j.nombre }}" class="jugador-foto">
+                                <div class="jugador-info">
+                                    <span>{{ j.nombre }}</span>
+                                    <span class="jugador-posicion">{{ j.posicion }}</span>
+                                </div>
+                            </a>
+                        </li>
                     {% endfor %}
                     </ul>
                 {% else %}
@@ -112,9 +144,9 @@
     </main>
     </div>
     <script>
-        const partidoId = {{ partido.partido_id }};
-        const equipoLocalId = {{ partido.equipo_local_id }};
-        const equipoVisitanteId = {{ partido.equipo_visitante_id }};
+        var partidoId = {{ partido.partido_id }};
+        var equipoLocalId = {{ partido.equipo_local_id }};
+        var equipoVisitanteId = {{ partido.equipo_visitante_id }};
     </script>
     <script src="/static/js/partidos_programados.js"></script>
     <script src="/static/js/partido_eventos.js"></script>

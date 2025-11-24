@@ -546,18 +546,13 @@ th {
 
 /* Lateral con lista de partidos en el detalle */
 .detail-layout {
-    display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 24px;
+    display: block;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
-.sidebar { position: sticky; top: 12px; height: fit-content; }
-.sidebar #partidos { padding: 12px 12px 6px; }
-.sidebar .match-card { padding: 10px; margin-bottom: 12px; }
-.sidebar .eq-name { max-width: 140px; font-size: 14px; }
-.sidebar .resultado { font-size: 22px; }
-.sidebar .escudo { width: 44px; height: 44px; }
-.sidebar .match-card.active { outline: 2px solid #58a6ff; }
+.sidebar { display: none; } /* Ocultar sidebar en detalle de partido */
 
 /* ===============================
    PLANTILLA DE JUGADORES
