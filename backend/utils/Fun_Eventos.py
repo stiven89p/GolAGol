@@ -163,3 +163,54 @@ def anular_tarjeta(session, evento, partido, Estadisticas_E, TipoEvento, estadis
     session.refresh(estadistica)
     if estadistica_jugador:
         session.refresh(estadistica_jugador)
+
+def validar_sustitucion(session, evento, partido, TipoEvento):
+    """
+    Valida que una sustitución cumpla las reglas:
+    - jugador_id (sale) debe estar actualmente en cancha (titular inicial o entró por sustitución previa).
+    - jugador_asociado_id (entra) debe ser suplente inicial que nunca haya entrado.
+    """
+    from backend.modelos.Formaciones import FormacionJugador
+    from backend.modelos.Eventos import Evento
+    from fastapi import HTTPException
+    
+    if not evento.jugador_asociado_id:
+        raise HTTPException(status_code=400, detail="Debe enviar jugador_asociado_id para una sustitución (jugador que entra)")
+    
+    # Obtener formación correspondiente
+    formacion_id = None
+    if evento.equipo_id == partido.equipo_local_id:
+        formacion_id = partido.formacion_local_id
+    elif evento.equipo_id == partido.equipo_visitante_id:
+        formacion_id = partido.formacion_visitante_id
+    if not formacion_id:
+        raise HTTPException(status_code=400, detail="No hay formación asignada para este equipo en el partido")
+
+    # Titulares y suplentes iniciales
+    formacion_jugadores = session.query(FormacionJugador).filter(FormacionJugador.formacion_id == formacion_id).all()
+    titulares_iniciales = {fj.jugador_id for fj in formacion_jugadores if fj.titular}
+    suplentes_iniciales = {fj.jugador_id for fj in formacion_jugadores if not fj.titular}
+    
+    if evento.jugador_id not in titulares_iniciales:
+        raise HTTPException(status_code=400, detail="El jugador que sale no está entre los titulares iniciales")
+    if evento.jugador_asociado_id not in suplentes_iniciales:
+        raise HTTPException(status_code=400, detail="El jugador que entra no está entre los suplentes iniciales")
+
+    # Construir estado actual del campo según sustituciones previas
+    sustituciones_previas = session.query(Evento).filter(
+        Evento.partido_id == evento.partido_id,
+        Evento.equipo_id == evento.equipo_id,
+        Evento.tipo == TipoEvento.SUSTITUCION
+    ).order_by(Evento.minuto.asc()).all()
+
+    en_campo = set(titulares_iniciales)
+    for ev in sustituciones_previas:
+        if ev.jugador_id in en_campo:
+            en_campo.remove(ev.jugador_id)
+        en_campo.add(ev.jugador_asociado_id)
+
+    # Validar estado actual
+    if evento.jugador_id not in en_campo:
+        raise HTTPException(status_code=400, detail="El jugador que sale ya no está en el campo")
+    if evento.jugador_asociado_id in en_campo:
+        raise HTTPException(status_code=400, detail="El jugador que entra ya está en el campo")

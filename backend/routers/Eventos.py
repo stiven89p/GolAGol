@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Form
 from backend.utils.enumeraciones import TipoEvento
-from backend.utils.Fun_Eventos import *
+from backend.utils.Fun_Eventos import procesar_gol, procesar_tarjeta, anular_gol, anular_tarjeta, validar_sustitucion
 from backend.modelos.Equipos import Equipo
 from backend.modelos.Estadisticas_Jugadores import Estadisticas_J
 from backend.modelos.Estadisticas_Equipos import Estadisticas_E
@@ -78,7 +78,13 @@ async def crear_evento(session: SessionDep,
     if jugador.equipo_id != evento.equipo_id:
         raise HTTPException(status_code=400, detail="El jugador no pertenece al equipo del evento")
 
-
+    # Validación específica para sustituciones
+    if evento.tipo == TipoEvento.SUSTITUCION:
+        if not jugador_asociado:
+            raise HTTPException(status_code=404, detail="El jugador que entra no existe")
+        if jugador_asociado.equipo_id != evento.equipo_id:
+            raise HTTPException(status_code=400, detail="El jugador que entra no pertenece al equipo del evento")
+        validar_sustitucion(session, evento, partido, TipoEvento)
 
     if evento.tipo == TipoEvento.GOL:
         if evento.jugador_asociado_id:
