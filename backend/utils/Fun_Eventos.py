@@ -1,3 +1,4 @@
+
 # python
 def procesar_gol(session, evento, partido, Estadisticas_E, estadistica_jugador,estadistica_jugador_asociado=None):
     # Determinar equipo y rival y actualizar goles del partido

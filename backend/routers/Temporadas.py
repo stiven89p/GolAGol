@@ -1,6 +1,7 @@
 from typing import List
 from datetime import date
 from fastapi import APIRouter, HTTPException, Form
+from sqlmodel import select
 from backend.modelos.Temporada import Temporada, TemporadaCrear
 from backend.modelos.Equipos import Equipo
 from backend.modelos.Estadisticas_Equipos import Estadisticas_E
