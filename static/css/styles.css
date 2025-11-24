@@ -41,6 +41,13 @@ body {
 
 .brand { font-weight: 700; color: #58a6ff; }
 
+
+/* Logo del sitio en el header */
+.site-logo {
+    height: 72px;
+    width: auto;
+    display: block;
+}
 h1, h2, h3 {
     color: #58a6ff;
     margin: 0;
@@ -723,4 +730,33 @@ th {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+}
+
+/* ===============================
+   🕒 TIMELINE DE EVENTOS DE PARTIDO
+================================ */
+.eventos-timeline { position: relative; }
+.eventos-timeline #eventos-container { position: relative; margin-top: 10px; }
+.evento-item { display: flex; gap: 10px; align-items: flex-start; margin: 10px 0; max-width: 700px; padding: 12px 16px; border-radius: 8px; background: #1e2329; border: 1px solid #30363d; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
+.evento-item.left { margin-right: auto; border-left: 4px solid #58a6ff; }
+.evento-item.right { margin-left: auto; border-right: 4px solid #58a6ff; }
+.evento-minuto { font-weight: 700; font-size: 18px; color: #58a6ff; min-width: 48px; text-align: center; }
+.evento-contenido { display: flex; align-items: center; gap: 12px; }
+.evento-icono { font-size: 24px; line-height: 1; }
+.evento-jugador-foto { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #30363d; }
+.evento-detalles strong { display: block; color: #e6edf3; font-size: 15px; }
+.evento-detalles small { display: block; color: #8b949e; font-size: 12px; margin-top: 2px; }/* Variantes por tipo */
+.evento-gol { background: linear-gradient(90deg,#1e2329,#10253b); }
+.evento-tarjeta-amarilla { background: #2e2a00; border-color: #b3a000; }
+.evento-tarjeta-roja { background: #3b0d12; border-color: #c4002b; }
+.evento-sustitucion { background: #14261d; border-color: #1b8f58; }
+
+/* Indicador de descanso */
+.descanso-marker { text-align: center; font-weight: 600; color: #8b949e; background:#0d1117; border:1px solid #30363d; padding:6px 10px; border-radius:6px; margin:20px auto; width:160px; }
+.tiempo-section > h3 { margin:0 0 6px; font-size:14px; color:#8b949e; font-weight:600; letter-spacing:.5px; text-transform:uppercase; }
+
+@media (max-width: 640px) {
+    .evento-item { max-width: 100%; }
+    .evento-minuto { font-size: 16px; }
+    .evento-icono { font-size: 20px; }
 }
