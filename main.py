@@ -9,6 +9,7 @@ import backend.routers.Temporadas
 import backend.routers.Equipos
 import backend.routers.Eventos
 import backend.routers.Jugadores
+import backend.routers.Formaciones
 from backend.modelos.Equipos import Equipo
 import backend.routers.Estadisticas_Equipos
 import backend.routers.Estadisticas_Jugadores
@@ -33,6 +34,7 @@ app.include_router(backend.routers.Equipos.router)
 app.include_router(backend.routers.Partidos.router)
 app.include_router(backend.routers.Eventos.router)
 app.include_router(backend.routers.Jugadores.router)
+app.include_router(backend.routers.Formaciones.router)
 app.include_router(backend.routers.Temporadas.router)
 app.include_router(backend.routers.Estadisticas_Equipos.router)
 app.include_router(backend.routers.Estadisticas_Jugadores.router)
@@ -74,6 +76,45 @@ async def partido_detalle(request: Request, partido_id: int, session: SessionDep
             path = f"img/{path}"
         return f"/static/{path}"
 
+    # Función para cargar formación con jugadores
+    def cargar_formacion(formacion_id: int | None):
+        if not formacion_id:
+            return None
+        
+        formacion = session.get(Formacion, formacion_id)
+        if not formacion:
+            return None
+        
+        # Obtener jugadores de la formación
+        fjs = session.query(FormacionJugador).filter(FormacionJugador.formacion_id == formacion_id).all()
+        jugador_ids = [fj.jugador_id for fj in fjs]
+        jugadores = session.query(Jugador).filter(Jugador.jugador_id.in_(jugador_ids)).all()
+        jugadores_dict = {j.jugador_id: j for j in jugadores}
+        
+        titulares = []
+        suplentes = []
+        
+        for fj in fjs:
+            jugador = jugadores_dict.get(fj.jugador_id)
+            if jugador:
+                info = {
+                    "nombre": f"{jugador.nombre} {jugador.apellido}",
+                    "posicion": fj.posicion
+                }
+                if fj.titular:
+                    titulares.append(info)
+                else:
+                    suplentes.append(info)
+        
+        return {
+            "defensas": formacion.defensas,
+            "mediocampistas": formacion.mediocampistas,
+            "delanteros": formacion.delanteros,
+            "portero_id": formacion.portero_id,
+            "titulares": titulares,
+            "suplentes": suplentes
+        }
+
     detalle = {
         "partido_id": partido.partido_id,
         "estado": partido.estado,
@@ -88,6 +129,8 @@ async def partido_detalle(request: Request, partido_id: int, session: SessionDep
         "equipo_visitante_id": partido.equipo_visitante_id,
         "equipo_visitante_nombre": getattr(equipo_visitante, "nombre", ""),
         "equipo_visitante_logo": logo_url(getattr(equipo_visitante, "logo", None)),
+        "formacion_local": cargar_formacion(partido.formacion_local_id),
+        "formacion_visitante": cargar_formacion(partido.formacion_visitante_id),
     }
 
     return templates.TemplateResponse("partido.html", {"request": request, "partido": detalle})
@@ -113,11 +156,12 @@ async def equipo(request: Request, equipo_id: int, session: SessionDep):
         return f"/static/{path}"
     
     # Obtener resultados recientes (últimos 5 partidos finalizados)
-    el = aliased(Equipo)
-    ev = aliased(Equipo)
+    el = aliased(Equipo, name="equipo_local")
+    ev = aliased(Equipo, name="equipo_visitante")
     
     partidos_finalizados = (
         session.query(Partido, el, ev)
+        .select_from(Partido)
         .join(el, Partido.equipo_local_id == el.equipo_id)
         .join(ev, Partido.equipo_visitante_id == ev.equipo_id)
         .filter(
@@ -125,6 +169,7 @@ async def equipo(request: Request, equipo_id: int, session: SessionDep):
             Partido.estado == EstadoPartidos.FINALIZADO
         )
         .order_by(Partido.fecha.desc())
+        .limit(5)
         .all()
     )
     
@@ -148,6 +193,7 @@ async def equipo(request: Request, equipo_id: int, session: SessionDep):
     # Obtener próximos partidos (programados)
     partidos_programados = (
         session.query(Partido, el, ev)
+        .select_from(Partido)
         .join(el, Partido.equipo_local_id == el.equipo_id)
         .join(ev, Partido.equipo_visitante_id == ev.equipo_id)
         .filter(

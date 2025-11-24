@@ -33,6 +33,13 @@
                         <span class="score-num">{{ partido.goles_visitante }}</span>
                     </div>
                     <small class="meta">Finalizado</small>
+                {% elif partido.estado == 'EN_CURSO' %}
+                    <div class="score live">
+                        <span class="score-num">{{ partido.goles_local }}</span>
+                        <span class="score-sep">-</span>
+                        <span class="score-num">{{ partido.goles_visitante }}</span>
+                    </div>
+                    <small class="meta live-badge">🔴 EN VIVO</small>
                 {% else %}
                     <div class="status-upcoming">{{ partido.hora or '' }}</div>
                     <small class="meta">{{ partido.fecha }}{% if partido.lugar %} • {{ partido.lugar }}{% endif %}</small>
@@ -51,8 +58,65 @@
             <p class="fecha-hora">{{ partido.fecha }}{% if partido.hora %} - {{ partido.hora }}{% endif %}</p>
             <p class="estado">Estado: {{ partido.estado }}</p>
         </section>
+
+        <section class="panel eventos-timeline">
+            <h2>Eventos del Partido</h2>
+            <div id="eventos-container">
+                <p class="loading">Cargando eventos...</p>
+            </div>
+        </section>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <section class="panel">
+                <h2>Formación Local</h2>
+                {% if partido.formacion_local %}
+                    <p>{{ partido.formacion_local.defensas }}-{{ partido.formacion_local.mediocampistas }}-{{ partido.formacion_local.delanteros }} (Portero ID {{ partido.formacion_local.portero_id }})</p>
+                    <h3>Titulares</h3>
+                    <ul class="alineacion">
+                    {% for j in partido.formacion_local.titulares %}
+                        <li><strong>{{ j.nombre }}</strong> - {{ j.posicion }}</li>
+                    {% endfor %}
+                    </ul>
+                    <h3>Suplentes</h3>
+                    <ul class="alineacion suplentes">
+                    {% for j in partido.formacion_local.suplentes %}
+                        <li>{{ j.nombre }} - {{ j.posicion }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No asignada.</p>
+                {% endif %}
+            </section>
+            
+            <section class="panel">
+                <h2>Formación Visitante</h2>
+                {% if partido.formacion_visitante %}
+                    <p>{{ partido.formacion_visitante.defensas }}-{{ partido.formacion_visitante.mediocampistas }}-{{ partido.formacion_visitante.delanteros }} (Portero ID {{ partido.formacion_visitante.portero_id }})</p>
+                    <h3>Titulares</h3>
+                    <ul class="alineacion">
+                    {% for j in partido.formacion_visitante.titulares %}
+                        <li><strong>{{ j.nombre }}</strong> - {{ j.posicion }}</li>
+                    {% endfor %}
+                    </ul>
+                    <h3>Suplentes</h3>
+                    <ul class="alineacion suplentes">
+                    {% for j in partido.formacion_visitante.suplentes %}
+                        <li>{{ j.nombre }} - {{ j.posicion }}</li>
+                    {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>No asignada.</p>
+                {% endif %}
+            </section>
+        </div>
     </main>
     </div>
+    <script>
+        const partidoId = {{ partido.partido_id }};
+        const equipoLocalId = {{ partido.equipo_local_id }};
+        const equipoVisitanteId = {{ partido.equipo_visitante_id }};
+    </script>
     <script src="/static/js/partidos_programados.js"></script>
+    <script src="/static/js/partido_eventos.js"></script>
 </body>
 </html>
