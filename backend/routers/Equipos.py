@@ -66,6 +66,8 @@ async def actualizar_equipo(equipo_id: int,
                             estadio: str = Form(None),
                             anio_fundacion: int = Form(None),
                             titulos: int = Form(None),
+                            activo: bool = Form(None),
+                            remove_logo: bool = Form(False),
                             file: UploadFile = File(None)
                             ):
     equipo = session.get(Equipo, equipo_id)
@@ -75,6 +77,8 @@ async def actualizar_equipo(equipo_id: int,
     if file:
         logo = await upload_file(file)
         equipo.logo = logo["file_name"]
+    elif remove_logo:
+        equipo.logo = None
 
     if nombre is not None:
         equipo.nombre = nombre
@@ -86,6 +90,8 @@ async def actualizar_equipo(equipo_id: int,
         equipo.anio_fundacion = anio_fundacion
     if titulos is not None:
         equipo.titulos = titulos
+    if activo is not None:
+        equipo.activo = activo
     session.commit()
     session.refresh(equipo)
     return equipo
