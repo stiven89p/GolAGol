@@ -1,4 +1,88 @@
 /* ===============================
+   NUEVO LAYOUT INDEX
+================================ */
+.flex-main {
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+    margin: 20px;
+}
+
+.left-panel {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    min-width: 0;
+}
+
+.right-panel {
+    flex: 0 0 400px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 320px;
+}
+
+.partidos-vivo-panel {
+    background: #161b22;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    padding: 18px 20px;
+    margin-bottom: 0;
+}
+
+#partidos, #ultimos-resultados {
+    background: #161b22;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    padding: 18px 20px;
+    margin-bottom: 0;
+}
+
+#partidos h2, .partidos-vivo-panel h2, #ultimos-resultados h2 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: bold;
+    color: #58a6ff;
+    border-bottom: 1px solid #30363d;
+    padding-bottom: 0.5rem;
+    margin-bottom: 18px;
+}
+
+@media (max-width: 1024px) {
+    .flex-main {
+        flex-direction: column;
+        gap: 20px;
+        margin: 12px;
+    }
+    .right-panel {
+        min-width: 0;
+        flex: 1 1 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .flex-main {
+        flex-direction: column;
+        gap: 12px;
+        margin: 8px;
+    }
+    .left-panel, .right-panel {
+        min-width: 0;
+        flex: 1 1 0;
+    }
+    #partidos, .partidos-vivo-panel, #ultimos-resultados, #tabla-posiciones, #goleadores {
+        padding: 12px;
+    }
+}
+/* Logo de equipo en tabla de posiciones */
+.equipo-logo-tabla {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+/* ===============================
    🎨 ESTILOS GENERALES
 ================================ */
 body {
@@ -44,7 +128,7 @@ body {
 
 /* Logo del sitio en el header */
 .site-logo {
-    height: 72px;
+    height: 56px;
     width: auto;
     display: block;
 }
@@ -596,6 +680,7 @@ th {
     gap: 0.75rem;
     transition: all 0.2s ease;
     border: 1px solid transparent;
+    cursor: pointer;
 }
 
 .jugador-card:hover {
@@ -948,6 +1033,32 @@ th {
 
 .jugadores-lista-scroll::-webkit-scrollbar-thumb:hover {
     background: #58a6ff;
+}
+
+/* ===============================
+   Altura dinámica para lista de jugadores
+   Ajusta la sidebar y el scroll a la altura real de la pantalla
+   considerando el alto del header sticky. Usa --header-height
+   para evitar recortes en diferentes dispositivos.
+================================ */
+:root {
+    --header-height: 0px; /* Se actualiza vía JS */
+}
+
+.jugadores-layout {
+    min-height: calc(100dvh - var(--header-height));
+}
+
+.jugadores-sidebar {
+    max-height: calc(100dvh - var(--header-height) - 40px); /* 40px del padding general */
+}
+
+.jugadores-sidebar .panel {
+    max-height: inherit;
+}
+
+.jugadores-lista-scroll {
+    min-height: 0; /* Permite que flexbox/grid calcule correctamente el área scroll */
 }
 
 .posicion-grupo-jugadores {
@@ -1349,14 +1460,22 @@ th {
     font-size: 0.85rem;
 }
 
+/* ===============================
+   RESPONSIVE DESIGN
+================================ */
+@media (max-width: 1400px) {
+    .jugadores-layout {
+        grid-template-columns: 320px 1fr;
+        gap: 20px;
+        padding: 16px;
+    }
+}
+
 @media (max-width: 1024px) {
     .jugadores-layout {
-        grid-template-columns: 1fr;
-    }
-    
-    .jugadores-sidebar {
-        position: static;
-        max-height: 400px;
+        grid-template-columns: 280px 1fr;
+        gap: 16px;
+        padding: 12px;
     }
     
     .jugador-header-perfil {
@@ -1368,4 +1487,194 @@ th {
     .jugador-info-basica {
         grid-template-columns: 1fr;
     }
+    
+    .equipo-logo-small {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .equipo-header h2 {
+        font-size: 1.1rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .jugadores-layout {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 10px;
+        min-height: calc(100dvh - var(--header-height));
+    }
+    
+    .jugadores-sidebar {
+        position: static;
+        max-height: calc(100dvh - var(--header-height) - 20px);
+        margin-bottom: 0;
+    }
+    
+    .jugadores-sidebar .panel {
+        max-height: inherit;
+    }
+    
+    .jugador-foto-grande {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .jugador-nombre-grande {
+        font-size: 2rem;
+    }
+    
+    .main-layout {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        margin: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    .jugadores-filtro {
+        gap: 6px;
+    }
+    
+    .filtro-btn {
+        padding: 5px 10px;
+        font-size: 0.8rem;
+    }
+    
+    .jugador-item {
+        gap: 10px;
+        padding: 8px;
+    }
+    
+    .jugador-foto-small {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .jugador-nombre-item {
+        font-size: 0.9rem;
+    }
+    
+    .jugador-foto-grande {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .jugador-nombre-grande {
+        font-size: 1.6rem;
+    }
+    
+    .jugador-numero-grande {
+        font-size: 2rem;
+    }
+}
+
+/* ===============================
+   NAVBAR
+================================ */
+.navbar {
+  width: 100%;
+  height: 80px;
+  min-height: 0;
+  background: #161b22;
+  padding: 0 2rem;
+  border-bottom: 1px solid #30363d;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 10;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+.site-logo {
+  height: 70px;
+  width: auto;
+}
+.navbar-links {
+  display: flex;
+  gap: 1.2rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+.navbar-links li {
+  display: flex;
+  align-items: center;
+}
+.navbar-links li a {
+  font-size: 1.02rem;
+  padding: 0.32rem 0.85rem;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  background: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #e6edf3 !important;
+  text-decoration: none !important;
+  font-weight: 500;
+  box-shadow: 0 1px 2px rgba(88,166,255,0.05);
+  transition: color 0.2s, background 0.2s, border 0.2s;
+}
+.navbar-links li a:hover {
+  color: #58a6ff !important;
+  background: #161b22;
+  border-color: #58a6ff;
+  text-decoration: none;
+}
+
+.equipos-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+.equipo-card {
+  display: flex;
+  align-items: center;
+  background: #21262d;
+  border-radius: 8px;
+  text-decoration: none;
+  color: #e6edf3;
+  box-shadow: 0 2px 8px rgba(88,166,255,0.05);
+  padding: 1.2rem 1.5rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+  border: 1px solid transparent;
+  gap: 1.5rem;
+}
+.equipo-card:hover {
+  box-shadow: 0 6px 16px rgba(88,166,255,0.15);
+  border-color: #58a6ff;
+  transform: translateY(-2px);
+}
+.equipo-logo {
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+  border-radius: 0;
+  background: none;
+  margin-right: 1.2rem;
+}
+.equipo-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.equipo-nombre {
+  margin: 0 0 0.3rem 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #58a6ff;
+}
+.equipo-meta {
+  color: #8b949e;
+  font-size: 1rem;
+  margin: 0;
+}
+.equipo-meta + .equipo-meta {
+  margin-top: 0.2rem;
 }
