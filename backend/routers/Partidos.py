@@ -105,9 +105,16 @@ async def crear_partido(
 
     return partido
 
-# python
-@router.get("/", response_model=list[PartidoDTO])
+@router.get("/", response_model=list[Partido])
 async def obtener_partidos(session: SessionDep):
+    partidos = session.query(Partido).all()
+    return partidos 
+
+@router.get("/{estado}/", response_model=list[PartidoDTO])
+async def obtener_partidos_por_estado(estado: EstadoPartidos, session: SessionDep):
+    from backend.modelos.Equipos import Equipo
+    from backend.modelos.Partidos import PartidoDTO
+    from sqlalchemy.orm import aliased
     equipo_local = aliased(Equipo)
     equipo_visitante = aliased(Equipo)
 
@@ -115,12 +122,10 @@ async def obtener_partidos(session: SessionDep):
         session.query(Partido, equipo_local, equipo_visitante)
         .join(equipo_local, Partido.equipo_local_id == equipo_local.equipo_id)
         .join(equipo_visitante, Partido.equipo_visitante_id == equipo_visitante.equipo_id)
-        .order_by(Partido.fecha.asc())
+        .filter(Partido.estado == estado)
+        .order_by(Partido.fecha.desc())
         .all()
     )
-
-    if not rows:
-        raise HTTPException(status_code=404, detail="No se encontraron partidos programados")
 
     dto_list: list[PartidoDTO] = []
     for partido, el, ev in rows:
@@ -179,13 +184,6 @@ async def obtener_partidos_equipo(equipo_id: int, session: SessionDep):
         dto_list.append(dto)
 
     return dto_list
-
-@router.get("/{estado}/", response_model=list[Partido])
-async def obtener_partidos_equipo(estado: EstadoPartidos, session: SessionDep):
-    partidos = session.query(Partido).filter(Partido.estado == estado).all()
-    if not partidos:
-        raise HTTPException(status_code=404, detail="No se encontraron partidos para este equipo")
-    return partidos
 
 
 @router.patch("/{partido_id}", response_model=Partido)
