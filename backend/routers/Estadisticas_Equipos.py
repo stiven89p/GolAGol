@@ -28,6 +28,7 @@ async def obtener_estadistica_equipos(temporada_id: int, session: SessionDep):
         dto = Estadisticas_EDTO(
             equipo_id=estad.equipo_id,
             equipo_logo=getattr(equipo, "logo", None),
+            equipo_nombre=getattr(equipo, "nombre", None),
             temporada=estad.temporada,
             partidos_jugados=estad.partidos_jugados,
             victorias=estad.victorias,
@@ -37,7 +38,7 @@ async def obtener_estadistica_equipos(temporada_id: int, session: SessionDep):
             goles_contra=estad.goles_contra,
             puntos=estad.puntos,
             tarjetas_amarillas=estad.tarjetas_amarillas,
-            tarjetas_rojas=estad.tarjetas_rojas,
+            tarjetas_rojas=estad.tarjetas_rojas
         )
         dto_list.append(dto)
 
