@@ -1,10 +1,11 @@
-<nav class="site-header">
-  <a href="{{ url_for('home') }}" class="brand" aria-label="Ir a la página principal">
-    <img
-      src="{{ url_for('static', path='/img/logo.png') }}"
-      alt="GolAGol"
-      class="site-logo"
-      loading="eager"
-    />
+<nav class="navbar">
+  <a href="{{ url_for('home') }}" class="brand">
+    <img src="{{ url_for('static', path='/img/logo.png') }}" alt="GolAGol" class="site-logo" />
   </a>
+  <ul class="navbar-links">
+    <li><a href="{{ url_for('home') }}">Inicio</a></li>
+    <li><a href="/equipos_listado">Equipos</a></li>
+    <li><a href="/partidos">Partidos</a></li>
+    <li><a href="/estadisticas">Estadísticas</a></li>
+  </ul>
 </nav>
