@@ -27,9 +27,12 @@ document.addEventListener("DOMContentLoaded", () => {
                 tr.innerHTML = `
                     <td>${index + 1}</td>
                     <td style="display:flex;align-items:center;gap:10px;">
-                        <img src="/static/img/${team.equipo_logo}" 
-                             onerror="this.src='/static/img/default_logo.png'"
-                             style="width:28px;height:28px;object-fit:contain;">
+                        <a href="/equipo/${team.equipo_id}" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
+                            <img src="/static/img/${team.equipo_logo}" 
+                                 onerror="this.src='/static/img/default_logo.png'"
+                                 style="width:28px;height:28px;object-fit:contain;">
+                            <span>${team.equipo_nombre}</span>
+                        </a>
                     </td>
                     <td>${team.partidos_jugados}</td>
                     <td>${team.victorias}</td>

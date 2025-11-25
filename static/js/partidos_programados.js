@@ -151,13 +151,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const cargarPartidos = async () => {
         try {
-            const res = await fetch("/partidos");
-            if (!res.ok) throw new Error("Error al obtener partidos");
 
-            const partidos = await res.json();
-            // Separar por estado
-            const programados = partidos.filter(p => p.estado === "PROGRAMADO");
-            const finalizados = partidos.filter(p => p.estado === "FINALIZADO");
+            // Cargar partidos programados
+            const resProgramados = await fetch("/partidos/programado/");
+            if (!resProgramados.ok) throw new Error("Error al obtener partidos programados");
+            const programados = await resProgramados.json();
+
+            // Cargar partidos finalizados
+            const resFinalizados = await fetch("/partidos/finalizado/");
+            if (!resFinalizados.ok) throw new Error("Error al obtener partidos finalizados");
+            const finalizados = await resFinalizados.json();
 
             // Ordenar por fecha y hora
             const sortDesc = (a, b) => {

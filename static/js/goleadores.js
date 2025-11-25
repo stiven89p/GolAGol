@@ -41,9 +41,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 };
 
+                // Solo mostrar el nombre del jugador como span, sin link
                 const spanNombre = document.createElement("span");
                 spanNombre.textContent = `${g.jugador_nombre} ${g.jugador_apellido}`;
-
                 tdJugador.append(imgJugador, spanNombre);
 
                 const tdEquipo = document.createElement("td");
