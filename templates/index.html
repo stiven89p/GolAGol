@@ -8,27 +8,38 @@
 </head>
 <body>
     {% include 'partials/header.html' %}
-    <div class="main-layout">
-        <!-- Partidos programados -->
-        <section id="partidos">
-            <h2>Partidos Programados</h2>
-            <div id="partidos-lista">
-                <p class="loading">Cargando partidos...</p>
-            </div>
-            <div style="margin-top: 12px;">
-                <button id="toggle-partidos" type="button">Ver todos</button>
-            </div>
 
-            <h2 style="margin-top:20px;">Últimos Resultados</h2>
-            <div id="ultimos-lista">
-                <p class="loading">Cargando últimos partidos...</p>
-            </div>
-        </section>
+    <div class="main-layout flex-main">
+        <!-- Columna izquierda: partidos y resultados -->
 
+        <div class="left-panel">
+            <section class="panel partidos-vivo-panel">
+                <h2>Partidos en Vivo</h2>
+                <div id="partidos-vivo-lista">
+                    <p class="loading">Cargando partidos en vivo...</p>
+                </div>
+            </section>
 
-        <!-- Contenedor derecho con tablas -->
+            <section id="partidos">
+                <h2>Partidos Programados</h2>
+                <div id="partidos-lista">
+                    <p class="loading">Cargando partidos...</p>
+                </div>
+                <div style="margin-top: 12px;">
+                    <button id="toggle-partidos" type="button">Ver todos</button>
+                </div>
+            </section>
+
+            <section id="ultimos-resultados">
+                <h2>Últimos Resultados</h2>
+                <div id="ultimos-lista">
+                    <p class="loading">Cargando últimos partidos...</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- Columna derecha: tablas -->
         <div class="right-panel">
-            <!-- Tabla de posiciones -->
             <section id="tabla-posiciones">
                 <h2>Tabla de Posiciones</h2>
                 <table>
@@ -53,7 +64,6 @@
                 </table>
             </section>
 
-            <!-- Tabla de Goleadores -->
             <section id="goleadores">
                 <h2>Goleadores</h2>
                 <table>
@@ -78,5 +88,6 @@
     <script src="{{ url_for('static', path='/js/tabla_posiciones.js') }}?v={{ cache_bust }}"></script>
     <script src="{{ url_for('static', path='/js/goleadores.js') }}?v={{ cache_bust }}"></script>
     <script src="{{ url_for('static', path='/js/partidos_programados.js') }}?v={{ cache_bust }}"></script>
+    <script src="{{ url_for('static', path='/js/partidos_vivo.js') }}?v={{ cache_bust }}"></script>
 </body>
 </html>
