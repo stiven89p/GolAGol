@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Listado de Equipos - GolAGol</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+</head>
+<body>
+  {% include 'partials/header.html' %}
+  <main class="equipos-main">
+    <section class="panel equipos-lista-panel">
+      <h1>Listado completo de equipos</h1>
+      <div class="equipos-lista">
+        {% for equipo in equipos %}
+        <a href="/equipo/{{ equipo.equipo_id }}" class="equipo-card">
+          <img src="{{ url_for('static', path='img/' ~ equipo.logo) if equipo.logo else url_for('static', path='img/default_logo.png') }}" alt="Logo {{ equipo.nombre }}" class="equipo-logo" />
+          <div class="equipo-info">
+            <h2 class="equipo-nombre">{{ equipo.nombre }}</h2>
+            <p class="equipo-meta">Ciudad: {{ equipo.ciudad }}</p>
+            <p class="equipo-meta">Año de fundación: {{ equipo.anio_fundacion }}</p>
+          </div>
+        </a>
+        {% else %}
+        <p>No hay equipos registrados.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+</body>
+</html>

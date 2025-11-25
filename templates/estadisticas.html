@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Estadísticas - GolAGol</title>
+  <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+  <style>
+    .tabs {
+      display: flex;
+      justify-content: center;
+      margin: 2rem 0 1rem 0;
+      gap: 0.5rem;
+    }
+    .tab-btn {
+      background: #161b22;
+      color: #e6edf3;
+      border: 1px solid #58a6ff;
+      padding: 0.7rem 2.2rem;
+      font-size: 1.1rem;
+      border-radius: 4px 4px 0 0;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.2s, color 0.2s;
+    }
+    .tab-btn.active {
+      background: #58a6ff;
+      color: #161b22;
+      border-bottom: 2px solid #161b22;
+    }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .ranking-destacados {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      background: #181c23;
+      padding: 1.5rem 0 1.2rem 0;
+      border-radius: 8px 8px 0 0;
+    }
+    .ranking-destacado {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 160px;
+    }
+    .ranking-foto {
+      width: 90px;
+      height: 90px;
+      object-fit: cover;
+      border-radius: 50%;
+      margin-bottom: 0.5rem;
+      border: 3px solid #30363d;
+      background: #21262d;
+    }
+    .ranking-num {
+      background: #161b22;
+      color: #fff;
+      font-size: 1.3rem;
+      font-weight: bold;
+      border-radius: 8px;
+      padding: 0.3rem 1.1rem;
+      margin-bottom: 0.5rem;
+      margin-top: -2.2rem;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(88,166,255,0.08);
+    }
+    .ranking-nombre {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #e6edf3;
+      margin-bottom: 0.2rem;
+      text-align: center;
+    }
+    .ranking-info {
+      color: #8b949e;
+      font-size: 0.95rem;
+      text-align: center;
+      margin-bottom: 0.2rem;
+    }
+    .ranking-lista {
+      background: #181c23;
+      border-radius: 0 0 8px 8px;
+      margin-top: 0;
+      padding: 0.5rem 0;
+    }
+    .ranking-item {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      padding: 0.7rem 2rem;
+      border-bottom: 1px solid #21262d;
+    }
+    .ranking-item:last-child { border-bottom: none; }
+    .ranking-item-foto {
+      width: 40px;
+      height: 40px;
+      object-fit: cover;
+      border-radius: 50%;
+      background: #21262d;
+      border: 2px solid #30363d;
+    }
+    .ranking-item-nombre {
+      font-weight: 500;
+      color: #e6edf3;
+      font-size: 1rem;
+    }
+    .ranking-item-info {
+      color: #8b949e;
+      font-size: 0.95rem;
+      margin-left: 0.5rem;
+    }
+    .ranking-item-pais {
+      color: #8b949e;
+      font-size: 0.92rem;
+      margin-left: 0.5rem;
+    }
+    .ranking-item-goles {
+      margin-left: auto;
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #58a6ff;
+    }
+  </style>
+</head>
+<body>
+  {% include 'partials/header.html' %}
+  <main class="estadisticas-main">
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="jugadores">Jugadores</button>
+      <button class="tab-btn" data-tab="equipos">Equipos</button>
+    </div>
+    <section class="tab-content active" id="tab-jugadores">
+      <h2 style="margin-bottom:1.2rem;">Goles</h2>
+      <div class="ranking-destacados">
+        {% for jugador in estadisticas_jugadores[:3] %}
+        <div class="ranking-destacado">
+          <img src="{{ url_for('static', path='img/' ~ jugador.foto) if jugador.foto else url_for('static', path='img/default_logo.png') }}" class="ranking-foto" alt="{{ jugador.nombre }}" />
+          <div class="ranking-num">{{ jugador.goles }}</div>
+          <div class="ranking-nombre">{{ jugador.nombre }} {{ jugador.apellido }}</div>
+          <div class="ranking-info">{{ jugador.equipo_nombre }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="ranking-lista">
+        {% for jugador in estadisticas_jugadores[3:] %}
+        <div class="ranking-item">
+          <img src="{{ url_for('static', path='img/' ~ jugador.foto) if jugador.foto else url_for('static', path='img/default_logo.png') }}" class="ranking-item-foto" alt="{{ jugador.nombre }}" />
+          <span class="ranking-item-nombre">{{ jugador.nombre }} {{ jugador.apellido }}</span>
+          <span class="ranking-item-pais">{{ jugador.equipo_nombre }}</span>
+          <span class="ranking-item-goles">{{ jugador.goles }}</span>
+        </div>
+        {% endfor %}
+      </div>
+      <h2 style="margin:2.5rem 0 1.2rem 0;">Asistencias</h2>
+      <div class="ranking-destacados">
+        {% for jugador in asistidores[:3] %}
+        <div class="ranking-destacado">
+          <img src="{{ url_for('static', path='img/' ~ jugador.foto) if jugador.foto else url_for('static', path='img/default_logo.png') }}" class="ranking-foto" alt="{{ jugador.nombre }}" />
+          <div class="ranking-num">{{ jugador.asistencias }}</div>
+          <div class="ranking-nombre">{{ jugador.nombre }} {{ jugador.apellido }}</div>
+          <div class="ranking-info">{{ jugador.equipo_nombre }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      <div class="ranking-lista">
+        {% for jugador in asistidores[3:] %}
+        <div class="ranking-item">
+          <img src="{{ url_for('static', path='img/' ~ jugador.foto) if jugador.foto else url_for('static', path='img/default_logo.png') }}" class="ranking-item-foto" alt="{{ jugador.nombre }}" />
+          <span class="ranking-item-nombre">{{ jugador.nombre }} {{ jugador.apellido }}</span>
+          <span class="ranking-item-pais">{{ jugador.equipo_nombre }}</span>
+          <span class="ranking-item-goles">{{ jugador.asistencias }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    <section class="tab-content" id="tab-equipos">
+      <h2 style="margin-bottom:1.2rem;">Ranking de Equipos</h2>
+      <div class="ranking-lista">
+        {% for equipo in estadisticas_equipos %}
+        <div class="ranking-item">
+          <img src="{{ url_for('static', path='img/' ~ equipo.logo) if equipo.logo else url_for('static', path='img/default_logo.png') }}" class="ranking-item-foto" alt="{{ equipo.nombre }}" />
+          <span class="ranking-item-nombre">{{ equipo.nombre }}</span>
+          <span class="ranking-item-info">PJ: {{ equipo.partidos_jugados }} | G: {{ equipo.victorias }} | E: {{ equipo.empates }} | P: {{ equipo.derrotas }}</span>
+          <span class="ranking-item-goles">{{ equipo.puntos }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+  <script>
+    // Tabs JS
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.getElementById('tab-' + this.dataset.tab).classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

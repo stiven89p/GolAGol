@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liga Colombiana – Partidos y Tabla</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}?v={{ cache_bust }}">
+</head>
+<body>
+    {% include 'partials/header.html' %}
+  <main class="equipos-main">
+    <section class="panel equipos-lista-panel">
+      <h1>Equipos</h1>
+      <div class="equipos-opciones">
+        <label><input type="radio" name="vista" value="logos" checked> Solo nombres y logos</label>
+        <label><input type="radio" name="vista" value="completa"> Vista completa</label>
+      </div>
+      <div class="equipos-lista" id="equipos-lista">
+        {% for equipo in equipos %}
+        <a href="/equipo/{{ equipo.equipo_id }}" class="equipo-card" data-ciudad="{{ equipo.ciudad }}" data-anio="{{ equipo.anio_fundacion }}">
+          <img src="{{ equipo.logo if equipo.logo else url_for('static', path='img/default_logo.png') }}" alt="Logo {{ equipo.nombre }}" class="equipo-logo" />
+          <div class="equipo-info">
+            <h2 class="equipo-nombre">{{ equipo.nombre }}</h2>
+            <p class="equipo-meta">🏙️ {{ equipo.ciudad }} | 📅 {{ equipo.anio_fundacion }}</p>
+          </div>
+        </a>
+        {% else %}
+        <p>No hay equipos registrados.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
+  <script>
+    // JS para cambiar la vista de equipos
+    document.addEventListener('DOMContentLoaded', function() {
+      const radios = document.querySelectorAll('input[name="vista"]');
+      const cards = document.querySelectorAll('.equipo-card');
+      radios.forEach(radio => {
+        radio.addEventListener('change', function() {
+          if (this.value === 'logos') {
+            cards.forEach(card => {
+              card.querySelector('.equipo-meta').style.display = 'none';
+            });
+          } else {
+            cards.forEach(card => {
+              card.querySelector('.equipo-meta').style.display = '';
+            });
+          }
+        });
+      });
+      // Inicializa en modo logos
+      cards.forEach(card => {
+        card.querySelector('.equipo-meta').style.display = 'none';
+      });
+    });
+  </script>
+</body>
+</html>
