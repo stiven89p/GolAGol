@@ -44,6 +44,15 @@
     
     <script>
         var equipoId = {{ equipo.equipo_id }};
+        // Ajusta la variable --header-height dinámicamente para cálculo de alturas
+        function setHeaderHeightVar() {
+            const header = document.querySelector('.site-header');
+            if (header) {
+                document.documentElement.style.setProperty('--header-height', header.offsetHeight + 'px');
+            }
+        }
+        setHeaderHeightVar();
+        window.addEventListener('resize', setHeaderHeightVar);
     </script>
     <script src="/static/js/jugadores.js"></script>
 </body>

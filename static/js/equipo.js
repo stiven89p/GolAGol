@@ -127,8 +127,10 @@
       }
 
       jugadoresGrupo.forEach(j => {
-        const div = document.createElement('div');
-        div.className = 'jugador-card';
+        const link = document.createElement('a');
+        link.href = `/jugador/${j.jugador_id}`;
+        link.className = 'jugador-link jugador-card';
+        link.title = `Ver perfil de ${j.nombre} ${j.apellido}`;
 
         const img = document.createElement('img');
         img.src = j.foto ? `/static/img/${j.foto}` : '/static/img/default.png';
@@ -157,8 +159,8 @@
           edad.textContent = `${edadCalculada} años`;
         }
 
-        div.append(img, nombre, edad);
-        lista.appendChild(div);
+        link.append(img, nombre, edad);
+        lista.appendChild(link);
       });
     };
 
