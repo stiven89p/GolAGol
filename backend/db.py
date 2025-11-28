@@ -14,8 +14,11 @@ db_port = os.getenv("DB_PORT")
 db_name = os.getenv("DB_NAME")
 
 
-# URL de conexión PostgreSQL
-db_url = f"postgresql+psycopg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+# URL de conexión PostgreSQL (omitir puerto si no está definido)
+if db_port and db_port.strip().lower() != 'none':
+    db_url = f"postgresql+psycopg://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}"
+else:
+    db_url = f"postgresql+psycopg://{db_user}:{db_password}@{db_host}/{db_name}"
 
 # Crea el engine de SQLAlchemy/SQLModel
 engine = create_engine(db_url, echo=True, connect_args={"client_encoding": "utf8"})

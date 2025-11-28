@@ -122,3 +122,50 @@ function renderEventos(eventos) {
 
 // Cargar eventos al iniciar
 document.addEventListener('DOMContentLoaded', cargarEventosPartido);
+
+// Poller para actualizar marcador en vivo
+async function pollScoreOnce(){
+    try{
+        const res = await fetch(`/partidos/id/${partidoId}`);
+        if(!res.ok) return;
+        const p = await res.json();
+        const localEl = document.getElementById('goles-local');
+        const visitanteEl = document.getElementById('goles-visitante');
+        if(localEl) localEl.textContent = p.goles_local ?? localEl.textContent;
+        if(visitanteEl) visitanteEl.textContent = p.goles_visitante ?? visitanteEl.textContent;
+
+        // Update live badge / score styling if estado changed
+        const centerScore = document.querySelector('.center-block .score');
+        const liveBadge = document.querySelector('.center-block .meta.live-badge');
+        if(p.estado === 'EN_CURSO'){
+            if(centerScore && !centerScore.classList.contains('live')) centerScore.classList.add('live');
+            if(liveBadge) liveBadge.style.display = '';
+        } else {
+            if(centerScore) centerScore.classList.remove('live');
+            if(liveBadge) liveBadge.style.display = (p.estado === 'FINALIZADO') ? '' : 'none';
+        }
+
+        // Notify timer about potential changes (estado, hora_inicio, parte)
+        try{
+            const evt = new CustomEvent('partido-update', { detail: {
+                estado: p.estado,
+                fecha: p.fecha,
+                hora_inicio: p.hora_inicio || null,
+                hora_fin_primer_tiempo: p.hora_fin_primer_tiempo || null,
+                hora_inicio_segundo_tiempo: p.hora_inicio_segundo_tiempo || null,
+                hora_fin_segundo_tiempo: p.hora_fin_segundo_tiempo || null,
+                parte: p.parte || null
+            }});
+            window.dispatchEvent(evt);
+        }catch(_e){ /* ignore */ }
+    }catch(e){
+        // silently ignore polling errors
+    }
+}
+
+// Start polling every 5 seconds when DOM ready
+document.addEventListener('DOMContentLoaded', function(){
+    // initial fetch
+    pollScoreOnce();
+    setInterval(pollScoreOnce, 5000);
+});
