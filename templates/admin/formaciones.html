@@ -61,6 +61,7 @@
     <span class="close" onclick="cerrarFormulario()">&times;</span>
     <h3 id="form-title">Crear Formación</h3>
     <form id="formacion-form">
+      <div id="form-step-1">
       <div class="form-row">
         <div class="form-group">
           <label for="equipo_id">Equipo *</label>
@@ -91,14 +92,23 @@
       <div class="form-group">
         <label>Titulares (11) *</label>
         <div id="titulares-container" class="multi-select"></div>
+        <small class="hint">Seleccione exactamente 10 jugadores de campo. El portero se escoge arriba.</small>
       </div>
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" onclick="cerrarFormulario()">Cancelar</button>
+        <button type="button" class="btn btn-primary" id="go-step-2">Continuar</button>
+      </div>
+      </div>
+      <div id="form-step-2" style="display:none;">
       <div class="form-group">
         <label>Suplentes (9) *</label>
         <div id="suplentes-container" class="multi-select"></div>
       </div>
       <div class="form-actions">
         <button type="button" class="btn btn-secondary" onclick="cerrarFormulario()">Cancelar</button>
+        <button type="button" class="btn" id="back-step-1">Volver</button>
         <button type="submit" class="btn btn-primary">Guardar</button>
+      </div>
       </div>
     </form>
   </div>
