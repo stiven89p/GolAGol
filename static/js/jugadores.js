@@ -58,12 +58,12 @@ function renderizarJugadores(jugadores) {
             html += `<h3 class="posicion-titulo">${posicionLabels[posicion]}</h3>`;
             
             jugadores.forEach(j => {
-                const fotoUrl = j.foto || '/static/img/default-player.png';
+                const fotoUrl = j.foto ? `/static/img/${j.foto}` : '/static/img/default-player.png';
                 const edad = calcularEdad(j.fecha_nacimiento);
                 
                 html += `
                     <div class="jugador-item" data-jugador-id="${j.jugador_id}" data-posicion="${j.posicion}">
-                        <img src="${fotoUrl}" alt="${j.nombre}" class="jugador-foto-small">
+                        <img src="${fotoUrl}" alt="${j.nombre}" class="jugador-foto-small" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">
                         <div class="jugador-item-info">
                             <strong class="jugador-nombre-item">${j.nombre} ${j.apellido}</strong>
                             <div class="jugador-meta">
@@ -132,13 +132,13 @@ function renderizarInfoJugador() {
     
     const container = document.getElementById('jugador-info');
     const j = jugadorSeleccionado;
-    const fotoUrl = j.foto || '/static/img/default-player.png';
+    const fotoUrl = j.foto ? `/static/img/${j.foto}` : '/static/img/default-player.png';
     const edad = calcularEdad(j.fecha_nacimiento);
     
     let html = `
         <div class="jugador-perfil panel">
             <div class="jugador-header-perfil">
-                <img src="${fotoUrl}" alt="${j.nombre} ${j.apellido}" class="jugador-foto-grande">
+                <img src="${fotoUrl}" alt="${j.nombre} ${j.apellido}" class="jugador-foto-grande" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">
                 <div class="jugador-datos-principales">
                     <h1 class="jugador-nombre-grande">${j.nombre} ${j.apellido}</h1>
                     <div class="jugador-numero-grande">#${j.numero_camiseta || '-'}</div>

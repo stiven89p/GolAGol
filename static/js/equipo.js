@@ -133,12 +133,12 @@
         link.title = `Ver perfil de ${j.nombre} ${j.apellido}`;
 
         const img = document.createElement('img');
-        img.src = j.foto ? `/static/img/${j.foto}` : '/static/img/default.png';
+        img.src = j.foto ? `/static/img/${j.foto}` : '/static/img/default-player.png';
         img.alt = `${j.nombre} ${j.apellido}`;
         img.className = 'jugador-foto';
         img.onerror = function() {
-          if (this.src !== '/static/img/default.png') {
-            this.src = '/static/img/default.png';
+          if (this.src !== '/static/img/default-player.png') {
+            this.src = '/static/img/default-player.png';
           }
         };
 
@@ -208,12 +208,12 @@
       div.className = 'jugador-card goleador-item';
 
       const img = document.createElement('img');
-      img.src = g.jugador_foto ? `/static/img/${g.jugador_foto}` : '/static/img/default.png';
+      img.src = g.jugador_foto ? `/static/img/${g.jugador_foto}` : '/static/img/default-player.png';
       img.alt = `${g.jugador_nombre} ${g.jugador_apellido}`;
       img.className = 'jugador-foto';
       img.onerror = function() {
-        if (this.src !== '/static/img/default.png') {
-          this.src = '/static/img/default.png';
+        if (this.src !== '/static/img/default-player.png') {
+          this.src = '/static/img/default-player.png';
         }
       };
 

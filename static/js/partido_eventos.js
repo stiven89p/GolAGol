@@ -68,7 +68,7 @@ function renderEventos(eventos) {
                 className += ' evento-gol';
                 descripcion = evento.descripcion || `Gol de ${evento.jugador_nombre || 'Jugador'}`;
                 if (evento.jugador_foto) {
-                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto">`;
+                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
                 }
                 if (evento.jugador_asociado_nombre) {
                     descripcion += ` (Asistencia: ${evento.jugador_asociado_nombre})`;
@@ -78,8 +78,8 @@ function renderEventos(eventos) {
             case 'SUSTITUCION':
                 icono = '🔄';
                 className += ' evento-sustitucion';
-                const saleFoto = evento.jugador_foto ? `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto jugador-sale">` : '';
-                const entraFoto = evento.jugador_asociado_foto ? `<img src="${evento.jugador_asociado_foto}" alt="${evento.jugador_asociado_nombre}" class="evento-jugador-foto jugador-entra">` : '';
+                const saleFoto = evento.jugador_foto ? `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto jugador-sale" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">` : '';
+                const entraFoto = evento.jugador_asociado_foto ? `<img src="${evento.jugador_asociado_foto}" alt="${evento.jugador_asociado_nombre}" class="evento-jugador-foto jugador-entra" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">` : '';
                 
                 fotoHTML = `<div class="sustitucion-fotos">${saleFoto}${entraFoto}</div>`;
                 descripcion = `<span class="jugador-sale-nombre">${evento.jugador_nombre || 'Jugador'}</span> sale`;
