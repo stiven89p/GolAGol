@@ -22,6 +22,10 @@ async def crear_evento(session: SessionDep,
                        jugador_id: int = Form(...),
                        jugador_asociado_id: Optional[int] = Form(None)
                        ):
+    # Normalizar jugador_asociado_id: valores 0, '', None se interpretan como ausencia
+    if jugador_asociado_id in (0, '', None):
+        jugador_asociado_id = None
+
     new_evento = EventoCrear(
         minuto=minuto,
         tipo=tipo,
@@ -59,6 +63,8 @@ async def crear_evento(session: SessionDep,
         if partido.estado == "CANCELADO":
             raise HTTPException(status_code=400, detail="No se pueden agregar eventos a un partido cancelado")
 
+
+    
     if evento.equipo_id not in [partido.equipo_local_id, partido.equipo_visitante_id]:
         raise HTTPException(status_code=400, detail="El equipo no está participando en el partido")
 
@@ -69,10 +75,11 @@ async def crear_evento(session: SessionDep,
         raise HTTPException(status_code=400, detail="El jugador no pertenece al equipo que está participando en el partido")
 
     if evento.jugador_asociado_id:
-        if evento.jugador_asociado_id and not jugador:
-            raise HTTPException(status_code=404, detail="El jugador no existe")
-        if evento.jugador_asociado_id and jugador_asociado.equipo_id not in [partido.equipo_local_id, partido.equipo_visitante_id]:
-            raise HTTPException(status_code=400, detail="El jugador asociado no pertenece al equipo que está participando en el partido")
+        # Validar jugador asociado usando la variable correcta
+        if not jugador_asociado:
+            raise HTTPException(status_code=404, detail="El jugador asociado no existe")
+        if jugador_asociado.equipo_id not in [partido.equipo_local_id, partido.equipo_visitante_id]:
+            raise HTTPException(status_code=400, detail="El jugador asociado no pertenece a un equipo del partido")
         estadistica_jugador_asociado = session.get(Estadisticas_J, evento.jugador_asociado_id)
 
     if jugador.equipo_id != evento.equipo_id:
