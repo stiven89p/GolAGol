@@ -155,8 +155,7 @@ async function cargarJugadoresEquipo(equipoId){
             const jugadorId = e.target.dataset.jugadorId;
             const titularChk = document.querySelector(`.titular-chk[data-jugador-id="${jugadorId}"]`);
             if(titularChk) titularChk.checked = false;
-            // re-render to keep list in sync
-            renderSuplentes();
+            // Do NOT re-render here to preserve current suplente selections
           }
         });
       });
@@ -173,11 +172,9 @@ async function cargarJugadoresEquipo(equipoId){
           const jugadorId = e.target.dataset.jugadorId;
           const suplenteChk = document.querySelector(`.suplente-chk[data-jugador-id="${jugadorId}"]`);
           if(suplenteChk) suplenteChk.checked = false;
-          // Re-render suplentes to hide this player
-          renderSuplentes();
         }
-          // also re-render when unchecking to show back in suplentes
-          renderSuplentes();
+        // Re-render suplentes to reflect inclusion/exclusion after titular changes
+        renderSuplentes();
       });
     });
     
