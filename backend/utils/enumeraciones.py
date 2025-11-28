@@ -23,3 +23,11 @@ class PosicionJugador(Enum):
     DEFENSOR = "defensor"
     MEDIOCAMPISTA = "mediocampista"
     DELANTERO = "delantero"
+
+
+class PartePartido(Enum):
+    PRIMER_TIEMPO = "primer tiempo"
+    SEGUNDO_TIEMPO = "segundo tiempo"
+    PRIMER_TIEMPO_EXTRA = "primer tiempo extra"
+    SEGUNDO_TIEMPO_EXTRA = "segundo tiempo extra"
+    PENALTIS = "penaltis"

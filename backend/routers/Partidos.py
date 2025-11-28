@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException, Form
 from sqlalchemy.orm import aliased
-from datetime import date, time
+from datetime import date, datetime, time
 from backend.modelos.Equipos import Equipo
 from backend.modelos.Partidos import Partido, PartidoCrear, PartidoDTO
 from backend.modelos.Formaciones import Formacion, FormacionJugador
@@ -8,7 +8,7 @@ from backend.modelos.Estadisticas_Equipos import Estadisticas_E
 from backend.modelos.Estadisticas_Jugadores import Estadisticas_J
 from backend.modelos.Eventos import Evento
 from backend.modelos.Temporada import Temporada
-from backend.utils.enumeraciones import EstadoPartidos, TipoEvento
+from backend.utils.enumeraciones import EstadoPartidos, PartePartido, TipoEvento
 from backend.db import SessionDep
 
 router = APIRouter(prefix="/partidos", tags=["partidos"])
@@ -197,11 +197,24 @@ async def cambiar_estado_partido(partido_id: int, estado:EstadoPartidos, session
     if estado == EstadoPartidos.EN_CURSO:
         if not partido.formacion_local_id or not partido.formacion_visitante_id:
             raise HTTPException(status_code=400, detail="Ambos equipos deben tener formación asignada antes de iniciar el partido (EN CURSO)")
+        partido.hora_inicio = datetime.now().time()
+        # Si no tiene parte asignada, iniciar en primer tiempo (guardar la instancia del enum)
+        if not partido.parte:
+            partido.parte = PartePartido.PRIMER_TIEMPO
+    
 
     # Solo actualizar estadísticas y PJ cuando el partido pasa a FINALIZADO
     if estado == EstadoPartidos.FINALIZADO and str(partido.estado).lower() != EstadoPartidos.FINALIZADO.value:
         estadistica = session.query(Estadisticas_E).filter_by(equipo_id=partido.equipo_local_id,temporada=partido.temporada_id).first()
         estadistica_rival = session.query(Estadisticas_E).filter_by(equipo_id=partido.equipo_visitante_id,temporada=partido.temporada_id).first()
+
+        
+        # La columna 'parte' en la BDD usa el enum; comparamos con la instancia del enum
+        if partido.parte is None or partido.parte == PartePartido.SEGUNDO_TIEMPO:
+            partido.hora_fin_segundo_tiempo = datetime.now().time()
+        else:
+            partido.hora_fin_segundo_tiempo_extra = datetime.now().time()
+            
 
         if estadistica:
             estadistica.partidos_jugados = (estadistica.partidos_jugados or 0) + 1
@@ -231,6 +244,145 @@ async def cambiar_estado_partido(partido_id: int, estado:EstadoPartidos, session
 
 
     partido.estado = estado
+    session.add(partido)
+    session.commit()
+    session.refresh(partido)
+    return partido
+
+@router.patch("/acadar_tiempo/{partido_id}", response_model=Partido)
+async def cambiar_tiempo_partido(partido_id: int, session: SessionDep):
+    partido = session.get(Partido, partido_id)
+    if not partido:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+    
+
+    if partido.parte is None:
+        partido.hora_fin_primer_tiempo = datetime.now().time()
+    elif partido.parte == PartePartido.SEGUNDO_TIEMPO:
+        partido.hora_inicio_segundo_tiempo = datetime.now().time()
+    elif partido.parte == PartePartido.PRIMER_TIEMPO_EXTRA:
+        partido.hora_fin_segundo_tiempo = datetime.now().time()
+    elif partido.parte == PartePartido.SEGUNDO_TIEMPO_EXTRA:
+        partido.hora_fin_segundo_tiempo_extra = datetime.now().time()
+    
+    # Persistir cambios y devolver el partido actualizado
+    session.add(partido)
+    session.commit()
+    session.refresh(partido)
+    return partido
+
+
+@router.patch("/iniciar_tiempo/{partido_id}", response_model=Partido)
+async def iniciar_tiempo_partido(partido_id: int, session: SessionDep):
+    """Registra únicamente las marcas de inicio correspondientes a la parte actual.
+    No cambia la 'parte' del partido; solo escribe la hora de inicio si aún no existe.
+    """
+    partido = session.get(Partido, partido_id)
+    if not partido:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+
+    if str(partido.estado).replace(' ', '_').upper() != EstadoPartidos.EN_CURSO.name:
+        raise HTTPException(status_code=400, detail="Solo se pueden iniciar tiempos cuando el partido está EN_CURSO")
+
+    now_time = datetime.now().time()
+
+    # Determinar qué campo de inicio corresponde según la parte actual
+    if partido.parte is None:
+        if partido.hora_inicio:
+            raise HTTPException(status_code=400, detail="La hora de inicio del partido ya está registrada")
+        partido.hora_inicio = now_time
+    elif partido.parte == PartePartido.SEGUNDO_TIEMPO:
+        if partido.hora_inicio_segundo_tiempo:
+            raise HTTPException(status_code=400, detail="La hora de inicio del segundo tiempo ya está registrada")
+        partido.hora_inicio_segundo_tiempo = now_time
+    elif partido.parte == PartePartido.PRIMER_TIEMPO_EXTRA:
+        if partido.hora_inicio_primer_tiempo_extra:
+            raise HTTPException(status_code=400, detail="La hora de inicio del primer tiempo extra ya está registrada")
+        partido.hora_inicio_primer_tiempo_extra = now_time
+    elif partido.parte == PartePartido.SEGUNDO_TIEMPO_EXTRA:
+        if partido.hora_inicio_segundo_tiempo_extra:
+            raise HTTPException(status_code=400, detail="La hora de inicio del segundo tiempo extra ya está registrada")
+        partido.hora_inicio_segundo_tiempo_extra = now_time
+    else:
+        raise HTTPException(status_code=400, detail="No corresponde iniciar un tiempo para la parte actual")
+
+    session.add(partido)
+    session.commit()
+    session.refresh(partido)
+    return partido
+
+
+@router.patch("/finalizar_tiempo/{partido_id}", response_model=Partido)
+async def finalizar_tiempo_partido(partido_id: int, session: SessionDep):
+    """Registra únicamente las marcas de fin correspondientes a la parte actual.
+    No cambia la 'parte' del partido; solo escribe la hora de finalización si aún no existe.
+    """
+    partido = session.get(Partido, partido_id)
+    if not partido:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+
+    if str(partido.estado).replace(' ', '_').upper() != EstadoPartidos.EN_CURSO.name:
+        raise HTTPException(status_code=400, detail="Solo se pueden finalizar tiempos cuando el partido está EN_CURSO")
+
+    now_time = datetime.now().time()
+
+    # Mapear la parte actual a la marca de fin correspondiente
+    if partido.parte is None:
+        # Si no hay parte definida, considerar que debemos finalizar el primer tiempo
+        if partido.hora_fin_primer_tiempo:
+            raise HTTPException(status_code=400, detail="La hora de fin del primer tiempo ya está registrada")
+        partido.hora_fin_primer_tiempo = now_time
+    elif partido.parte == PartePartido.PRIMER_TIEMPO:
+        if partido.hora_fin_primer_tiempo:
+            raise HTTPException(status_code=400, detail="La hora de fin del primer tiempo ya está registrada")
+        partido.hora_fin_primer_tiempo = now_time
+    elif partido.parte == PartePartido.SEGUNDO_TIEMPO:
+        if partido.hora_fin_segundo_tiempo:
+            raise HTTPException(status_code=400, detail="La hora de fin del segundo tiempo ya está registrada")
+        partido.hora_fin_segundo_tiempo = now_time
+    elif partido.parte == PartePartido.PRIMER_TIEMPO_EXTRA:
+        if partido.hora_fin_primer_tiempo_extra:
+            raise HTTPException(status_code=400, detail="La hora de fin del primer tiempo extra ya está registrada")
+        partido.hora_fin_primer_tiempo_extra = now_time
+    elif partido.parte == PartePartido.SEGUNDO_TIEMPO_EXTRA:
+        if partido.hora_fin_segundo_tiempo_extra:
+            raise HTTPException(status_code=400, detail="La hora de fin del segundo tiempo extra ya está registrada")
+        partido.hora_fin_segundo_tiempo_extra = now_time
+    else:
+        raise HTTPException(status_code=400, detail="No corresponde finalizar un tiempo para la parte actual")
+
+    session.add(partido)
+    session.commit()
+    session.refresh(partido)
+    return partido
+
+
+@router.patch("/actualizar_parte/{partido_id}", response_model=Partido)
+async def actualizar_parte_partido(partido_id: int, session: SessionDep):
+    partido = session.get(Partido, partido_id)
+    if not partido:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+    # Aceptar distintos formatos de representación en DB (p.ej. 'EN_CURSO' o 'en curso').
+    # Normalizamos a mayúsculas y comparamos con el nombre del enum.
+    if str(partido.estado).replace(' ', '_').upper() != EstadoPartidos.EN_CURSO.name:
+        raise HTTPException(status_code=400, detail="Solo se puede actualizar la parte de un partido que está EN_CURSO")
+    # Asignar el siguiente valor usando el nombre del enum (coincide con el tipo enum en Postgres)
+    if partido.parte is None:
+        partido.parte = PartePartido.PRIMER_TIEMPO
+        partido.hora_inicio = datetime.now().time()
+    elif partido.parte == PartePartido.PRIMER_TIEMPO:
+        partido.parte = PartePartido.SEGUNDO_TIEMPO
+        partido.hora_fin_primer_tiempo = datetime.now().time()
+    elif partido.parte == PartePartido.SEGUNDO_TIEMPO:
+        partido.parte = PartePartido.PRIMER_TIEMPO_EXTRA
+        partido.hora_inicio_primer_tiempo_extra = datetime.now().time()
+    elif partido.parte == PartePartido.PRIMER_TIEMPO_EXTRA:
+        partido.parte = PartePartido.SEGUNDO_TIEMPO_EXTRA
+        partido.hora_fin_primer_tiempo_extra = datetime.now().time()
+    elif partido.parte == PartePartido.SEGUNDO_TIEMPO_EXTRA:
+        partido.parte = PartePartido.PENALTIS
+        partido.hora_inicio_segundo_tiempo_extra = datetime.now().time()
+
     session.add(partido)
     session.commit()
     session.refresh(partido)
@@ -266,6 +418,46 @@ async def asignar_formacion_partido(partido_id: int, formacion_id: int, session:
     session.commit()
     session.refresh(partido)
     return partido
+
+
+@router.get("/id/{partido_id}", response_model=PartidoDTO)
+async def obtener_partido_por_id(partido_id: int, session: SessionDep):
+    from backend.modelos.Equipos import Equipo
+    equipo_local = aliased(Equipo)
+    equipo_visitante = aliased(Equipo)
+
+    row = (
+        session.query(Partido, equipo_local, equipo_visitante)
+        .join(equipo_local, Partido.equipo_local_id == equipo_local.equipo_id)
+        .join(equipo_visitante, Partido.equipo_visitante_id == equipo_visitante.equipo_id)
+        .filter(Partido.partido_id == partido_id)
+        .first()
+    )
+
+    if not row:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+
+    partido, el, ev = row
+    dto = PartidoDTO(
+        partido_id=partido.partido_id,
+        equipo_local_nombre=getattr(el, "nombre", "") if el else "",
+        equipo_local_logo=getattr(el, "logo", None) if el else None,
+        equipo_visitante_nombre=getattr(ev, "nombre", "") if ev else "",
+        equipo_visitante_logo=getattr(ev, "logo", None) if ev else None,
+        fecha=partido.fecha,
+        hora=partido.hora.strftime("%H:%M") if partido.hora else None,
+        hora_inicio=partido.hora_inicio.strftime("%H:%M:%S") if partido.hora_inicio else None,
+        hora_fin_primer_tiempo=partido.hora_fin_primer_tiempo.strftime("%H:%M:%S") if partido.hora_fin_primer_tiempo else None,
+        hora_inicio_segundo_tiempo=partido.hora_inicio_segundo_tiempo.strftime("%H:%M:%S") if partido.hora_inicio_segundo_tiempo else None,
+        hora_fin_segundo_tiempo=partido.hora_fin_segundo_tiempo.strftime("%H:%M:%S") if partido.hora_fin_segundo_tiempo else None,
+        parte=partido.parte.name if partido.parte else None,
+        lugar=partido.estadio,
+        estado=partido.estado,
+        goles_local=partido.goles_local,
+        goles_visitante=partido.goles_visitante,
+    )
+
+    return dto
 
 @router.delete("/{partido_id}", response_model=Partido)
 async def eliminar_partido(partido_id: int, session: SessionDep):

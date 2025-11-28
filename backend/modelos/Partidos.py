@@ -1,6 +1,7 @@
 from typing import Optional
 from datetime import date, time
 from sqlmodel import SQLModel, Field
+from backend.utils.enumeraciones import PartePartido
 
 class PartidoBase(SQLModel):
     fecha: date = Field(nullable=False, description="Fecha del partido")
@@ -10,6 +11,15 @@ class PartidoBase(SQLModel):
     temporada_id: int = Field(foreign_key="temporada.temporada_id", nullable=False, description="ID de la temporada")
     equipo_local_id: int = Field(foreign_key="equipo.equipo_id", nullable=False, description="ID del equipo local")
     equipo_visitante_id: int = Field(foreign_key="equipo.equipo_id", nullable=False, description="ID del equipo visitante")
+    parte: Optional[PartePartido] = Field(default=None, description="en que secion del partido esta primer segundo tiempo")
+    hora_inicio: Optional[time] = Field(default=None, description="Hora de inicio del partido")
+    hora_fin_primer_tiempo: Optional[time] = Field(default=None, description="Hora de finalización del primer tiempo")
+    hora_inicio_segundo_tiempo: Optional[time] = Field(default=None, description="Hora de inicio del segundo tiempo")
+    hora_fin_segundo_tiempo: Optional[time] = Field(default=None, description="Hora de finalización del segundo tiempo")
+    hora_inicio_primer_tiempo_extra: Optional[time] = Field(default=None, description="Hora de inicio del primer tiempo extra")
+    hora_fin_primer_tiempo_extra: Optional[time] = Field(default=None, description="Hora de finalización del primer tiempo extra")
+    hora_inicio_segundo_tiempo_extra: Optional[time] = Field(default=None, description="Hora de inicio del segundo tiempo extra")
+    hora_fin_segundo_tiempo_extra: Optional[time] = Field(default=None, description="Hora de finalización del segundo tiempo extra")
 
 
 
@@ -41,6 +51,11 @@ class PartidoDTO(SQLModel):
     equipo_visitante_logo: Optional[str] = Field(None, description="URL o ruta del logo del equipo visitante")
     fecha: date = Field(..., description="Fecha del partido (YYYY-MM-DD)")
     hora: Optional[str] = Field(None, description="Hora del partido (HH:MM)")
+    hora_inicio: Optional[str] = Field(None, description="Hora de inicio del partido (HH:MM:SS)")
+    hora_fin_primer_tiempo: Optional[str] = Field(None, description="Hora de fin del primer tiempo (HH:MM:SS)")
+    hora_inicio_segundo_tiempo: Optional[str] = Field(None, description="Hora de inicio del segundo tiempo (HH:MM:SS)")
+    hora_fin_segundo_tiempo: Optional[str] = Field(None, description="Hora de fin del segundo tiempo (HH:MM:SS)")
+    parte: Optional[str] = Field(None, description="Parte actual del partido (PRIMER_TIEMPO, SEGUNDO_TIEMPO, ...)")
     lugar: Optional[str] = Field(None, description="Lugar o estadio del partido")
     estado: str = Field(..., description="Estado del partido (PROGRAMADO, EN_CURSO, FINALIZADO, etc.)")
     goles_local: Optional[int] = Field(0, description="Goles del equipo local")

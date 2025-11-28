@@ -35,11 +35,18 @@
                     <small class="meta">Finalizado</small>
                 {% elif partido.estado == 'EN_CURSO' %}
                     <div class="score live">
-                        <span class="score-num">{{ partido.goles_local }}</span>
+                        <span id="goles-local" class="score-num">{{ partido.goles_local }}</span>
                         <span class="score-sep">-</span>
-                        <span class="score-num">{{ partido.goles_visitante }}</span>
+                        <span id="goles-visitante" class="score-num">{{ partido.goles_visitante }}</span>
                     </div>
                     <small class="meta live-badge">🔴 EN VIVO</small>
+                    <div id="match-timer-container" style="margin-top:8px; text-align:center;">
+                        <div id="match-timer" style="font-size:18px; font-weight:700;">0:00</div>
+                        <div style="display:flex; gap:12px; justify-content:center; margin-top:6px;">
+                            <small>1º Tiempo: <span id="first-half-timer">0:00</span></small>
+                            <small>2º Tiempo: <span id="second-half-timer">0:00</span></small>
+                        </div>
+                    </div>
                 {% else %}
                     <div class="status-upcoming">{{ partido.hora or '' }}</div>
                     <small class="meta">{{ partido.fecha }}{% if partido.lugar %} • {{ partido.lugar }}{% endif %}</small>
@@ -146,8 +153,16 @@
         var partidoId = {{ partido.partido_id }};
         var equipoLocalId = {{ partido.equipo_local_id }};
         var equipoVisitanteId = {{ partido.equipo_visitante_id }};
+        var partidoEstado = "{{ partido.estado }}";
+        var partidoFecha = "{{ partido.fecha }}";
+        var partidoHoraInicio = "{{ partido.hora_inicio or '' }}";
+        var partidoHoraFinPrimer = "{{ partido.hora_fin_primer_tiempo or '' }}";
+        var partidoHoraInicioSegundo = "{{ partido.hora_inicio_segundo_tiempo or '' }}";
+        var partidoHoraFinSegundo = "{{ partido.hora_fin_segundo_tiempo or '' }}";
+        var partidoParte = "{{ partido.parte or '' }}";
     </script>
     <script src="/static/js/partidos_programados.js"></script>
+    <script src="/static/js/match_timer.js"></script>
     <script src="/static/js/partido_eventos.js"></script>
 </body>
 </html>
