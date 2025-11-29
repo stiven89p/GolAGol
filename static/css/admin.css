@@ -1,3 +1,43 @@
+/* Formaciones admin selection styling */
+.chk-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin: 4px 0;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+.chk-item input[type="checkbox"] {
+    /* Hide default checkbox while keeping accessibility */
+    appearance: none;
+    -webkit-appearance: none;
+    width: 0;
+    height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+}
+.chk-item.selected {
+    background-color: #e6ffed; /* light green */
+    border-color: #28a745; /* green border */
+}
+.chk-item.selected label {
+    color: #1e7e34;
+}
+.multi-select {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 8px;
+}
+.jugador-foto-mini {
+    box-shadow: 0 0 0 2px rgba(40,167,69,0.0);
+    transition: box-shadow 0.2s ease;
+}
+.chk-item.selected .jugador-foto-mini {
+    box-shadow: 0 0 0 2px rgba(40,167,69,0.4);
+}
 /* Admin Layout - Matching main site theme with Bulma */
 .admin-body {
     margin: 0;
