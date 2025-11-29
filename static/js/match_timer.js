@@ -40,8 +40,16 @@ function formatDuration(seconds){
     // Debug: log received values
     console.log('Timer initialized:', {estado, parte, parteRaw, fecha, horaInicio, horaFinPrimer, horaInicioSegundo, horaFinSegundo});
 
-    // Parse datetimes - use today's date if match is live or finished, otherwise use scheduled date
-    const actualDate = (estado === 'EN_CURSO' || estado === 'FINALIZADO') ? new Date().toISOString().split('T')[0] : fecha;
+    // Helper: get local date string YYYY-MM-DD (not UTC)
+    function localDateString(d){
+        const y = d.getFullYear();
+        const m = String(d.getMonth()+1).padStart(2,'0');
+        const dd = String(d.getDate()).padStart(2,'0');
+        return `${y}-${m}-${dd}`;
+    }
+
+    // Parse datetimes - use today's local date if match is live or finished, otherwise use scheduled date
+    const actualDate = (estado === 'EN_CURSO' || estado === 'FINALIZADO') ? localDateString(new Date()) : fecha;
     let dtInicio = parseTime(actualDate, horaInicio);
     let dtFinPrimer = parseTime(actualDate, horaFinPrimer);
     let dtInicioSegundo = parseTime(actualDate, horaInicioSegundo);
@@ -131,8 +139,8 @@ function formatDuration(seconds){
         const newHoraInicioSegundo = p.hora_inicio_segundo_tiempo || horaInicioSegundo;
         const newHoraFinSegundo = p.hora_fin_segundo_tiempo || horaFinSegundo;
 
-        // Re-parse times - use today's date if match is live or finished
-        const updateActualDate = (estado === 'EN_CURSO' || estado === 'FINALIZADO') ? new Date().toISOString().split('T')[0] : newFecha;
+        // Re-parse times - use today's local date if match is live or finished
+            const updateActualDate = (estado === 'EN_CURSO' || estado === 'FINALIZADO') ? localDateString(new Date()) : newFecha;
         dtInicio = parseTime(updateActualDate, newHoraInicio);
         dtFinPrimer = parseTime(updateActualDate, newHoraFinPrimer);
         dtInicioSegundo = parseTime(updateActualDate, newHoraInicioSegundo);
