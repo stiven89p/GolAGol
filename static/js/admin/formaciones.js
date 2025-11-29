@@ -93,6 +93,10 @@ async function cargarJugadoresEquipo(equipoId){
       wrap.className='chk-item';
       wrap.appendChild(chk); 
       wrap.appendChild(lbl);
+      // mark selected style if checked
+      chk.addEventListener('change', ()=>{
+        wrap.classList.toggle('selected', chk.checked);
+      });
       return wrap;
     }
 
@@ -136,6 +140,9 @@ async function cargarJugadoresEquipo(equipoId){
       wrapTit.className='chk-item';
       wrapTit.appendChild(chkTit); 
       wrapTit.appendChild(lblTit);
+      chkTit.addEventListener('change', ()=>{
+        wrapTit.classList.toggle('selected', chkTit.checked);
+      });
       titulares.appendChild(wrapTit);
     });
 
