@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Form
 from backend.utils.enumeraciones import TipoEvento
-from backend.utils.Fun_Eventos import procesar_gol, procesar_tarjeta, anular_gol, anular_tarjeta, validar_sustitucion
+from backend.utils.Fun_Eventos import procesar_gol, procesar_tarjeta, anular_gol, anular_tarjeta, validar_sustitucion, anular_gol_en_contra
 from backend.modelos.Equipos import Equipo
 from backend.modelos.Estadisticas_Jugadores import Estadisticas_J
 from backend.modelos.Estadisticas_Equipos import Estadisticas_E
@@ -15,7 +15,7 @@ router = APIRouter(prefix="/eventos", tags=["eventos"])
 @router.post("/", response_model=Evento)
 async def crear_evento(session: SessionDep,
                        minuto: int = Form(...),
-                       tipo: TipoEvento = Form(...),
+                       tipo: TipoEvento | str = Form(...),
                        descripcion: Optional[str] = Form(None),
                        partido_id: int = Form(...),
                        equipo_id: int = Form(...),
@@ -26,9 +26,26 @@ async def crear_evento(session: SessionDep,
     if jugador_asociado_id in (0, '', None):
         jugador_asociado_id = None
 
+    # Normalizar el tipo recibido (acepta nombre en mayúsculas, minúsculas o valor en minúsculas)
+    # Ejemplos válidos: "TIRO", "tiro", TipoEvento.TIRO
+    if isinstance(tipo, TipoEvento):
+        tipo_valor = tipo
+    else:
+        # tipo es str; intentar por nombre del enum primero, luego por valor
+        tipo_str = str(tipo).strip()
+        try:
+            # Caso nombre del enum: "TIRO", "GOL_EN_CONTRA", etc.
+            tipo_valor = TipoEvento[tipo_str]
+        except KeyError:
+            # Caso valor del enum: "tiro", "gol_en_contra", etc.
+            try:
+                tipo_valor = TipoEvento(tipo_str.lower())
+            except ValueError:
+                raise HTTPException(status_code=400, detail=f"Tipo de evento inválido: {tipo_str}")
+
     new_evento = EventoCrear(
         minuto=minuto,
-        tipo=tipo,
+        tipo=tipo_valor,
         descripcion=descripcion,
         partido_id=partido_id,
         equipo_id=equipo_id,
@@ -37,10 +54,31 @@ async def crear_evento(session: SessionDep,
     )
     global estadistica_jugador_asociado
     evento = Evento.model_validate(new_evento)
+    # Asegurar que `evento.tipo` es una instancia de `TipoEvento` (no cadena) antes de persistir
+    if not isinstance(evento.tipo, TipoEvento):
+        # Manejar tanto nombre (e.g., "TIRO") como valor (e.g., "tiro")
+        val = str(evento.tipo).strip()
+        try:
+            evento.tipo = TipoEvento[val]
+        except KeyError:
+            try:
+                evento.tipo = TipoEvento(val.lower())
+            except ValueError:
+                raise HTTPException(status_code=400, detail=f"Tipo de evento inválido: {val}")
     partido = session.get(Partido, evento.partido_id)
     jugador = session.get(Jugador, evento.jugador_id)
     jugador_asociado = session.get(Jugador, evento.jugador_asociado_id) if evento.jugador_asociado_id else None
-    estadistica_jugador = session.get(Estadisticas_J, evento.jugador_id)
+    # Obtener o crear fila de estadísticas del jugador para la temporada del partido
+    estadistica_jugador = None
+    estadistica_jugador_asociado = None
+    if partido:
+        estadistica_jugador = session.query(Estadisticas_J).filter_by(jugador_id=evento.jugador_id, temporada=partido.temporada_id).first()
+        if not estadistica_jugador:
+            estadistica_jugador = Estadisticas_J(jugador_id=evento.jugador_id, temporada=partido.temporada_id)
+        if evento.jugador_asociado_id:
+            estadistica_jugador_asociado = session.query(Estadisticas_J).filter_by(jugador_id=evento.jugador_asociado_id, temporada=partido.temporada_id).first()
+            if not estadistica_jugador_asociado:
+                estadistica_jugador_asociado = Estadisticas_J(jugador_id=evento.jugador_asociado_id, temporada=partido.temporada_id)
 
 
     if not partido:
@@ -85,22 +123,55 @@ async def crear_evento(session: SessionDep,
     if jugador.equipo_id != evento.equipo_id:
         raise HTTPException(status_code=400, detail="El jugador no pertenece al equipo del evento")
 
+    # Convertir a Enum para comparaciones seguras
+    tipo_enum = evento.tipo
+
     # Validación específica para sustituciones
-    if evento.tipo == TipoEvento.SUSTITUCION:
+    if tipo_enum == TipoEvento.SUSTITUCION:
         if not jugador_asociado:
             raise HTTPException(status_code=404, detail="El jugador que entra no existe")
         if jugador_asociado.equipo_id != evento.equipo_id:
             raise HTTPException(status_code=400, detail="El jugador que entra no pertenece al equipo del evento")
         validar_sustitucion(session, evento, partido, TipoEvento)
 
-    if evento.tipo == TipoEvento.GOL:
+    # Mapear tipos adicionales a sus procesadores
+    from backend.utils.Fun_Eventos import (
+        procesar_gol, procesar_tarjeta, anular_gol, anular_tarjeta,
+        procesar_penal_fallado, procesar_tiro, procesar_parada, procesar_entrada, procesar_intercepcion,
+        procesar_gol_en_contra
+    )
+
+    if tipo_enum in (TipoEvento.GOL, TipoEvento.PENAL):
+        # Penal anotado: igual que gol; procesar_gol maneja penales_cobrados
         if evento.jugador_asociado_id:
             procesar_gol(session, evento, partido , Estadisticas_E, estadistica_jugador, estadistica_jugador_asociado)
         else:
             procesar_gol(session, evento, partido, Estadisticas_E, estadistica_jugador)
-    elif evento.tipo == TipoEvento.TARJETA_AMARILLA or evento.tipo == TipoEvento.TARJETA_ROJA:
-        procesar_tarjeta(session, evento, partido, Estadisticas_E, TipoEvento, partido.temporada_id, estadistica_jugador)
 
+    elif tipo_enum == TipoEvento.PENAL_FALLADO:
+        # Penal fallado: incrementar penales_fallados y, si hay portero asociado, penales_tapados
+        procesar_penal_fallado(session, evento, partido, Estadisticas_J, estadistica_jugador, estadistica_jugador_asociado)
+
+    elif tipo_enum == TipoEvento.GOL_EN_CONTRA:
+        # procesar gol en contra (autogol)
+        procesar_gol_en_contra(session, evento, partido, Estadisticas_E, estadistica_jugador)
+
+    elif tipo_enum == TipoEvento.TIRO:
+        procesar_tiro(session, evento, partido, Estadisticas_J, estadistica_jugador, a_puerta=False)
+
+    elif tipo_enum == TipoEvento.TIRO_A_PUERTA:
+        procesar_tiro(session, evento, partido, Estadisticas_J, estadistica_jugador, a_puerta=True)
+
+    elif tipo_enum == TipoEvento.ENTRADA:
+        procesar_entrada(session, evento, partido, Estadisticas_J, estadistica_jugador)
+
+    elif tipo_enum == TipoEvento.INTERCEPCION:
+        procesar_intercepcion(session, evento, partido, Estadisticas_J, estadistica_jugador)
+
+    elif tipo_enum == TipoEvento.TARJETA_AMARILLA or tipo_enum == TipoEvento.TARJETA_ROJA:
+        procesar_tarjeta(session, evento, partido, Estadisticas_E, TipoEvento, estadistica_jugador)
+
+    # En este punto, `evento.tipo` es TipoEvento y serializará al valor correcto (minúsculas)
     session.add(evento)
     session.commit()
     session.refresh(evento)
@@ -245,7 +316,13 @@ async def anular_evento(session: SessionDep, evento_id: int):
     if not evento:
         raise HTTPException(status_code=404, detail="No se encontraron evento")
 
-    if evento.tipo == TipoEvento.GOL:
+    if evento.tipo in (TipoEvento.GOL, TipoEvento.PENAL):
         anular_gol(session, evento, session.get(Partido, evento.partido_id), Estadisticas_E, session.get(Estadisticas_J, evento.jugador_id), session.get(Estadisticas_J, evento.jugador_asociado_id) if evento.jugador_asociado_id else None)
+    elif evento.tipo == TipoEvento.PENAL_FALLADO:
+        # Nada que revertir (solo se eliminará el evento)
+        pass
+    elif evento.tipo == TipoEvento.GOL_EN_CONTRA:
+        # Revertir autogol
+        anular_gol_en_contra(session, evento, session.get(Partido, evento.partido_id), Estadisticas_E, session.get(Estadisticas_J, evento.jugador_id) if evento.jugador_id else None)
     elif evento.tipo == TipoEvento.TARJETA_AMARILLA or evento.tipo == TipoEvento.TARJETA_ROJA:
         anular_tarjeta(session, evento, session.get(Partido, evento.partido_id), Estadisticas_E, session.get(Estadisticas_J, evento.jugador_id))
