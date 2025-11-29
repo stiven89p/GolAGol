@@ -249,29 +249,6 @@ async def cambiar_estado_partido(partido_id: int, estado:EstadoPartidos, session
     session.refresh(partido)
     return partido
 
-@router.patch("/acadar_tiempo/{partido_id}", response_model=Partido)
-async def cambiar_tiempo_partido(partido_id: int, session: SessionDep):
-    partido = session.get(Partido, partido_id)
-    if not partido:
-        raise HTTPException(status_code=404, detail="Partido no encontrado")
-    
-
-    if partido.parte is None:
-        partido.hora_fin_primer_tiempo = datetime.now().time()
-    elif partido.parte == PartePartido.SEGUNDO_TIEMPO:
-        partido.hora_inicio_segundo_tiempo = datetime.now().time()
-    elif partido.parte == PartePartido.PRIMER_TIEMPO_EXTRA:
-        partido.hora_fin_segundo_tiempo = datetime.now().time()
-    elif partido.parte == PartePartido.SEGUNDO_TIEMPO_EXTRA:
-        partido.hora_fin_segundo_tiempo_extra = datetime.now().time()
-    
-    # Persistir cambios y devolver el partido actualizado
-    session.add(partido)
-    session.commit()
-    session.refresh(partido)
-    return partido
-
-
 @router.patch("/iniciar_tiempo/{partido_id}", response_model=Partido)
 async def iniciar_tiempo_partido(partido_id: int, session: SessionDep):
     """Registra únicamente las marcas de inicio correspondientes a la parte actual.
