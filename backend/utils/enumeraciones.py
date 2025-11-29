@@ -5,6 +5,13 @@ class TipoEvento(Enum):
     SUSTITUCION = "sustitucion"
     TARJETA_AMARILLA = "tarjeta_amarilla"
     TARJETA_ROJA = "tarjeta_roja"
+    PENAL = "penal"
+    PENAL_FALLADO = "penal_fallado"
+    TIRO = "tiro"
+    TIRO_A_PUERTA = "tiro_a_puerta"
+    ENTRADA = "entrada"
+    INTERCEPCION = "intercepcion"
+    GOL_EN_CONTRA = "gol_en_contra"
 
 class EstadoPartidos(Enum):
     PROGRAMADO = "programado"
