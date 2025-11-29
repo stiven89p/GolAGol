@@ -102,6 +102,123 @@
     }
   };
 
+  // Populate season tabs from server-rendered 'estadisticas' list
+  const populateSeasonTabs = () => {
+    const tabsEl = document.getElementById('season-tabs');
+    if (!tabsEl) return [];
+    const serverItems = Array.from(document.querySelectorAll('.estadisticas .estadistica-item h4'));
+    const seasons = serverItems
+      .map(h => (h.textContent || '').replace('Temporada:', '').replace('Temporada', '').trim())
+      .map(s => s.split('•').pop().trim())
+      .filter(Boolean);
+    const uniqueSeasons = Array.from(new Set(seasons)).sort((a,b)=>String(b).localeCompare(String(a)));
+    tabsEl.innerHTML = '';
+    uniqueSeasons.forEach((season, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'tab-btn' + (idx === 0 ? ' active' : '');
+      btn.dataset.season = season.replace(/[^0-9]/g,'') || season;
+      btn.textContent = season;
+      tabsEl.appendChild(btn);
+    });
+    return uniqueSeasons;
+  };
+
+  const renderEquipoStatsPanel = (equipoStats) => {
+    const cont = document.getElementById('estadisticas-equipo');
+    if (!cont) return;
+    cont.innerHTML = '';
+    if (!equipoStats) { cont.innerHTML = '<p>No hay estadísticas del equipo.</p>'; return; }
+    const article = document.createElement('article');
+    article.className = 'estadistica-item';
+    const h4 = document.createElement('h4');
+    h4.textContent = `Temporada: ${equipoStats.temporada}`;
+    const table = document.createElement('table');
+    table.className = 'stats-table';
+    const tbody = document.createElement('tbody');
+    const rows = [
+      ['Partidos jugados', equipoStats.partidos_jugados],
+      ['Victorias', equipoStats.victorias],
+      ['Empates', equipoStats.empates],
+      ['Derrotas', equipoStats.derrotas],
+      ['Goles a favor', equipoStats.goles_favor],
+      ['Goles en contra', equipoStats.goles_contra],
+      ['Puntos', equipoStats.puntos],
+      ['Tarjetas amarillas', equipoStats.tarjetas_amarillas],
+      ['Tarjetas rojas', equipoStats.tarjetas_rojas],
+    ];
+    rows.forEach(([label, value]) => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `<th>${label}</th><td>${numberSafe(value)}</td>`;
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    article.append(h4, table);
+    cont.appendChild(article);
+  };
+
+  const renderJugadoresStatsPanel = (jugadoresStats) => {
+    const cont = document.getElementById('estadisticas-jugadores');
+    if (!cont) return;
+    cont.innerHTML = '';
+    if (!jugadoresStats || jugadoresStats.length === 0) { cont.innerHTML = '<p>No hay estadísticas de jugadores.</p>'; return; }
+    jugadoresStats.forEach(s => {
+      const article = document.createElement('article');
+      article.className = 'estadistica-item';
+      const h4 = document.createElement('h4');
+      h4.textContent = `${s.jugador_id} • Temporada: ${s.temporada}`;
+      const table = document.createElement('table');
+      table.className = 'stats-table';
+      const tbody = document.createElement('tbody');
+      const rows = [
+        ['Partidos jugados', s.partidos_jugados],
+        ['Goles', s.goles],
+        ['Asistencias', s.asistencias],
+        ['Tarjetas amarillas', s.tarjetas_amarillas],
+        ['Tarjetas rojas', s.tarjetas_rojas],
+      ];
+      rows.forEach(([label, value]) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<th>${label}</th><td>${numberSafe(value)}</td>`;
+        tbody.appendChild(tr);
+      });
+      table.appendChild(tbody);
+      article.append(h4, table);
+      cont.appendChild(article);
+    });
+  };
+
+  const fetchSeasonSplitStats = async (equipoId, temporada) => {
+    if (!equipoId || !temporada) return;
+    try {
+      const res = await fetch(`/estadisticas_jugadores/equipo/${encodeURIComponent(equipoId)}/temporada/${encodeURIComponent(temporada)}`);
+      if (!res.ok) { console.warn('Error cargando subdivisión stats', res.status); return; }
+      const data = await res.json();
+      renderEquipoStatsPanel(data.equipo || null);
+      renderJugadoresStatsPanel(Array.isArray(data.jugadores) ? data.jugadores : []);
+    } catch (e) { console.error('fetchSeasonSplitStats error', e); }
+  };
+
+  // Sub-tab toggle between Equipo and Jugadores
+  const setupStatsSubTabs = () => {
+    const nav = document.getElementById('stats-subtabs');
+    if (!nav) return;
+    const contents = Array.from(document.querySelectorAll('[data-subtab-content]'));
+    const show = (name) => {
+      contents.forEach(c => {
+        c.style.display = c.dataset.subtabContent === name ? '' : 'none';
+      });
+    };
+    // init: show equipo
+    show('equipo');
+    nav.addEventListener('click', (e) => {
+      const btn = e.target.closest('.tab-btn');
+      if (!btn) return;
+      nav.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      show(btn.dataset.subtab);
+    });
+  };
+
   // Renderiza jugadores por posición
   const renderJugadoresPorPosicion = (jugadores) => {
     const porterosList = document.getElementById('porteros-lista');
@@ -431,17 +548,17 @@
 
   // Manejo de pestañas
   const setupTabs = () => {
-    const tabBtns = document.querySelectorAll('.tab-btn');
+    // Solo los tabs principales del nav superior
+    const tabBtns = document.querySelectorAll('nav.tabs-nav .tab-btn[data-tab]');
     const tabContents = document.querySelectorAll('.tab-content');
 
     tabBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
         const targetTab = btn.dataset.tab;
-        
-        // Remover active de todos
+        if (!targetTab) return; // ignorar botones que no son tabs principales
+        // Remover active de todos los tabs principales
         tabBtns.forEach(b => b.classList.remove('active'));
         tabContents.forEach(c => c.classList.remove('active'));
-        
         // Activar el seleccionado
         btn.classList.add('active');
         const targetContent = document.getElementById(`tab-${targetTab}`);
@@ -524,6 +641,25 @@
       fetchAndRenderMatches(equipoId);
       fetchAndRenderJugadores(equipoId);
       fetchAndRenderGoleadores(equipoId);
+      // Setup season tabs
+      const seasons = populateSeasonTabs();
+      const tabsEl = document.getElementById('season-tabs');
+      if (tabsEl && seasons.length) {
+        const initSeason = tabsEl.querySelector('.tab-btn.active')?.dataset.season || seasons[0];
+        if (initSeason) fetchSeasonSplitStats(equipoId, initSeason);
+        tabsEl.addEventListener('click', (e) => {
+          const btn = e.target.closest('.tab-btn');
+          if (!btn) return;
+          // toggle active
+          tabsEl.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          const temporada = btn.dataset.season;
+          fetchSeasonSplitStats(equipoId, temporada);
+        });
+      }
+
+      // Setup sub-tabs toggle
+      setupStatsSubTabs();
     }
   });
 })();

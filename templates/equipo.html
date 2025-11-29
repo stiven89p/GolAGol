@@ -87,29 +87,64 @@
     <section class="tab-content" id="tab-estadisticas">
       <div class="panel estadisticas">
         <h2>Estadísticas por Temporada</h2>
-        <div id="estadisticas-lista">
-          {% if estadisticas %}
-            {% for s in estadisticas %}
-              <article class="estadistica-item">
-                <h3>Temporada: {{ s.temporada }}</h3>
-                <table class="stats-table">
-                  <tbody>
-                    <tr><th>Partidos jugados</th><td>{{ s.partidos_jugados }}</td></tr>
-                    <tr><th>Victorias</th><td>{{ s.victorias }}</td></tr>
-                    <tr><th>Empates</th><td>{{ s.empates }}</td></tr>
-                    <tr><th>Derrotas</th><td>{{ s.derrotas }}</td></tr>
-                    <tr><th>Goles a favor</th><td>{{ s.goles_favor }}</td></tr>
-                    <tr><th>Goles en contra</th><td>{{ s.goles_contra }}</td></tr>
-                    <tr><th>Puntos</th><td>{{ s.puntos }}</td></tr>
-                    <tr><th>Tarjetas amarillas</th><td>{{ s.tarjetas_amarillas }}</td></tr>
-                    <tr><th>Tarjetas rojas</th><td>{{ s.tarjetas_rojas }}</td></tr>
-                  </tbody>
-                </table>
-              </article>
-            {% endfor %}
-          {% else %}
-            <p>No hay estadísticas disponibles.</p>
-          {% endif %}
+        <div class="season-selector" style="margin:8px 0;">
+          <div id="season-tabs" class="tabs"></div>
+        </div>
+
+        <div class="stats-split">
+          <div class="tabs-nav" id="stats-subtabs" style="margin-bottom:10px;">
+            <button class="tab-btn active" data-subtab="equipo">Equipo</button>
+            <button class="tab-btn" data-subtab="jugadores">Jugadores</button>
+          </div>
+          <div class="panel subpanel">
+            <h3>Estadísticas del Equipo</h3>
+            <div id="estadisticas-equipo" data-subtab-content="equipo">
+              {% if estadisticas_equipo %}
+                <article class="estadistica-item">
+                  <h4>Temporada: {{ estadisticas_equipo.temporada }}</h4>
+                  <table class="stats-table">
+                    <tbody>
+                      <tr><th>Partidos jugados</th><td>{{ estadisticas_equipo.partidos_jugados }}</td></tr>
+                      <tr><th>Victorias</th><td>{{ estadisticas_equipo.victorias }}</td></tr>
+                      <tr><th>Empates</th><td>{{ estadisticas_equipo.empates }}</td></tr>
+                      <tr><th>Derrotas</th><td>{{ estadisticas_equipo.derrotas }}</td></tr>
+                      <tr><th>Goles a favor</th><td>{{ estadisticas_equipo.goles_favor }}</td></tr>
+                      <tr><th>Goles en contra</th><td>{{ estadisticas_equipo.goles_contra }}</td></tr>
+                      <tr><th>Puntos</th><td>{{ estadisticas_equipo.puntos }}</td></tr>
+                      <tr><th>Tarjetas amarillas</th><td>{{ estadisticas_equipo.tarjetas_amarillas }}</td></tr>
+                      <tr><th>Tarjetas rojas</th><td>{{ estadisticas_equipo.tarjetas_rojas }}</td></tr>
+                    </tbody>
+                  </table>
+                </article>
+              {% else %}
+                <p>No hay estadísticas del equipo.</p>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="panel subpanel">
+            <h3>Estadísticas de Jugadores</h3>
+            <div id="estadisticas-jugadores" data-subtab-content="jugadores">
+              {% if estadisticas_jugadores %}
+                {% for s in estadisticas_jugadores %}
+                  <article class="estadistica-item">
+                    <h4>{{ s.jugador_id }} • Temporada: {{ s.temporada }}</h4>
+                    <table class="stats-table">
+                      <tbody>
+                        <tr><th>Partidos jugados</th><td>{{ s.partidos_jugados }}</td></tr>
+                        <tr><th>Goles</th><td>{{ s.goles }}</td></tr>
+                        <tr><th>Asistencias</th><td>{{ s.asistencias }}</td></tr>
+                        <tr><th>Tarjetas amarillas</th><td>{{ s.tarjetas_amarillas }}</td></tr>
+                        <tr><th>Tarjetas rojas</th><td>{{ s.tarjetas_rojas }}</td></tr>
+                      </tbody>
+                    </table>
+                  </article>
+                {% endfor %}
+              {% else %}
+                <p>No hay estadísticas de jugadores.</p>
+              {% endif %}
+            </div>
+          </div>
         </div>
       </div>
     </section>

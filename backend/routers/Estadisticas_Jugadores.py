@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException
 from sqlmodel import select
 from backend.modelos.Estadisticas_Jugadores import Estadisticas_J
+from backend.modelos.Estadisticas_Equipos import Estadisticas_E
 from backend.modelos.Jugadores import Jugador
 from backend.modelos.Equipos import Equipo
 from backend.db import SessionDep
@@ -34,6 +35,27 @@ async def obtener_estadistica_jugador_temporada(equipo_id: int,temporada: int , 
     if not estadistica:
         raise HTTPException(status_code=404, detail="La estadística del jugador no existe")
     return estadistica
+
+@router.get("/equipo/{equipo_id}/temporada/{temporada}")
+async def obtener_estadisticas_equipo_y_jugadores(equipo_id: int, temporada: int, session: SessionDep):
+    """Subdivisión: estadísticas del equipo y estadísticas de jugadores para la temporada."""
+    stats_equipo = session.query(Estadisticas_E).filter(
+        Estadisticas_E.equipo_id == equipo_id,
+        Estadisticas_E.temporada == temporada
+    ).first()
+
+    stats_jugadores = session.query(Estadisticas_J).filter(
+        Estadisticas_J.equipo_id == equipo_id,
+        Estadisticas_J.temporada == temporada
+    ).all()
+
+    if not stats_equipo and not stats_jugadores:
+        raise HTTPException(status_code=404, detail="No hay estadísticas para el equipo en la temporada indicada")
+
+    return {
+        "equipo": stats_equipo,
+        "jugadores": stats_jugadores,
+    }
 
 @router.get("/temporada/{temporada_id}/goleadores", response_model=List[GoleadorDTO])
 async def obtener_goleadores_temporada(temporada_id: int, session: SessionDep, limit: int = 10):

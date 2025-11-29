@@ -432,9 +432,9 @@ async def equipo(request: Request, equipo_id: int, session: SessionDep):
             "lugar": partido.estadio
         })
     
-    # Obtener estadísticas del equipo
+    # Obtener estadísticas del equipo (todas las temporadas)
     stats = session.query(Estadisticas_E).filter(Estadisticas_E.equipo_id == equipo_id).all()
-    
+
     estadisticas = []
     for stat in stats:
         estadisticas.append({
@@ -449,13 +449,29 @@ async def equipo(request: Request, equipo_id: int, session: SessionDep):
             "tarjetas_amarillas": stat.tarjetas_amarillas,
             "tarjetas_rojas": stat.tarjetas_rojas
         })
-    
+
+    # Seleccionar temporada más reciente para subdivisión equipo/jugadores
+    latest_season = max([s.temporada for s in stats], default=None)
+    estadisticas_equipo = None
+    estadisticas_jugadores = []
+    if latest_season is not None:
+        # Registro del equipo para la última temporada
+        estadisticas_equipo = next((s for s in stats if s.temporada == latest_season), None)
+        # Estadísticas de jugadores para la misma temporada
+        from backend.modelos.Estadisticas_Jugadores import Estadisticas_J
+        estadisticas_jugadores = session.query(Estadisticas_J).filter(
+            Estadisticas_J.equipo_id == equipo_id,
+            Estadisticas_J.temporada == latest_season
+        ).all()
+
     return templates.TemplateResponse("equipo.html", {
         "request": request,
         "equipo": equipo,
         "resultados": resultados,
         "proximos": proximos,
-        "estadisticas": estadisticas
+        "estadisticas": estadisticas,
+        "estadisticas_equipo": estadisticas_equipo,
+        "estadisticas_jugadores": estadisticas_jugadores
     })
 
 
