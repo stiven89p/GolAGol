@@ -23,6 +23,9 @@ function limpiarFiltroFormaciones(){
   window.location.href = '/admin/formaciones';
 }
 
+
+// Lista global de jugadores cargados para el equipo seleccionado
+let jugadores = [];
 async function cargarJugadoresEquipo(equipoId){
   if(!equipoId){
     document.getElementById('portero_id').innerHTML='';
@@ -32,7 +35,7 @@ async function cargarJugadoresEquipo(equipoId){
   }
   try {
     const resp = await fetch(`/jugadores/equipo/${equipoId}`);
-    const jugadores = await resp.json();
+    jugadores = await resp.json();
     
     // Cargar porteros en el select
     const porteroSelect = document.getElementById('portero_id');
@@ -91,8 +94,18 @@ async function cargarJugadoresEquipo(equipoId){
 
       const wrap=document.createElement('div'); 
       wrap.className='chk-item';
+      wrap.style.cursor = 'pointer';
       wrap.appendChild(chk); 
       wrap.appendChild(lbl);
+      
+      // Hacer que todo el wrap sea clickeable
+      wrap.addEventListener('click', (e) => {
+        // Si no se hizo click directamente en el checkbox, disparar su click
+        if(e.target !== chk) {
+          chk.click();
+        }
+      });
+      
       // mark selected style if checked
       chk.addEventListener('change', ()=>{
         wrap.classList.toggle('selected', chk.checked);
@@ -138,8 +151,18 @@ async function cargarJugadoresEquipo(equipoId){
       
       const wrapTit=document.createElement('div'); 
       wrapTit.className='chk-item';
+      wrapTit.style.cursor = 'pointer';
       wrapTit.appendChild(chkTit); 
       wrapTit.appendChild(lblTit);
+      
+      // Hacer que todo el wrap sea clickeable
+      wrapTit.addEventListener('click', (e) => {
+        // Si no se hizo click directamente en el checkbox, disparar su click
+        if(e.target !== chkTit) {
+          chkTit.click();
+        }
+      });
+      
       chkTit.addEventListener('change', ()=>{
         wrapTit.classList.toggle('selected', chkTit.checked);
       });
@@ -192,6 +215,16 @@ async function cargarJugadoresEquipo(equipoId){
   }
 }
 
+// Helpers para obtener IDs y objetos de jugadores seleccionados en el DOM
+function getCheckedIds(selector){
+  return Array.from(document.querySelectorAll(selector)).map(c => parseInt(c.value));
+}
+
+function getCheckedPlayers(selector){
+  const ids = getCheckedIds(selector);
+  return jugadores.filter(j => ids.includes(j.jugador_id));
+}
+
 document.addEventListener('DOMContentLoaded',()=>{
   const eqSelect = document.getElementById('equipo_id');
   if(eqSelect){
@@ -217,6 +250,13 @@ document.addEventListener('DOMContentLoaded',()=>{
         if(titularesSel.length !== 10){
           return mostrarMensaje('Debe seleccionar exactamente 10 jugadores de campo','error');
         }
+        
+        // Validar que las posiciones coincidan con las cantidades ingresadas
+        const validacion = validarFormulario();
+        if(!validacion){
+          return; // validarFormulario ya mostró el mensaje de error
+        }
+        
         // Paso al Step 2
         if(step1 && step2){ step1.style.display='none'; step2.style.display='block'; }
       });
@@ -301,3 +341,37 @@ window.onclick = function(ev){
   const modal = document.getElementById('formulario-formacion');
   if(ev.target === modal){ cerrarFormulario(); }
 };
+
+function validarFormulario(){
+  // Jugadores titulares seleccionados (objetos completos)
+  const titularesSeleccionados = getCheckedPlayers('.titular-chk:checked');
+  
+  // Filtrar por posición (usar OR en lugar de AND)
+  const defensas = titularesSeleccionados.filter(j => j.posicion === 'DEFENSOR' || j.posicion === 'defensor');
+  const mediocampistas = titularesSeleccionados.filter(j => j.posicion === 'MEDIOCAMPISTA' || j.posicion === 'mediocampista');
+  const delanteros = titularesSeleccionados.filter(j => j.posicion === 'DELANTERO' || j.posicion === 'delantero');
+
+  console.log('Defensas:', defensas);
+  console.log('Mediocampistas:', mediocampistas);
+  console.log('Delanteros:', delanteros);
+
+  // Validar que coincidan las cantidades ingresadas
+  const defensasInput = parseInt(document.getElementById('defensas').value || '0');
+  const mediocampistasInput = parseInt(document.getElementById('mediocampistas').value || '0');
+  const delanterosInput = parseInt(document.getElementById('delanteros').value || '0');
+
+  if(defensas.length !== defensasInput){
+    mostrarMensaje(`Debe seleccionar ${defensasInput} defensas, tiene ${defensas.length}`, 'error');
+    return null;
+  }
+  if(mediocampistas.length !== mediocampistasInput){
+    mostrarMensaje(`Debe seleccionar ${mediocampistasInput} mediocampistas, tiene ${mediocampistas.length}`, 'error');
+    return null;
+  }
+  if(delanteros.length !== delanterosInput){
+    mostrarMensaje(`Debe seleccionar ${delanterosInput} delanteros, tiene ${delanteros.length}`, 'error');
+    return null;
+  }
+
+  return { titularesSeleccionados, defensas, mediocampistas, delanteros };
+}
