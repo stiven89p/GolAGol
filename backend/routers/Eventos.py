@@ -99,7 +99,7 @@ async def crear_evento(session: SessionDep,
             raise HTTPException(status_code=404, detail="El jugador asociado no existe")
         if jugador_asociado.equipo_id not in [partido.equipo_local_id, partido.equipo_visitante_id]:
             raise HTTPException(status_code=400, detail="El jugador asociado no pertenece a un equipo del partido")
-        estadistica_jugador_asociado = session.get(Estadisticas_J, evento.jugador_asociado_id)
+        # Ya se obtuvo o creó estadistica_jugador_asociado en las líneas 60-63
 
     if jugador.equipo_id != evento.equipo_id:
         raise HTTPException(status_code=400, detail="El jugador no pertenece al equipo del evento")
@@ -144,15 +144,14 @@ async def crear_evento(session: SessionDep,
         procesar_tiro(session, evento, partido, Estadisticas_J, estadistica_jugador, a_puerta=True)
 
     elif tipo_enum == TipoEvento.ENTRADA:
-        procesar_entrada(session, evento, partido, Estadisticas_J, estadistica_jugador)
+        procesar_entrada(session, evento, partido, Estadisticas_J, estadistica_jugador, estadistica_jugador_asociado if evento.jugador_asociado_id else None)
 
     elif tipo_enum == TipoEvento.INTERCEPCION:
-        procesar_intercepcion(session, evento, partido, Estadisticas_J, estadistica_jugador)
+        procesar_intercepcion(session, evento, partido, Estadisticas_J, estadistica_jugador, estadistica_jugador_asociado if evento.jugador_asociado_id else None)
 
     elif tipo_enum == TipoEvento.TARJETA_AMARILLA or tipo_enum == TipoEvento.TARJETA_ROJA:
         procesar_tarjeta(session, evento, partido, Estadisticas_E, TipoEvento, estadistica_jugador)
 
-    # En este punto, `evento.tipo` es TipoEvento y serializará al valor correcto (minúsculas)
     session.add(evento)
     session.commit()
     session.refresh(evento)
