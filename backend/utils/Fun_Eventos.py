@@ -160,7 +160,7 @@ def procesar_parada(session, evento, partido, Estadisticas_J, estadistica_porter
     session.refresh(estadistica_portero)
 
 
-def procesar_entrada(session, evento, partido, Estadisticas_J, estadistica_jugador):
+def procesar_entrada(session, evento, partido, Estadisticas_J, estadistica_jugador, estadistica_jugador_asociado=None):
     if not estadistica_jugador:
         estadistica_jugador = session.query(Estadisticas_J).filter_by(jugador_id=evento.jugador_id, temporada=partido.temporada_id).first()
         if estadistica_jugador is None:
@@ -172,7 +172,7 @@ def procesar_entrada(session, evento, partido, Estadisticas_J, estadistica_jugad
 
     # Si hay jugador asociado (por ejemplo, quien pierde el balón), aumentar balones_perdidos
     if getattr(evento, 'jugador_asociado_id', None):
-        estad_assoc = session.query(Estadisticas_J).filter_by(jugador_id=evento.jugador_asociado_id, temporada=partido.temporada_id).first()
+        estad_assoc = estadistica_jugador_asociado if estadistica_jugador_asociado else session.query(Estadisticas_J).filter_by(jugador_id=evento.jugador_asociado_id, temporada=partido.temporada_id).first()
         if estad_assoc is None:
             estad_assoc = Estadisticas_J(jugador_id=evento.jugador_asociado_id, temporada=partido.temporada_id)
         estad_assoc.balones_perdidos = (estad_assoc.balones_perdidos or 0) + 1
@@ -181,7 +181,7 @@ def procesar_entrada(session, evento, partido, Estadisticas_J, estadistica_jugad
         session.refresh(estad_assoc)
 
 
-def procesar_intercepcion(session, evento, partido, Estadisticas_J, estadistica_jugador):
+def procesar_intercepcion(session, evento, partido, Estadisticas_J, estadistica_jugador, estadistica_jugador_asociado=None):
     if not estadistica_jugador:
         estadistica_jugador = session.query(Estadisticas_J).filter_by(jugador_id=evento.jugador_id, temporada=partido.temporada_id).first()
         if estadistica_jugador is None:
@@ -193,7 +193,7 @@ def procesar_intercepcion(session, evento, partido, Estadisticas_J, estadistica_
 
     # Si hay jugador asociado (quien pierde el balón por la intercepción), aumentar balones_perdidos
     if getattr(evento, 'jugador_asociado_id', None):
-        estad_assoc = session.query(Estadisticas_J).filter_by(jugador_id=evento.jugador_asociado_id, temporada=partido.temporada_id).first()
+        estad_assoc = estadistica_jugador_asociado if estadistica_jugador_asociado else session.query(Estadisticas_J).filter_by(jugador_id=evento.jugador_asociado_id, temporada=partido.temporada_id).first()
         if estad_assoc is None:
             estad_assoc = Estadisticas_J(jugador_id=evento.jugador_asociado_id, temporada=partido.temporada_id)
         estad_assoc.balones_perdidos = (estad_assoc.balones_perdidos or 0) + 1
