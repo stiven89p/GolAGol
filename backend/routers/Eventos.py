@@ -15,7 +15,7 @@ router = APIRouter(prefix="/eventos", tags=["eventos"])
 @router.post("/", response_model=Evento)
 async def crear_evento(session: SessionDep,
                        minuto: int = Form(...),
-                       tipo: TipoEvento | str = Form(...),
+                       tipo: TipoEvento = Form(...),
                        descripcion: Optional[str] = Form(None),
                        partido_id: int = Form(...),
                        equipo_id: int = Form(...),
@@ -26,22 +26,8 @@ async def crear_evento(session: SessionDep,
     if jugador_asociado_id in (0, '', None):
         jugador_asociado_id = None
 
-    # Normalizar el tipo recibido (acepta nombre en mayúsculas, minúsculas o valor en minúsculas)
-    # Ejemplos válidos: "TIRO", "tiro", TipoEvento.TIRO
-    if isinstance(tipo, TipoEvento):
-        tipo_valor = tipo
-    else:
-        # tipo es str; intentar por nombre del enum primero, luego por valor
-        tipo_str = str(tipo).strip()
-        try:
-            # Caso nombre del enum: "TIRO", "GOL_EN_CONTRA", etc.
-            tipo_valor = TipoEvento[tipo_str]
-        except KeyError:
-            # Caso valor del enum: "tiro", "gol_en_contra", etc.
-            try:
-                tipo_valor = TipoEvento(tipo_str.lower())
-            except ValueError:
-                raise HTTPException(status_code=400, detail=f"Tipo de evento inválido: {tipo_str}")
+    # Usar directamente el Enum `TipoEvento` para que SQLAlchemy/psycopg serialicen el valor correcto en la BD
+    tipo_valor = tipo if isinstance(tipo, TipoEvento) else TipoEvento(str(tipo).lower())
 
     new_evento = EventoCrear(
         minuto=minuto,
@@ -54,17 +40,12 @@ async def crear_evento(session: SessionDep,
     )
     global estadistica_jugador_asociado
     evento = Evento.model_validate(new_evento)
-    # Asegurar que `evento.tipo` es una instancia de `TipoEvento` (no cadena) antes de persistir
-    if not isinstance(evento.tipo, TipoEvento):
-        # Manejar tanto nombre (e.g., "TIRO") como valor (e.g., "tiro")
-        val = str(evento.tipo).strip()
-        try:
-            evento.tipo = TipoEvento[val]
-        except KeyError:
-            try:
-                evento.tipo = TipoEvento(val.lower())
-            except ValueError:
-                raise HTTPException(status_code=400, detail=f"Tipo de evento inválido: {val}")
+    # Asegurar que `evento.tipo` es una instancia de `TipoEvento` para comparaciones y persistencia correctas
+    try:
+        if not isinstance(evento.tipo, TipoEvento):
+            evento.tipo = TipoEvento(str(evento.tipo).lower())
+    except ValueError:
+        raise HTTPException(status_code=400, detail=f"Tipo de evento inválido: {evento.tipo}")
     partido = session.get(Partido, evento.partido_id)
     jugador = session.get(Jugador, evento.jugador_id)
     jugador_asociado = session.get(Jugador, evento.jugador_asociado_id) if evento.jugador_asociado_id else None
