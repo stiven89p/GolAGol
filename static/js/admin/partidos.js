@@ -15,22 +15,24 @@ function cerrarFormulario() {
 
 async function editarPartido(id) {
     try {
-        const response = await fetch(`/partidos/${id}`);
+        const response = await fetch(`/partidos/id/${id}`);
         const partido = await response.json();
         
         mostrarFormulario(false);
         document.getElementById('form-title').textContent = 'Editar Partido';
         document.getElementById('partido_id').value = partido.partido_id;
         document.getElementById('fecha').value = partido.fecha;
-        document.getElementById('hora').value = partido.hora.substring(0, 5);
+        if (partido.hora) document.getElementById('hora').value = partido.hora.substring(0, 5);
         document.getElementById('jornada').value = partido.jornada;
-        document.getElementById('equipo_local_id').value = partido.equipo_local_id;
-        document.getElementById('equipo_visitante_id').value = partido.equipo_visitante_id;
-        document.getElementById('estadio').value = partido.estadio;
-        document.getElementById('temporada_id').value = partido.temporada_id;
-        document.getElementById('estado').value = partido.estado;
-        document.getElementById('goles_local').value = partido.goles_local || 0;
-        document.getElementById('goles_visitante').value = partido.goles_visitante || 0;
+        // Estos campos no vienen completos en el DTO /partidos/id/:id para edición;
+        // Si se necesitan, se debería consultar otro endpoint de detalle editable.
+        // document.getElementById('equipo_local_id').value = ...
+        // document.getElementById('equipo_visitante_id').value = ...
+        // document.getElementById('temporada_id').value = ...
+        document.getElementById('estadio').value = partido.lugar || '';
+        if (document.getElementById('estado')) {
+            document.getElementById('estado').value = partido.estado;
+        }
     } catch (error) {
         mostrarMensaje('Error al cargar el partido', 'error');
     }
@@ -57,8 +59,6 @@ document.getElementById('partido-form').addEventListener('submit', async (e) => 
     formData.append('estadio', document.getElementById('estadio').value.trim());
     formData.append('temporada_id', document.getElementById('temporada_id').value);
     formData.append('estado', document.getElementById('estado').value);
-    formData.append('goles_local', document.getElementById('goles_local').value || '0');
-    formData.append('goles_visitante', document.getElementById('goles_visitante').value || '0');
     
     try {
         let url, method;

@@ -43,7 +43,7 @@ async function cargarEventosPartido() {
             html += renderEventos(segundoTiempo);
             html += '</div>';
         }
-
+        
         container.innerHTML = html;
     } catch (error) {
         console.error('Error cargando eventos:', error);
@@ -99,6 +99,61 @@ function renderEventos(eventos) {
                 className += ' evento-tarjeta-roja';
                 descripcion = `Tarjeta roja para ${evento.jugador_nombre || 'Jugador'}`;
                 break;
+                case 'penal':
+            case 'PENAL':
+                icono = '✅';
+                className += ' evento-penal';
+                descripcion = evento.descripcion || `Penal convertido por ${evento.jugador_nombre || 'Jugador'}`;
+                if (evento.jugador_foto) {
+                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                }
+                break;
+            case 'penal_fallado':
+            case 'PENAL_FALLADO':
+                icono = '❌';
+                className += ' evento-penal-fallado';
+                descripcion = evento.descripcion || `Penal fallado por ${evento.jugador_nombre || 'Jugador'}`;
+                if (evento.jugador_foto) {
+                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                }
+                break;
+            case 'tiro':
+            case 'TIRO':
+                icono = '🎯';
+                className += ' evento-tiro';
+                descripcion = evento.descripcion || `Tiro de ${evento.jugador_nombre || 'Jugador'}`;
+                if (evento.jugador_foto) {
+                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                }
+                break;
+            case 'entrada':
+            case 'ENTRADA':
+                icono = '➕';
+                className += ' evento-entrada';
+                descripcion = evento.descripcion || `Entrada de ${evento.jugador_nombre || 'Jugador'}`;
+                if (evento.jugador_foto) {
+                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                }
+                break;
+            case 'intercepcion':
+            case 'INTERCEPCION':
+                icono = '🛡️';
+                className += ' evento-intercepcion';
+                descripcion = evento.descripcion || `Intercepción de ${evento.jugador_nombre || 'Jugador'}`;
+                if (evento.jugador_foto) {
+                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                }
+                break;
+                            case 'gol_en_contra':
+            case 'GOL_EN_CONTRA':
+                icono = '⚽';
+                className += ' evento-gol-en-contra';
+                descripcion = evento.descripcion || `Autogol de ${evento.jugador_nombre || 'Jugador'}`;
+                if (evento.jugador_foto) {
+                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                }
+                break;
+
             default:
                 icono = '•';
                 descripcion = evento.descripcion || 'Evento';
@@ -165,7 +220,11 @@ async function pollScoreOnce(){
 
 // Start polling every 5 seconds when DOM ready
 document.addEventListener('DOMContentLoaded', function(){
-    // initial fetch
+    // primer fetch inmediato
     pollScoreOnce();
-    setInterval(pollScoreOnce, 5000);
+    cargarEventosPartido();
+    // actualizar marcador cada 2 segundos
+    setInterval(pollScoreOnce, 2000);
+    // actualizar timeline de eventos cada 2 segundos
+    setInterval(cargarEventosPartido, 2000);
 });
