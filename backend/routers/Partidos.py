@@ -249,6 +249,97 @@ async def cambiar_estado_partido(partido_id: int, estado:EstadoPartidos, session
     session.refresh(partido)
     return partido
 
+@router.get("/{partido_id}/jugadores_en_cancha")
+async def jugadores_en_cancha(partido_id: int, session: SessionDep):
+    """Devuelve los jugadores actualmente en cancha para cada equipo del partido.
+
+    Lógica dinámica (sin persistencia adicional):
+    1. Se parte de los titulares de las formaciones asignadas al partido.
+    2. Se recorren los eventos cronológicamente aplicando sustituciones y expulsiones.
+       - Evento SUSTITUCION: jugador_id sale, jugador_asociado_id entra.
+       - Evento TARJETA_ROJA: jugador_id sale.
+
+    Respuesta incluye jugadores con nombre y posición.
+    """
+    partido = session.get(Partido, partido_id)
+    if not partido:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+
+    # Cargar formaciones (pueden ser None si no asignadas aún)
+    from backend.modelos.Formaciones import FormacionJugador
+    from backend.modelos.Jugadores import Jugador
+
+    def cargar_titulares(formacion_id: int | None) -> set[int]:
+        if not formacion_id:
+            return set()
+        rows = session.query(FormacionJugador).filter(
+            FormacionJugador.formacion_id == formacion_id,
+            FormacionJugador.titular == True
+        ).all()
+        return {r.jugador_id for r in rows}
+
+    activos_local = cargar_titulares(partido.formacion_local_id)
+    activos_visitante = cargar_titulares(partido.formacion_visitante_id)
+
+    # Aplicar eventos ordenados
+    eventos = session.query(Evento).filter(Evento.partido_id == partido_id).order_by(Evento.minuto.asc(), Evento.id_evento.asc()).all()
+    for e in eventos:
+        tipo_val = e.tipo.value if hasattr(e.tipo, 'value') else str(e.tipo)
+        # normalizar a enum para comparación robusta
+        try:
+            tipo_enum = e.tipo if isinstance(e.tipo, TipoEvento) else TipoEvento(tipo_val)
+        except Exception:
+            continue  # ignorar tipos desconocidos
+
+        if tipo_enum == TipoEvento.SUSTITUCION:
+            # jugador_id sale, jugador_asociado_id entra
+            if e.jugador_id in activos_local:
+                activos_local.discard(e.jugador_id)
+                if e.jugador_asociado_id:
+                    activos_local.add(e.jugador_asociado_id)
+            elif e.jugador_id in activos_visitante:
+                activos_visitante.discard(e.jugador_id)
+                if e.jugador_asociado_id:
+                    activos_visitante.add(e.jugador_asociado_id)
+        elif tipo_enum == TipoEvento.TARJETA_ROJA:
+            # expulsión: jugador sale
+            if e.jugador_id in activos_local:
+                activos_local.discard(e.jugador_id)
+            elif e.jugador_id in activos_visitante:
+                activos_visitante.discard(e.jugador_id)
+        # Otros tipos no modifican quién está en cancha
+
+    # Cargar datos de jugadores activos
+    todos_ids = list(activos_local | activos_visitante)
+    if todos_ids:
+        jugadores_rows = session.query(Jugador).filter(Jugador.jugador_id.in_(todos_ids)).all()
+        jugadores_map = {j.jugador_id: j for j in jugadores_rows}
+    else:
+        jugadores_map = {}
+
+    def serializar(ids: set[int]):
+        datos = []
+        for jid in ids:
+            j = jugadores_map.get(jid)
+            if not j:
+                continue
+            posicion_val = j.posicion.value if hasattr(j.posicion, 'value') else str(j.posicion)
+            datos.append({
+                "jugador_id": j.jugador_id,
+                "nombre": f"{j.nombre} {j.apellido}",
+                "posicion": posicion_val
+            })
+        return datos
+
+    return {
+        "partido_id": partido.partido_id,
+        "estado": partido.estado,
+        "local": serializar(activos_local),
+        "visitante": serializar(activos_visitante),
+        "total_local": len(activos_local),
+        "total_visitante": len(activos_visitante)
+    }
+
 @router.patch("/iniciar_tiempo/{partido_id}", response_model=Partido)
 async def iniciar_tiempo_partido(partido_id: int, session: SessionDep):
     """Registra únicamente las marcas de inicio correspondientes a la parte actual.
