@@ -621,6 +621,135 @@
     color: #58a6ff;
 }
 
+/* Admin Eventos - List & Badges */
+.event-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.event-item {
+    display: grid;
+    grid-template-columns: 60px 1fr auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-bottom: 1px solid #30363d;
+    background: #161b22;
+}
+
+.event-item:hover {
+    background: #1e2329;
+}
+
+.event-minute {
+    font-weight: 700;
+    color: #a5d6ff;
+    text-align: center;
+}
+
+.event-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.event-meta {
+    font-size: 0.85rem;
+    color: #8b949e;
+}
+
+.event-badges {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.badge-event {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+}
+
+.badge-gol {
+    background: #238636;
+    color: #aff5b4;
+}
+
+.badge-gol_en_contra {
+    background: #da3633;
+    color: #ffdcd7;
+}
+
+.badge-penal {
+    background: #238636;
+    color: #aff5b4;
+}
+
+.badge-penal_fallado {
+    background: #da3633;
+    color: #ffdcd7;
+}
+
+.badge-tiro {
+    background: #7c3aed;
+    color: #e9d5ff;
+}
+
+.badge-tarjeta_amarilla {
+    background: #9e6a03;
+    color: #ffd580;
+}
+
+.badge-tarjeta_roja {
+    background: #da3633;
+    color: #ffdcd7;
+}
+
+.badge-penal {
+    background: #1f6feb;
+    color: #a5d6ff;
+}
+
+.badge-falta, .badge-fuera_de_juego, .badge-tiro_libre {
+    background: #21262d;
+    color: #c9d1d9;
+    border: 1px solid #30363d;
+}
+
+.badge-sustitucion {
+    background: #7d8590;
+    color: #0d1117;
+}
+
+/* Admin Eventos - Form helpers */
+.event-form {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 16px;
+}
+
+.event-form .fields {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.event-form .actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.hint {
+    font-size: 0.85rem;
+    color: #8b949e;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .admin-nav {

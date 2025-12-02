@@ -5,6 +5,189 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{{ equipo.nombre if equipo else 'Equipo' }} - Livescore</title>
   <link rel="stylesheet" href="{{ url_for('static', path='css/styles.css') }}">
+  <style>
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .stat-card {
+      background: #1c2128;
+      padding: 20px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid #30363d;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(88, 166, 255, 0.1);
+    }
+    .stat-card.stat-highlight {
+      background: linear-gradient(135deg, #1f6feb 0%, #1158c7 100%);
+      border-color: #58a6ff;
+    }
+    .stat-label {
+      font-size: 0.9rem;
+      color: #8b949e;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #e6edf3;
+    }
+    .stat-value.stat-success {
+      color: #3fb950;
+    }
+    .stat-value.stat-warning {
+      color: #d29922;
+    }
+    .stat-value.stat-danger {
+      color: #f85149;
+    }
+    .stat-highlight .stat-label {
+      color: #e6edf3;
+    }
+    .stats-table-full {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+    .stats-table-full thead {
+      background: #161b22;
+    }
+    .stats-table-full th {
+      padding: 12px;
+      text-align: left;
+      color: #e6edf3;
+      font-weight: 600;
+      border-bottom: 2px solid #58a6ff;
+    }
+    .stats-table-full td {
+      padding: 12px;
+      border-bottom: 1px solid #30363d;
+      color: #c9d1d9;
+    }
+    .stats-table-full tbody tr:hover {
+      background: #161b22;
+    }
+    .jugador-nombre-cell {
+      font-weight: 500;
+      color: #58a6ff;
+    }
+    #season-tabs {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    #season-tabs .tab-btn {
+      background: #21262d;
+      color: #c9d1d9;
+      border: 1px solid #30363d;
+      padding: 8px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    #season-tabs .tab-btn:hover {
+      background: #30363d;
+      border-color: #58a6ff;
+    }
+    #season-tabs .tab-btn.active {
+      background: #1f6feb;
+      color: white;
+      border-color: #1f6feb;
+    }
+    .jugadores-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .stat-panel-small {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 20px;
+      border: 1px solid #30363d;
+    }
+    .stat-header-small {
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #30363d;
+    }
+    .stat-header-small h3 {
+      font-size: 1.1rem;
+      color: #e6edf3;
+      margin: 0;
+    }
+    .stat-list-small {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .stat-item-small {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #21262d;
+    }
+    .stat-item-small:last-child {
+      border-bottom: none;
+    }
+    .stat-rank-small {
+      font-size: 1rem;
+      font-weight: bold;
+      color: #888;
+      width: 25px;
+      text-align: center;
+    }
+    .stat-player-small {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      margin-left: 10px;
+    }
+    .stat-player-small img {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-right: 10px;
+      border: 2px solid #30363d;
+    }
+    .stat-player-info-small {
+      flex: 1;
+    }
+    .stat-player-name-small {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #e6edf3;
+      margin-bottom: 2px;
+    }
+    .stat-player-meta-small {
+      font-size: 0.75rem;
+      color: #8b949e;
+    }
+    .stat-value-small {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #e6edf3;
+      min-width: 35px;
+      text-align: right;
+    }
+    .stat-item-small:nth-child(1) .stat-rank-small { color: #FFD700; }
+    .stat-item-small:nth-child(2) .stat-rank-small { color: #C0C0C0; }
+    .stat-item-small:nth-child(3) .stat-rank-small { color: #CD7F32; }
+    .badge-goleador { color: #3fb950; }
+    .badge-asistencia { color: #58a6ff; }
+    .badge-amarilla { color: #d29922; }
+    .badge-roja { color: #f85149; }
+  </style>
 </head>
 <body>
   {% include 'partials/header.html' %}
@@ -84,65 +267,120 @@
     </section>
 
     <!-- Tab: Estadísticas -->
-    <section class="tab-content" id="tab-estadisticas">
+    <section class="tab-content" id="tab-estadisticas" {% if estadisticas_equipo %}data-temporada="{{ estadisticas_equipo.temporada }}"{% endif %}>
       <div class="panel estadisticas">
         <h2>Estadísticas por Temporada</h2>
-        <div class="season-selector" style="margin:8px 0;">
+        <div class="season-selector" style="margin:8px 0 20px 0;">
           <div id="season-tabs" class="tabs"></div>
         </div>
 
         <div class="stats-split">
-          <div class="tabs-nav" id="stats-subtabs" style="margin-bottom:10px;">
+          <div class="tabs-nav" id="stats-subtabs" style="margin-bottom:15px;">
             <button class="tab-btn active" data-subtab="equipo">Equipo</button>
             <button class="tab-btn" data-subtab="jugadores">Jugadores</button>
           </div>
-          <div class="panel subpanel">
-            <h3>Estadísticas del Equipo</h3>
-            <div id="estadisticas-equipo" data-subtab-content="equipo">
-              {% if estadisticas_equipo %}
-                <article class="estadistica-item">
-                  <h4>Temporada: {{ estadisticas_equipo.temporada }}</h4>
-                  <table class="stats-table">
-                    <tbody>
-                      <tr><th>Partidos jugados</th><td>{{ estadisticas_equipo.partidos_jugados }}</td></tr>
-                      <tr><th>Victorias</th><td>{{ estadisticas_equipo.victorias }}</td></tr>
-                      <tr><th>Empates</th><td>{{ estadisticas_equipo.empates }}</td></tr>
-                      <tr><th>Derrotas</th><td>{{ estadisticas_equipo.derrotas }}</td></tr>
-                      <tr><th>Goles a favor</th><td>{{ estadisticas_equipo.goles_favor }}</td></tr>
-                      <tr><th>Goles en contra</th><td>{{ estadisticas_equipo.goles_contra }}</td></tr>
-                      <tr><th>Puntos</th><td>{{ estadisticas_equipo.puntos }}</td></tr>
-                      <tr><th>Tarjetas amarillas</th><td>{{ estadisticas_equipo.tarjetas_amarillas }}</td></tr>
-                      <tr><th>Tarjetas rojas</th><td>{{ estadisticas_equipo.tarjetas_rojas }}</td></tr>
-                    </tbody>
-                  </table>
-                </article>
-              {% else %}
-                <p>No hay estadísticas del equipo.</p>
-              {% endif %}
+          
+          <!-- Estadísticas del Equipo -->
+          <div id="estadisticas-equipo" data-subtab-content="equipo">
+            <div class="panel subpanel">
+              <h3>Estadísticas del Equipo</h3>
+              <div id="estadisticas-equipo-content">
+                {% if estadisticas_equipo %}
+                  <article class="estadistica-item">
+                    <div class="stats-grid">
+                      <div class="stat-card">
+                        <div class="stat-label">Partidos Jugados</div>
+                        <div class="stat-value">{{ estadisticas_equipo.partidos_jugados }}</div>
+                      </div>
+                      <div class="stat-card">
+                        <div class="stat-label">Victorias</div>
+                        <div class="stat-value stat-success">{{ estadisticas_equipo.victorias }}</div>
+                      </div>
+                      <div class="stat-card">
+                        <div class="stat-label">Empates</div>
+                        <div class="stat-value stat-warning">{{ estadisticas_equipo.empates }}</div>
+                      </div>
+                      <div class="stat-card">
+                        <div class="stat-label">Derrotas</div>
+                        <div class="stat-value stat-danger">{{ estadisticas_equipo.derrotas }}</div>
+                      </div>
+                      <div class="stat-card">
+                        <div class="stat-label">Goles a Favor</div>
+                        <div class="stat-value">{{ estadisticas_equipo.goles_favor }}</div>
+                      </div>
+                      <div class="stat-card">
+                        <div class="stat-label">Goles en Contra</div>
+                        <div class="stat-value">{{ estadisticas_equipo.goles_contra }}</div>
+                      </div>
+                      <div class="stat-card">
+                        <div class="stat-label">Diferencia de Goles</div>
+                        <div class="stat-value">{{ estadisticas_equipo.goles_favor - estadisticas_equipo.goles_contra }}</div>
+                      </div>
+                      <div class="stat-card stat-highlight">
+                        <div class="stat-label">Puntos</div>
+                        <div class="stat-value">{{ estadisticas_equipo.puntos }}</div>
+                      </div>
+                      <div class="stat-card">
+                        <div class="stat-label">Tarjetas Amarillas</div>
+                        <div class="stat-value">{{ estadisticas_equipo.tarjetas_amarillas }}</div>
+                      </div>
+                      <div class="stat-card">
+                        <div class="stat-label">Tarjetas Rojas</div>
+                        <div class="stat-value">{{ estadisticas_equipo.tarjetas_rojas }}</div>
+                      </div>
+                    </div>
+                  </article>
+                {% else %}
+                  <p>No hay estadísticas del equipo.</p>
+                {% endif %}
+              </div>
             </div>
           </div>
 
-          <div class="panel subpanel">
-            <h3>Estadísticas de Jugadores</h3>
-            <div id="estadisticas-jugadores" data-subtab-content="jugadores">
-              {% if estadisticas_jugadores %}
-                {% for s in estadisticas_jugadores %}
-                  <article class="estadistica-item">
-                    <h4>{{ s.jugador_id }} • Temporada: {{ s.temporada }}</h4>
-                    <table class="stats-table">
-                      <tbody>
-                        <tr><th>Partidos jugados</th><td>{{ s.partidos_jugados }}</td></tr>
-                        <tr><th>Goles</th><td>{{ s.goles }}</td></tr>
-                        <tr><th>Asistencias</th><td>{{ s.asistencias }}</td></tr>
-                        <tr><th>Tarjetas amarillas</th><td>{{ s.tarjetas_amarillas }}</td></tr>
-                        <tr><th>Tarjetas rojas</th><td>{{ s.tarjetas_rojas }}</td></tr>
-                      </tbody>
-                    </table>
-                  </article>
-                {% endfor %}
-              {% else %}
-                <p>No hay estadísticas de jugadores.</p>
-              {% endif %}
+          <!-- Estadísticas de Jugadores -->
+          <div id="estadisticas-jugadores" data-subtab-content="jugadores" style="display:none;">
+            <div id="estadisticas-jugadores-content">
+              <div class="jugadores-stats-grid">
+                <!-- Goleadores -->
+                <div class="stat-panel-small">
+                  <div class="stat-header-small">
+                    <h3>⚽ Goles</h3>
+                  </div>
+                  <ul class="stat-list-small" id="equipo-goleadores-list">
+                    <li style="padding: 20px; text-align: center; color: #666;">Cargando...</li>
+                  </ul>
+                </div>
+                
+                <!-- Asistencias -->
+                <div class="stat-panel-small">
+                  <div class="stat-header-small">
+                    <h3>🎯 Asistencias</h3>
+                  </div>
+                  <ul class="stat-list-small" id="equipo-asistencias-list">
+                    <li style="padding: 20px; text-align: center; color: #666;">Cargando...</li>
+                  </ul>
+                </div>
+                
+                <!-- Tarjetas Amarillas -->
+                <div class="stat-panel-small">
+                  <div class="stat-header-small">
+                    <h3>🟨 T. Amarillas</h3>
+                  </div>
+                  <ul class="stat-list-small" id="equipo-amarillas-list">
+                    <li style="padding: 20px; text-align: center; color: #666;">Cargando...</li>
+                  </ul>
+                </div>
+                
+                <!-- Tarjetas Rojas -->
+                <div class="stat-panel-small">
+                  <div class="stat-header-small">
+                    <h3>🟥 T. Rojas</h3>
+                  </div>
+                  <ul class="stat-list-small" id="equipo-rojas-list">
+                    <li style="padding: 20px; text-align: center; color: #666;">Cargando...</li>
+                  </ul>
+                </div>
+              </div>
             </div>
           </div>
         </div>
