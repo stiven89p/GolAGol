@@ -631,65 +631,30 @@ async def equipos_listado(request: Request, session: SessionDep):
     equipos = session.query(Equipo).all()
     return templates.TemplateResponse("equipos_listado.html", {"request": request, "equipos": equipos})
 
-@app.get("/estadisticas", response_class=HTMLResponse)
-async def estadisticas(request: Request, session: SessionDep):
-    from backend.modelos.Estadisticas_Equipos import Estadisticas_E
-    from backend.modelos.Estadisticas_Jugadores import Estadisticas_J
-    from backend.modelos.Equipos import Equipo
-    from backend.modelos.Jugadores import Jugador
-    # Estadísticas de equipos
-    estadisticas_equipos = session.query(Estadisticas_E, Equipo).join(Equipo, Estadisticas_E.equipo_id == Equipo.equipo_id).all()
-    equipos_list = []
-    for estad, equipo in estadisticas_equipos:
-        equipos_list.append({
-            "logo": equipo.logo,
-            "nombre": equipo.nombre,
-            "partidos_jugados": estad.partidos_jugados,
-            "victorias": estad.victorias,
-            "empates": estad.empates,
-            "derrotas": estad.derrotas,
-            "goles_favor": estad.goles_favor,
-            "goles_contra": estad.goles_contra,
-            "puntos": estad.puntos,
-            "tarjetas_amarillas": estad.tarjetas_amarillas,
-            "tarjetas_rojas": estad.tarjetas_rojas
-        })
-    # Goleadores (solo los que han hecho goles, ordenados por goles descendente)
-    estadisticas_jugadores = session.query(Estadisticas_J, Jugador, Equipo).join(Jugador, Estadisticas_J.jugador_id == Jugador.jugador_id).join(Equipo, Jugador.equipo_id == Equipo.equipo_id).filter(Estadisticas_J.goles > 0).all()
-    jugadores_list = []
-    for estad, jugador, equipo in estadisticas_jugadores:
-        jugadores_list.append({
-            "foto": jugador.foto,
-            "nombre": jugador.nombre,
-            "apellido": jugador.apellido,
-            "equipo_nombre": equipo.nombre,
-            "partidos_jugados": estad.partidos_jugados,
-            "goles": estad.goles,
-            "asistencias": estad.asistencias,
-            "tarjetas_amarillas": estad.tarjetas_amarillas,
-            "tarjetas_rojas": estad.tarjetas_rojas
-        })
-    jugadores_list.sort(key=lambda x: x["goles"], reverse=True)
-    # Asistidores (solo los que han hecho asistencias, ordenados por asistencias descendente)
-    estadisticas_asistidores = session.query(Estadisticas_J, Jugador, Equipo).join(Jugador, Estadisticas_J.jugador_id == Jugador.jugador_id).join(Equipo, Jugador.equipo_id == Equipo.equipo_id).filter(Estadisticas_J.asistencias > 0).all()
-    asistidores_list = []
-    for estad, jugador, equipo in estadisticas_asistidores:
-        asistidores_list.append({
-            "foto": jugador.foto,
-            "nombre": jugador.nombre,
-            "apellido": jugador.apellido,
-            "equipo_nombre": equipo.nombre,
-            "partidos_jugados": estad.partidos_jugados,
-            "goles": estad.goles,
-            "asistencias": estad.asistencias,
-            "tarjetas_amarillas": estad.tarjetas_amarillas,
-            "tarjetas_rojas": estad.tarjetas_rojas
-        })
-    asistidores_list.sort(key=lambda x: x["asistencias"], reverse=True)
-    return templates.TemplateResponse("estadisticas.html", {
+@app.get("/estadisticas/detalle", response_class=HTMLResponse)
+async def estadisticas_detalle(request: Request, session: SessionDep, temporada_id: int = None):
+    """Vista detallada de estadísticas por categorías"""
+    from backend.modelos.Temporada import Temporada
+    
+    # Si no se especifica temporada, obtener la activa o la más reciente
+    if not temporada_id:
+        temporada = session.query(Temporada).filter(
+            Temporada.estado == "EN_CURSO"
+        ).first()
+        if not temporada:
+            temporada = session.query(Temporada).order_by(
+                Temporada.temporada_id.desc()
+            ).first()
+        temporada_id = temporada.temporada_id if temporada else 1
+    else:
+        temporada = session.get(Temporada, temporada_id)
+    
+    temporada_nombre = f"{temporada.nombre}" if temporada else "Temporada Actual"
+    
+    return templates.TemplateResponse("estadisticas_detalle.html", {
         "request": request,
-        "estadisticas_equipos": equipos_list,
-        "estadisticas_jugadores": jugadores_list,
-        "asistidores": asistidores_list
+        "temporada_id": temporada_id,
+        "temporada_nombre": temporada_nombre,
+        "cache_bust": int(time.time())
     })
 

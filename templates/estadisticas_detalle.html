@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estadísticas - Liga Colombiana</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/css/styles.css') }}?v={{ cache_bust }}">
+</head>
+<body>
+    {% include 'partials/header.html' %}
+    
+    <main class="estadisticas-container">
+        <h1 style="color: #fff; margin-bottom: 10px;">Estadísticas de Jugadores</h1>
+        <p style="color: #888; margin-bottom: 30px;">Temporada {{ temporada_nombre or 'Actual' }}</p>
+        
+        <div class="stats-grid">
+            <!-- Bloque superior: Goles, Asistencias, Goles+Asistencias -->
+            <!-- Goleadores -->
+            <div class="stat-panel">
+                <div class="stat-header">
+                    <h2>⚽ Goles</h2>
+                    <span class="info-icon">?</span>
+                </div>
+                <ul class="stat-list" id="goleadores-list">
+                    <!-- Cargado dinámicamente -->
+                </ul>
+                <a href="#" class="mostrar-mas" data-category="goleadores">Mostrar más ▼</a>
+            </div>
+            
+            <!-- Asistencias -->
+            <div class="stat-panel">
+                <div class="stat-header">
+                    <h2>🎯 Asistencias</h2>
+                    <span class="info-icon">?</span>
+                </div>
+                <ul class="stat-list" id="asistencias-list">
+                    <!-- Cargado dinámicamente -->
+                </ul>
+                <a href="#" class="mostrar-mas" data-category="asistencias">Mostrar más ▼</a>
+            </div>
+            
+            <!-- Goles + Asistencias -->
+            <div class="stat-panel">
+                <div class="stat-header">
+                    <h2>🔥 Goles + Asistencias</h2>
+                    <span class="info-icon">?</span>
+                </div>
+                <ul class="stat-list" id="goles-asistencias-list">
+                    <!-- Cargado dinámicamente -->
+                </ul>
+                <a href="#" class="mostrar-mas" data-category="goles_asistencias">Mostrar más ▼</a>
+            </div>
+            
+            <!-- Separador de bloques -->
+            <div style="grid-column: 1 / -1; height: 8px;
+                        margin: 6px 0 2px; border-top: 1px solid #30363d;
+                        box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
+                        opacity: .6;"></div>
+
+            <!-- Bloque inferior: Tarjetas Amarillas y Rojas -->
+            <!-- Tarjetas Amarillas -->
+            <div class="stat-panel">
+                <div class="stat-header">
+                    <h2>🟨 Tarjetas Amarillas</h2>
+                    <span class="info-icon">?</span>
+                </div>
+                <ul class="stat-list" id="amarillas-list">
+                    <!-- Cargado dinámicamente -->
+                </ul>
+                <a href="#" class="mostrar-mas" data-category="tarjetas_amarillas">Mostrar más ▼</a>
+            </div>
+            
+            <!-- Tarjetas Rojas -->
+            <div class="stat-panel">
+                <div class="stat-header">
+                    <h2>🟥 Tarjetas Rojas</h2>
+                    <span class="info-icon">?</span>
+                </div>
+                <ul class="stat-list" id="rojas-list">
+                    <!-- Cargado dinámicamente -->
+                </ul>
+                <a href="#" class="mostrar-mas" data-category="tarjetas_rojas">Mostrar más ▼</a>
+            </div>
+        </div>
+    </main>
+    
+    <script>
+        const temporadaId = {{ temporada_id }};
+        let currentLimit = 3;
+        
+        async function cargarEstadisticas(limit = 3) {
+            try {
+                const response = await fetch(`/estadisticas_jugadores/temporada/${temporadaId}/top-stats?limit=${limit}`);
+                const data = await response.json();
+                
+                renderList('goleadores-list', data.goleadores, 'goles');
+                renderList('asistencias-list', data.asistencias, 'asistencias');
+                renderList('goles-asistencias-list', data.goles_asistencias, 'total');
+                renderList('amarillas-list', data.tarjetas_amarillas, 'amarillas');
+                renderList('rojas-list', data.tarjetas_rojas, 'rojas');
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+        
+        function renderList(containerId, data, type) {
+            const container = document.getElementById(containerId);
+            if (!data || data.length === 0) {
+                container.innerHTML = '<li style="padding: 20px; text-align: center; color: #666;">No hay datos disponibles</li>';
+                return;
+            }
+            
+            container.innerHTML = data.map((item, index) => `
+                <li class="stat-item">
+                    <div class="stat-rank">${index + 1}</div>
+                    <div class="stat-player">
+                        <img src="${item.jugador_foto ? '/static/img/' + item.jugador_foto : '/static/img/default-player.png'}" 
+                             alt="${item.jugador_nombre}"
+                             onerror="this.src='/static/img/default-player.png'">
+                        <div class="stat-player-info">
+                            <div class="stat-player-name">${item.jugador_nombre}</div>
+                            <div class="stat-player-meta">
+                                <span class="position-badge">${item.posicion || 'N/A'}</span>
+                                <span>${item.equipo_nombre}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="stat-value ${getBadgeClass(type)}">${item.valor}</div>
+                </li>
+            `).join('');
+        }
+        
+        function getBadgeClass(type) {
+            const classes = {
+                'goles': 'badge-goleador',
+                'asistencias': 'badge-asistencia',
+                'amarillas': 'badge-amarilla',
+                'rojas': 'badge-roja'
+            };
+            return classes[type] || '';
+        }
+        
+        // Event listeners para "Mostrar más"
+        document.querySelectorAll('.mostrar-mas').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                currentLimit = currentLimit === 3 ? 12 : 3;
+                cargarEstadisticas(currentLimit);
+                btn.textContent = currentLimit === 3 ? 'Mostrar más ▼' : 'Mostrar menos ▲';
+            });
+        });
+        
+        // Cargar al iniciar
+        cargarEstadisticas(3);
+    </script>
+</body>
+</html>
