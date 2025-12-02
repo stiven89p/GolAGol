@@ -138,14 +138,13 @@
                 <td>{{ partido.partido_id }}</td>
                 <td>{{ partido.fecha }}<br><small>{{ partido.hora }}</small></td>
                 <td>{{ partido.equipo_local }}</td>
-                <td class="resultado">{{ partido.goles_local }} - {{ partido.goles_visitante }}</td>
                 <td>{{ partido.equipo_visitante }}</td>
                 <td>{{ partido.jornada }}</td>
                 <td><span class="badge badge-{{ partido.estado|lower }}">{{ partido.estado }}</span></td>
                 <td>
                     {% if partido.estado == 'PROGRAMADO' %}
                         <button class="btn-sm btn-success" onclick="iniciarPartido({{ partido.partido_id }})">▶ Iniciar</button>
-                        <a href="/admin/partidos/{{ partido.partido_id }}/formaciones" class="btn-sm">Formaciones</a>
+                        <button class="btn-sm" onclick="abrirFormaciones({{ partido.partido_id }})">Formaciones</button>
                     {% elif partido.estado == 'EN_CURSO' %}
                         <button class="btn-sm btn-edit" onclick="editarPartido({{ partido.partido_id }})">Editar</button>
                         <a href="/admin/partidos/{{ partido.partido_id }}/eventos" class="btn-sm">Eventos</a>

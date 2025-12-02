@@ -127,10 +127,105 @@ async function iniciarPartido(partidoId) {
     }
 }
 
-// Cerrar modal al hacer clic fuera
+// --------- Gestión de Formaciones del Partido ---------
+async function abrirFormaciones(partidoId){
+    const modal = document.getElementById('modal-formaciones-partido');
+    document.getElementById('modal-partido-id').value = partidoId;
+    document.getElementById('formaciones-local').innerHTML = 'Cargando...';
+    document.getElementById('formaciones-visitante').innerHTML = 'Cargando...';
+    document.getElementById('nombre-local').textContent = '-';
+    document.getElementById('nombre-visitante').textContent = '-';
+    modal.style.display = 'flex';
+
+    try {
+        const resp = await fetch(`/partidos/id/${partidoId}`);
+        if(!resp.ok) throw new Error('No se pudo cargar el partido');
+        const p = await resp.json();
+
+        // Nombres y enlaces de creación
+        document.getElementById('nombre-local').textContent = p.equipo_local_nombre || 'Local';
+        document.getElementById('nombre-visitante').textContent = p.equipo_visitante_nombre || 'Visitante';
+        document.getElementById('link-formaciones-local').href = `/admin/formaciones?equipo_id=${p.equipo_local_id}`;
+        document.getElementById('link-formaciones-visitante').href = `/admin/formaciones?equipo_id=${p.equipo_visitante_id}`;
+
+        // Cargar formaciones de ambos equipos
+        const [rLocal, rVis] = await Promise.all([
+            fetch(`/formaciones/equipo/${p.equipo_local_id}`),
+            fetch(`/formaciones/equipo/${p.equipo_visitante_id}`)
+        ]);
+        const [fl, fv] = await Promise.all([rLocal.json(), rVis.json()]);
+
+        const render = (lista, contId, name) =>{
+            const cont = document.getElementById(contId);
+            if(!lista || lista.length === 0){
+                cont.innerHTML = '<em>Sin formaciones</em>';
+                return;
+            }
+            cont.innerHTML = '';
+            lista.forEach(f=>{
+                const id = `${name}-${f.formacion_id}`;
+                const wrap = document.createElement('div');
+                wrap.className = 'chk-item';
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = name;
+                radio.value = f.formacion_id;
+                radio.id = id;
+                const lbl = document.createElement('label');
+                lbl.htmlFor = id;
+                lbl.style.cursor = 'pointer';
+                lbl.textContent = `${f.defensas}-${f.mediocampistas}-${f.delanteros} (ID ${f.formacion_id})`;
+                wrap.appendChild(radio);
+                wrap.appendChild(lbl);
+                cont.appendChild(wrap);
+            });
+        };
+
+        render(fl, 'formaciones-local', 'formacion_local');
+        render(fv, 'formaciones-visitante', 'formacion_visitante');
+    } catch(err){
+        console.error(err);
+        mostrarMensaje('Error cargando formaciones', 'error');
+    }
+}
+
+function cerrarModalFormaciones(){
+    document.getElementById('modal-formaciones-partido').style.display = 'none';
+}
+
+async function asignarFormacionesSeleccionadas(){
+    const partidoId = document.getElementById('modal-partido-id').value;
+    const localSel = document.querySelector('input[name="formacion_local"]:checked');
+    const visSel = document.querySelector('input[name="formacion_visitante"]:checked');
+    if(!localSel && !visSel){
+        mostrarMensaje('Seleccione al menos una formación para asignar', 'error');
+        return;
+    }
+    try{
+        if(localSel){
+            const r1 = await fetch(`/partidos/${partidoId}/formacion/${localSel.value}`, { method: 'POST' });
+            if(!r1.ok) throw new Error('Error asignando formación local');
+        }
+        if(visSel){
+            const r2 = await fetch(`/partidos/${partidoId}/formacion/${visSel.value}`, { method: 'POST' });
+            if(!r2.ok) throw new Error('Error asignando formación visitante');
+        }
+        mostrarMensaje('Formaciones asignadas');
+        cerrarModalFormaciones();
+        setTimeout(()=> location.reload(), 800);
+    }catch(err){
+        mostrarMensaje(err.message || 'Error asignando formaciones', 'error');
+    }
+}
+
+// Cerrar modales al hacer clic fuera
 window.onclick = function(event) {
-    const modal = document.getElementById('formulario-partido');
-    if (event.target === modal) {
+    const modalPartido = document.getElementById('formulario-partido');
+    const modalFormaciones = document.getElementById('modal-formaciones-partido');
+    if (event.target === modalPartido) {
         cerrarFormulario();
+    }
+    if (event.target === modalFormaciones) {
+        cerrarModalFormaciones();
     }
 }
