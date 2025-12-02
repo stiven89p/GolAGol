@@ -4,19 +4,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const cargarGoleadores = async () => {
         try {
             // Asumiendo temporada_id = 1 (puedes hacerlo dinámico después)
-            const res = await fetch("/estadisticas_jugadores/temporada/1/goleadores?limit=10");
+            const res = await fetch("/estadisticas_jugadores/temporada/1/goleadores?limit=5");
             if (!res.ok) throw new Error("Error al obtener goleadores");
 
             const goleadores = await res.json();
+            // Forzar tope local a 5 por si el backend ignora el parámetro
+            const lista = Array.isArray(goleadores) ? goleadores.slice(0, 5) : [];
             
-            if (goleadores.length === 0) {
+            if (lista.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" class="loading">No hay goleadores registrados</td></tr>';
                 return;
             }
 
             tbody.innerHTML = "";
 
-            goleadores.forEach(g => {
+            lista.forEach(g => {
                 const tr = document.createElement("tr");
 
                 const tdPos = document.createElement("td");
