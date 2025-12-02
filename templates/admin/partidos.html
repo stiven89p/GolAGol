@@ -81,16 +81,6 @@
                             <option value="FINALIZADO">Finalizado</option>
                         </select>
                     </div>
-                    
-                    <div class="form-group">
-                        <label for="goles_local">Goles Local</label>
-                        <input type="number" id="goles_local" name="goles_local" min="0" value="0">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="goles_visitante">Goles Visitante</label>
-                        <input type="number" id="goles_visitante" name="goles_visitante" min="0" value="0">
-                    </div>
                 </div>
                 
                 <div class="form-actions">
@@ -101,13 +91,41 @@
         </div>
     </div>
     
+    <!-- Modal para seleccionar y asignar formaciones -->
+    <div id="modal-formaciones-partido" class="form-modal" style="display:none;">
+        <div class="form-modal-content large">
+            <span class="close" onclick="cerrarModalFormaciones()">&times;</span>
+            <h3>Formaciones del Partido</h3>
+            <input type="hidden" id="modal-partido-id">
+            <div class="form-row">
+                <div class="form-group" style="flex:1;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <label>Equipo Local: <strong id="nombre-local">-</strong></label>
+                        <a id="link-formaciones-local" href="#" target="_blank" class="btn-sm">+ Nueva formación</a>
+                    </div>
+                    <div id="formaciones-local" class="multi-select" style="max-height:320px;overflow:auto;"></div>
+                </div>
+                <div class="form-group" style="flex:1;">
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <label>Equipo Visitante: <strong id="nombre-visitante">-</strong></label>
+                        <a id="link-formaciones-visitante" href="#" target="_blank" class="btn-sm">+ Nueva formación</a>
+                    </div>
+                    <div id="formaciones-visitante" class="multi-select" style="max-height:320px;overflow:auto;"></div>
+                </div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn btn-secondary" onclick="cerrarModalFormaciones()">Cancelar</button>
+                <button type="button" class="btn btn-primary" onclick="asignarFormacionesSeleccionadas()">Asignar</button>
+            </div>
+        </div>
+    </div>
+    
     <table class="admin-table">
         <thead>
             <tr>
                 <th>ID</th>
                 <th>Fecha</th>
                 <th>Local</th>
-                <th>Resultado</th>
                 <th>Visitante</th>
                 <th>Jornada</th>
                 <th>Estado</th>

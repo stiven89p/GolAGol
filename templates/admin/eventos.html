@@ -1,0 +1,85 @@
+{% extends "admin/layout.html" %}
+{% block title %}Eventos del Partido - Admin{% endblock %}
+{% block content %}
+<div class="admin-section">
+  <div class="section-header">
+    <h2>Eventos del Partido</h2>
+    <a class="btn" href="/admin/partidos">← Volver a Partidos</a>
+  </div>
+
+  <div id="partido-info" class="card" style="margin-bottom:1rem;">
+    <div class="card-body">
+      <h3 id="partido-titulo">Partido</h3>
+      <div id="partido-detalle" class="muted"></div>
+    </div>
+  </div>
+
+  <div class="grid two-cols" style="gap:1rem;">
+    <div>
+      <h4>Registrar Evento</h4>
+      <form id="evento-form">
+        <input type="hidden" id="partido_id" value="{{ partido_id }}">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="equipo_id">Equipo *</label>
+            <select id="equipo_id" name="equipo_id" required>
+              <option value="">Seleccione...</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="minuto">Minuto *</label>
+            <input type="number" id="minuto" name="minuto" min="0" max="120" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="tipo">Tipo *</label>
+            <select id="tipo" name="tipo" required>
+              <option value="gol">Gol</option>
+              <option value="penal">Penal</option>
+              <option value="penal_fallado">Penal Fallado</option>
+              <option value="gol_en_contra">Gol en Contra</option>
+              <option value="tarjeta_amarilla">Tarjeta Amarilla</option>
+              <option value="tarjeta_roja">Tarjeta Roja</option>
+              <option value="sustitucion">Sustitución</option>
+              <option value="tiro">Tiro</option>
+              <option value="tiro_a_puerta">Tiro a Puerta</option>
+              <option value="entrada">Entrada</option>
+              <option value="intercepcion">Intercepción</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="jugador_id">Jugador *</label>
+            <select id="jugador_id" name="jugador_id" required></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label for="jugador_asociado_id">Jugador Asociado</label>
+            <select id="jugador_asociado_id" name="jugador_asociado_id"></select>
+            <small class="hint">Para penales (portero), sustitución (quien entra), etc.</small>
+          </div>
+          <div class="form-group" style="flex:1;">
+            <label for="descripcion">Descripción</label>
+            <input type="text" id="descripcion" name="descripcion" placeholder="Descripción opcional">
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">Guardar Evento</button>
+        </div>
+      </form>
+    </div>
+
+    <div>
+      <h4>Eventos Registrados</h4>
+      <div id="eventos-lista" class="list"></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script src="/static/js/admin/eventos.js"></script>
+<script>
+  window.__PARTIDO_ID__ = {{ partido_id }};
+</script>
+{% endblock %}

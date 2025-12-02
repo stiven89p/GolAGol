@@ -250,6 +250,17 @@ async def admin_formaciones(request: Request, session: SessionDep, equipo_id: in
         "equipos": equipos
     })
 
+@app.get("/admin/partidos/{partido_id}/eventos", response_class=HTMLResponse)
+async def admin_eventos_partido(request: Request, partido_id: int, session: SessionDep):
+    # Validar que el partido existe
+    partido = session.get(Partido, partido_id)
+    if not partido:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+    return templates.TemplateResponse("admin/eventos.html", {
+        "request": request,
+        "partido_id": partido_id
+    })
+
 @app.get("/partido/{partido_id}", response_class=HTMLResponse)
 async def partido_detalle(request: Request, partido_id: int, session: SessionDep):
     from backend.modelos.Formaciones import Formacion, FormacionJugador
