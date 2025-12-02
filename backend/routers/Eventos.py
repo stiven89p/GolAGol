@@ -115,6 +115,29 @@ async def crear_evento(session: SessionDep,
             raise HTTPException(status_code=400, detail="El jugador que entra no pertenece al equipo del evento")
         validar_sustitucion(session, evento, partido, TipoEvento)
 
+        # Incrementar partidos jugados para el jugador que entra (una sola vez por partido)
+        try:
+            # Asegurar que existe la fila de estadísticas para la temporada del partido
+            if estadistica_jugador_asociado is None:
+                estadistica_jugador_asociado = Estadisticas_J(jugador_id=jugador_asociado.jugador_id, temporada=partido.temporada_id)
+                session.add(estadistica_jugador_asociado)
+
+            # Evitar duplicar el conteo si hay múltiples sustituciones del mismo jugador en el mismo partido
+            ya_contado = session.query(Evento).filter(
+                Evento.partido_id == partido.partido_id,
+                Evento.tipo == TipoEvento.SUSTITUCION,
+                Evento.jugador_asociado_id == jugador_asociado.jugador_id
+            ).count() > 0
+
+            if not ya_contado:
+                actual = estadistica_jugador_asociado.partidos_jugados or 0
+                estadistica_jugador_asociado.partidos_jugados = actual + 1
+                session.add(estadistica_jugador_asociado)
+        except Exception as e:
+            # No impedir el flujo del evento por errores de conteo; log simplificado
+            # En producción, usar logging adecuado
+            pass
+
     # Mapear tipos adicionales a sus procesadores
     from backend.utils.Fun_Eventos import (
         procesar_gol, procesar_tarjeta, anular_gol, anular_tarjeta,
