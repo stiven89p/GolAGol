@@ -417,8 +417,10 @@ async def obtener_partido_por_id(partido_id: int, session: SessionDep):
     partido, el, ev = row
     dto = PartidoDTO(
         partido_id=partido.partido_id,
+        equipo_local_id=partido.equipo_local_id,
         equipo_local_nombre=getattr(el, "nombre", "") if el else "",
         equipo_local_logo=getattr(el, "logo", None) if el else None,
+        equipo_visitante_id=partido.equipo_visitante_id,
         equipo_visitante_nombre=getattr(ev, "nombre", "") if ev else "",
         equipo_visitante_logo=getattr(ev, "logo", None) if ev else None,
         fecha=partido.fecha,

@@ -57,6 +57,8 @@ class PartidoDTO(SQLModel):
     hora_fin_segundo_tiempo: Optional[str] = Field(None, description="Hora de fin del segundo tiempo (HH:MM:SS)")
     parte: Optional[str] = Field(None, description="Parte actual del partido (PRIMER_TIEMPO, SEGUNDO_TIEMPO, ...)")
     lugar: Optional[str] = Field(None, description="Lugar o estadio del partido")
+    equipo_local_id: Optional[int] = Field(None, description="ID del equipo local")
+    equipo_visitante_id: Optional[int] = Field(None, description="ID del equipo visitante")
     estado: str = Field(..., description="Estado del partido (PROGRAMADO, EN_CURSO, FINALIZADO, etc.)")
     goles_local: Optional[int] = Field(0, description="Goles del equipo local")
     goles_visitante: Optional[int] = Field(0, description="Goles del equipo visitante")
