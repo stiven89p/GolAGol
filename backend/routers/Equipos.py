@@ -21,8 +21,17 @@ async def crear_equipo(session: SessionDep,
     else:
         logo = {"file_name": None}
 
+        
+    nombremayuscula = nombre.title() 
+
+    existing_equipo = session.query(Equipo).filter_by(nombre=nombremayuscula).first()
+    if existing_equipo:
+        raise HTTPException(status_code=400, detail="El equipo ya existe")
+
+    
+
     new_equipo = EquipoCrear(
-        nombre=nombre,
+        nombre=nombremayuscula,
         ciudad=ciudad,
         estadio=estadio,
         anio_fundacion=anio_fundacion,
@@ -73,6 +82,10 @@ async def actualizar_equipo(equipo_id: int,
     equipo = session.get(Equipo, equipo_id)
     if not equipo:
         raise HTTPException(status_code=404, detail="El equipo no existe")
+    
+    nombremayuscula = nombre.title() 
+
+    
 
     if file:
         logo = await upload_file(file)
@@ -81,7 +94,7 @@ async def actualizar_equipo(equipo_id: int,
         equipo.logo = None
 
     if nombre is not None:
-        equipo.nombre = nombre
+        equipo.nombre = nombremayuscula
     if ciudad is not None:
         equipo.ciudad = ciudad
     if estadio is not None:

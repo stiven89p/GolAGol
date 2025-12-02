@@ -25,9 +25,17 @@ async def crear_jugador(session: SessionDep,
         uploaded = await upload_file(foto)
         foto_name = uploaded["file_name"]
 
+    nombremayuscula = nombre.title() 
+    apellidomayuscula = apellido.title()
+
+
+    existing_jugador = session.query(Jugador).filter_by(nombre=nombremayuscula, apellido=apellidomayuscula, equipo_id=equipo_id).first()
+    if existing_jugador:
+        raise HTTPException(status_code=400, detail="El jugador ya existe")
+
     new_jugador = JugadorCrear(
-        nombre=nombre,
-        apellido=apellido,
+        nombre=nombremayuscula,
+        apellido=apellidomayuscula,
         fecha_nacimiento=fecha_nacimiento,
         posicion=posicion,
         nacionalidad=nacionalidad,
@@ -96,10 +104,13 @@ async def actualizar_jugador(jugador_id: int,
         uploaded = await upload_file(foto)
         jugador.foto = uploaded["file_name"]
 
+    nombremayuscula = nombre.title() 
+    apellidomayuscula = apellido.title()
+
     if nombre is not None:
-        jugador.nombre = nombre
+        jugador.nombre = nombremayuscula
     if apellido is not None:
-        jugador.apellido = apellido
+        jugador.apellido = apellidomayuscula
     if fecha_nacimiento is not None:
         jugador.fecha_nacimiento = fecha_nacimiento
     if posicion is not None:
