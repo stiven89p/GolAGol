@@ -248,7 +248,7 @@ th {
 }
 
 /* Botón Ver todos / Ver menos */
-#toggle-partidos {
+#toggle-partidos, #toggle-ultimos {
     background-color: #21262d;
     color: #c9d1d9;
     border: 1px solid #30363d;
@@ -258,15 +258,15 @@ th {
     cursor: pointer;
     transition: background-color .15s ease, border-color .15s ease, color .15s ease, transform .05s ease;
 }
-#toggle-partidos:hover {
+#toggle-partidos:hover, #toggle-ultimos:hover {
     background-color: #30363d;
     border-color: #58a6ff;
     color: #e6edf3;
 }
-#toggle-partidos:active {
+#toggle-partidos:active, #toggle-ultimos:active {
     transform: translateY(1px);
 }
-#toggle-partidos:focus-visible {
+#toggle-partidos:focus-visible, #toggle-ultimos:focus-visible {
     outline: 2px solid #58a6ff;
     outline-offset: 2px;
 }
@@ -1311,18 +1311,24 @@ th {
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* un poquito más de ancho */
     gap: 12px;
+    align-items: stretch; /* evita saltos */
 }
 
+
 .stat-card {
-    background-color: #0d1117;
-    padding: 16px;
-    border-radius: 8px;
-    border: 2px solid #30363d;
-    text-align: center;
-    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100px;
+    box-sizing: border-box; /* Importante */
+    background: #0d1117;
+    border: 1px solid #30363d;
+    border-radius: 10px;
+    padding: 12px 14px;
 }
+
 
 .stat-card:hover {
     transform: translateY(-2px);
@@ -1339,8 +1345,9 @@ th {
 }
 
 .stat-card.roja {
-    border-color: #c4002b;
+    border: 2px solid #c4002b !important;
 }
+
 
 .stat-valor {
     font-size: 2rem;
@@ -1362,6 +1369,18 @@ th {
     color: #8b949e;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+}
+
+/* Extendida grid for stats: keep consistent spacing */
+.stats-grid.stats-grid-extendida {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 14px;
+}
+.stats-grid.stats-grid-extendida .stat-card .stat-valor {
+    font-size: 1.8rem;
+}
+.stats-grid.stats-grid-extendida .stat-card .stat-label {
+    font-size: 0.8rem;
 }
 
 @media (max-width: 640px) {
