@@ -161,20 +161,41 @@ async function init(){
         const tipo = document.getElementById('tipo').value;
         asociadoSelect.innerHTML = '<option value="">Ninguno</option>';
         if(tipo === 'sustitucion'){
-          // Suplentes que no hayan entrado todavía: jugadores del equipo - activos - ya ingresados
-          const yaIngresados = new Set(
-            (eventosCache || [])
-              .filter(e => String(e.tipo) === 'sustitucion' && e.equipo_id === eqId && e.jugador_asociado_id)
-              .map(e => e.jugador_asociado_id)
-          );
-          const candidatos = jugadores.filter(j => !activosSet.has(j.jugador_id) && !yaIngresados.has(j.jugador_id));
-          candidatos.forEach(j=>{
-            const opt = document.createElement('option');
-            opt.value = j.jugador_id;
-            opt.textContent = `${j.nombre} ${j.apellido} (${j.posicion})`;
-            asociadoSelect.appendChild(opt);
-          });
-        } else if (tipo === 'gol' || tipo === 'gol_en_contra' || tipo === 'penal' || tipo === 'penal_fallado' || tipo === 'tiro' || tipo === 'tiro_a_puerta' || tipo === 'entrada' || tipo === 'intercepcion' || tipo === 'tarjeta_amarilla' || tipo === 'tarjeta_roja'){
+          // Obtener suplentes actuales desde el backend para asegurar que
+          // los que ya entraron no aparezcan y los salientes sí estén en banca
+          (async ()=>{
+            try{
+              const r = await fetch(`/partidos/${partidoId}/suplentes_en_cancha`);
+              if(!r.ok) throw new Error('No se pudo cargar suplentes');
+              const data = await r.json();
+              const lado = eqId === p.equipo_local_id ? 'local' : 'visitante';
+              const lista = Array.isArray(data[lado]) ? data[lado] : [];
+              // Mapear a ids para cruce con listado de jugadores del equipo
+              const idsBanca = new Set(lista.map(j=> j.jugador_id));
+              const candidatos = jugadores.filter(j => idsBanca.has(j.jugador_id));
+              candidatos.forEach(j=>{
+                const opt = document.createElement('option');
+                opt.value = j.jugador_id;
+                opt.textContent = `${j.nombre} ${j.apellido} (${j.posicion})`;
+                asociadoSelect.appendChild(opt);
+              });
+            }catch(_){
+              // fallback a lógica local si falla la API
+              const yaIngresados = new Set(
+                (eventosCache || [])
+                  .filter(e => String(e.tipo) === 'sustitucion' && e.equipo_id === eqId && e.jugador_asociado_id)
+                  .map(e => e.jugador_asociado_id)
+              );
+              const candidatos = jugadores.filter(j => !activosSet.has(j.jugador_id) && !yaIngresados.has(j.jugador_id));
+              candidatos.forEach(j=>{
+                const opt = document.createElement('option');
+                opt.value = j.jugador_id;
+                opt.textContent = `${j.nombre} ${j.apellido} (${j.posicion})`;
+                asociadoSelect.appendChild(opt);
+              });
+            }
+          })();
+        } else if (tipo === 'gol' || tipo === 'entrada' || tipo === 'intercepcion'){
           // Mostrar jugadores activos en cancha como posibles asociados (por ejemplo, asistente, portero rival, involucrado)
           const candidatos = jugadores.filter(j => activosSet.has(j.jugador_id));
           candidatos.forEach(j=>{
@@ -183,15 +204,7 @@ async function init(){
             opt.textContent = `${j.nombre} ${j.apellido} (${j.posicion})`;
             asociadoSelect.appendChild(opt);
           });
-        } else {
-          // Por defecto, todos los jugadores del equipo
-          jugadores.forEach(j=>{
-            const opt = document.createElement('option');
-            opt.value = j.jugador_id;
-            opt.textContent = `${j.nombre} ${j.apellido} (${j.posicion})`;
-            asociadoSelect.appendChild(opt);
-          });
-        }
+        } 
       }
       fillAsociado();
 
@@ -215,7 +228,7 @@ async function init(){
       fd.append('minuto', document.getElementById('minuto').value);
       // limitar a tipos esperados en UI
       const tipoVal = document.getElementById('tipo').value;
-      const tiposPermitidos = new Set(['gol','gol_en_contra','sustitucion','tarjeta_amarilla','tarjeta_roja','penal','penal_fallado','tiro']);
+      const tiposPermitidos = new Set([  'gol','penal','penal_fallado','gol_en_contra','tarjeta_amarilla','tarjeta_roja','sustitucion','tiro','tiro_a_puerta','entrada','intercepcion']);
       fd.append('tipo', tiposPermitidos.has(tipoVal) ? tipoVal : 'gol');
       fd.append('descripcion', document.getElementById('descripcion').value);
       fd.append('partido_id', partidoId);
@@ -230,10 +243,7 @@ async function init(){
           throw new Error(err.detail || 'Error al crear evento');
         }
         mostrarMensaje('Evento registrado');
-        // recargar lista
-        const evs = await cargarEventos(partidoId).catch(()=>[]);
-        renderEventos(evs);
-        form.reset();
+        setTimeout(() => {window.location.reload();}, 1000);
       }catch(err){
         mostrarMensaje(err.message, 'error');
       }
