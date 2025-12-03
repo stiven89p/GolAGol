@@ -643,6 +643,11 @@ async def equipos_listado(request: Request, session: SessionDep):
     equipos = session.query(Equipo).all()
     return templates.TemplateResponse("equipos_listado.html", {"request": request, "equipos": equipos})
 
+@app.get("/partidos", response_class=HTMLResponse)
+async def partidos_listado(request: Request, session: SessionDep):
+    equipos = session.query(Equipo).all()
+    return templates.TemplateResponse("partidos_listado.html", {"request": request, "equipos": equipos})
+
 @app.get("/estadisticas/detalle", response_class=HTMLResponse)
 async def estadisticas_detalle(request: Request, session: SessionDep, temporada_id: int = None):
     """Vista detallada de estadísticas por categorías"""
