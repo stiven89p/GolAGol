@@ -62,6 +62,82 @@ def _actualizar_partidos_jugados_jugadores(session, partido: Partido):
             session.add(estadistica_jugador)
 
 
+def _actualizar_minutos_jugados(session, partido: Partido):
+    """Calcula y persiste minutos jugados por jugador en Estadisticas_J para el partido y su temporada."""
+    from backend.modelos.Formaciones import FormacionJugador
+    from backend.modelos.Eventos import Evento
+
+    # Utiliza la misma lógica del endpoint de minutos
+    def cargar_ids(formacion_id: int | None, titulares: bool) -> set[int]:
+        if not formacion_id:
+            return set()
+        rows = session.query(FormacionJugador).filter(
+            FormacionJugador.formacion_id == formacion_id,
+            FormacionJugador.titular == titulares
+        ).all()
+        return {r.jugador_id for r in rows}
+
+    titulares_local = cargar_ids(partido.formacion_local_id, True)
+    titulares_visitante = cargar_ids(partido.formacion_visitante_id, True)
+
+    eventos = session.query(Evento).filter(Evento.partido_id == partido.partido_id).order_by(Evento.minuto.asc(), Evento.id_evento.asc()).all()
+
+    entradas: dict[int, list[int]] = {}
+    salidas: dict[int, list[int]] = {}
+    expulsado_en: dict[int, int] = {}
+    amarillas_count: dict[int, int] = {}
+
+    for jid in titulares_local | titulares_visitante:
+        entradas.setdefault(jid, []).append(0)
+
+    for e in eventos:
+        tipo_val = e.tipo.value if hasattr(e.tipo, 'value') else str(e.tipo)
+        try:
+            tipo_enum = e.tipo if isinstance(e.tipo, TipoEvento) else TipoEvento(tipo_val)
+        except Exception:
+            continue
+
+        if tipo_enum == TipoEvento.SUSTITUCION:
+            if e.jugador_id:
+                salidas.setdefault(e.jugador_id, []).append(e.minuto or 0)
+            if e.jugador_asociado_id:
+                entradas.setdefault(e.jugador_asociado_id, []).append(e.minuto or 0)
+        elif tipo_enum == TipoEvento.TARJETA_ROJA:
+            if e.jugador_id and e.minuto is not None:
+                expulsado_en[e.jugador_id] = e.minuto
+                salidas.setdefault(e.jugador_id, []).append(e.minuto)
+        elif tipo_enum == TipoEvento.TARJETA_AMARILLA:
+            if e.jugador_id:
+                amarillas_count[e.jugador_id] = amarillas_count.get(e.jugador_id, 0) + 1
+                if amarillas_count[e.jugador_id] >= 2 and e.minuto is not None:
+                    expulsado_en[e.jugador_id] = e.minuto
+                    salidas.setdefault(e.jugador_id, []).append(e.minuto)
+
+    ultimo_minuto_evento = max([ev.minuto or 0 for ev in eventos], default=0)
+    minuto_final = max(ultimo_minuto_evento, 90)
+
+    minutos_por_jugador: dict[int, int] = {}
+    for jid, entradas_list in entradas.items():
+        salidas_list = salidas.get(jid, [])
+        for idx, min_in in enumerate(entradas_list):
+            if idx < len(salidas_list):
+                min_out = salidas_list[idx]
+            else:
+                min_out = expulsado_en.get(jid, minuto_final)
+            delta = max((min_out or 0) - (min_in or 0), 0)
+            minutos_por_jugador[jid] = minutos_por_jugador.get(jid, 0) + delta
+
+    # Persistir en Estadisticas_J
+    for jugador_id, minutos in minutos_por_jugador.items():
+        estadistica_jugador = session.query(Estadisticas_J).filter_by(
+            jugador_id=jugador_id,
+            temporada=partido.temporada_id
+        ).first()
+        if estadistica_jugador:
+            estadistica_jugador.minutos_jugados = (estadistica_jugador.minutos_jugados or 0) + minutos
+            session.add(estadistica_jugador)
+
+
 @router.post("/", response_model=Partido)
 async def crear_partido(
         session: SessionDep,
@@ -242,6 +318,9 @@ async def cambiar_estado_partido(partido_id: int, estado:EstadoPartidos, session
         # Actualizar partidos_jugados para los jugadores que participaron
         _actualizar_partidos_jugados_jugadores(session, partido)
 
+        # Calcular y persistir minutos jugados por jugador
+        _actualizar_minutos_jugados(session, partido)
+
 
     partido.estado = estado
     session.add(partido)
@@ -348,6 +427,133 @@ async def jugadores_en_cancha(partido_id: int, session: SessionDep):
         "visitante": serializar(activos_visitante),
         "total_local": len(activos_local),
         "total_visitante": len(activos_visitante)
+    }
+
+@router.get("/{partido_id}/minutos_en_cancha")
+async def minutos_en_cancha(partido_id: int, session: SessionDep):
+    """Calcula los minutos jugados por cada jugador en el partido.
+
+    Reglas:
+    - Titulares: desde minuto 0 hasta que salen por sustitución o expulsión/doble amarilla.
+    - Suplentes que entran: desde su minuto de entrada hasta que salen o expulsión/doble amarilla.
+    - Si el jugador nunca sale ni es expulsado, se cuenta hasta el último minuto registrado del partido (90 por defecto).
+    """
+    partido = session.get(Partido, partido_id)
+    if not partido:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+
+    from backend.modelos.Formaciones import FormacionJugador
+    from backend.modelos.Jugadores import Jugador
+
+    # Obtener titulares iniciales por equipo
+    def cargar_ids(formacion_id: int | None, titulares: bool) -> set[int]:
+        if not formacion_id:
+            return set()
+        rows = session.query(FormacionJugador).filter(
+            FormacionJugador.formacion_id == formacion_id,
+            FormacionJugador.titular == titulares
+        ).all()
+        return {r.jugador_id for r in rows}
+
+    titulares_local = cargar_ids(partido.formacion_local_id, True)
+    titulares_visitante = cargar_ids(partido.formacion_visitante_id, True)
+    suplentes_local = cargar_ids(partido.formacion_local_id, False)
+    suplentes_visitante = cargar_ids(partido.formacion_visitante_id, False)
+
+    # Eventos ordenados
+    eventos = session.query(Evento).filter(Evento.partido_id == partido_id).order_by(Evento.minuto.asc(), Evento.id_evento.asc()).all()
+
+    # Mapas para calcular intervalos de juego
+    entradas: dict[int, list[int]] = {}  # jugador -> lista de minutos de entrada
+    salidas: dict[int, list[int]] = {}   # jugador -> lista de minutos de salida
+    expulsado_en: dict[int, int] = {}    # jugador -> minuto de expulsión
+    amarillas_count: dict[int, int] = {}
+
+    # Inicializar titulares: entran en minuto 0
+    for jid in titulares_local | titulares_visitante:
+        entradas.setdefault(jid, []).append(0)
+
+    # Recorrer eventos para armar entradas/salidas/expulsiones
+    for e in eventos:
+        tipo_val = e.tipo.value if hasattr(e.tipo, 'value') else str(e.tipo)
+        try:
+            tipo_enum = e.tipo if isinstance(e.tipo, TipoEvento) else TipoEvento(tipo_val)
+        except Exception:
+            continue
+
+        if tipo_enum == TipoEvento.SUSTITUCION:
+            # sale
+            if e.jugador_id:
+                salidas.setdefault(e.jugador_id, []).append(e.minuto or 0)
+            # entra
+            if e.jugador_asociado_id:
+                entradas.setdefault(e.jugador_asociado_id, []).append(e.minuto or 0)
+
+        elif tipo_enum == TipoEvento.TARJETA_ROJA:
+            if e.jugador_id and e.minuto is not None:
+                expulsado_en[e.jugador_id] = e.minuto
+                # salida inmediata por expulsión
+                salidas.setdefault(e.jugador_id, []).append(e.minuto)
+
+        elif tipo_enum == TipoEvento.TARJETA_AMARILLA:
+            if e.jugador_id:
+                amarillas_count[e.jugador_id] = amarillas_count.get(e.jugador_id, 0) + 1
+                if amarillas_count[e.jugador_id] >= 2 and e.minuto is not None:
+                    expulsado_en[e.jugador_id] = e.minuto
+                    salidas.setdefault(e.jugador_id, []).append(e.minuto)
+
+    # Determinar minuto final (máximo de eventos, o 90 por defecto)
+    ultimo_minuto_evento = max([ev.minuto or 0 for ev in eventos], default=0)
+    minuto_final = max(ultimo_minuto_evento, 90)
+
+    # Calcular minutos por jugador
+    minutos_por_jugador: dict[int, int] = {}
+    for jid, entradas_list in entradas.items():
+        salidas_list = salidas.get(jid, [])
+        # Emparejar entradas con salidas por orden
+        for idx, min_in in enumerate(entradas_list):
+            if idx < len(salidas_list):
+                min_out = salidas_list[idx]
+            else:
+                # si no hay salida, usar minuto de expulsión si existe; si no, usar minuto_final
+                min_out = expulsado_en.get(jid, minuto_final)
+            delta = max((min_out or 0) - (min_in or 0), 0)
+            minutos_por_jugador[jid] = minutos_por_jugador.get(jid, 0) + delta
+
+    # Preparar respuesta con datos básicos del jugador
+    jugadores_ids = list(minutos_por_jugador.keys())
+    if jugadores_ids:
+        jugadores_rows = session.query(Jugador).filter(Jugador.jugador_id.in_(jugadores_ids)).all()
+        jugadores_map = {j.jugador_id: j for j in jugadores_rows}
+    else:
+        jugadores_map = {}
+
+    resultado_local = []
+    resultado_visitante = []
+    for jid, minutos in minutos_por_jugador.items():
+        j = jugadores_map.get(jid)
+        if not j:
+            continue
+        posicion_val = j.posicion.value if hasattr(j.posicion, 'value') else str(j.posicion)
+        item = {
+            "jugador_id": j.jugador_id,
+            "nombre": f"{j.nombre} {j.apellido}",
+            "posicion": posicion_val,
+            "minutos_jugados": minutos
+        }
+        # Clasificar por equipo usando formación/banca
+        if jid in titulares_local or jid in suplentes_local:
+            resultado_local.append(item)
+        elif jid in titulares_visitante or jid in suplentes_visitante:
+            resultado_visitante.append(item)
+
+    return {
+        "partido_id": partido.partido_id,
+        "minuto_final": minuto_final,
+        "local": resultado_local,
+        "visitante": resultado_visitante,
+        "total_local": len(resultado_local),
+        "total_visitante": len(resultado_visitante)
     }
 
 @router.get("/{partido_id}/suplentes_en_cancha")
