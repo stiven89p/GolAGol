@@ -127,67 +127,83 @@ async function init(){
     let eventosCache = [];
     try { eventosCache = await cargarEventos(partidoId); } catch(_) {}
 
-    async function updateJugadores(){
+    async function updateJugadores() {
       const eqId = parseInt(equipoSelect.value);
-      if(!eqId){
+      if (!eqId){
         jugadorSelect.innerHTML = '';
         asociadoSelect.innerHTML = '';
         return;
       }
+
+      // === 1. Cargar jugadores del equipo actual ===
       const jugadores = await cargarJugadoresEquipo(eqId);
 
-      // Intentar obtener jugadores activos en cancha
+      // === 2. Cargar jugadores del rival ===
+      // Necesitamos el objeto partido (p), asegúrate que esté disponible
+      const esLocal = eqId === p.equipo_local_id;
+      const eqRivalId = esLocal ? p.equipo_visitante_id : p.equipo_local_id;
+
+      const jugadoresRival = await cargarJugadoresEquipo(eqRivalId);
+
+      // === 3. Obtener jugadores activos desde backend ===
       let activosLocal = new Set();
       let activosVisitante = new Set();
+
       try {
         const activosResp = await fetch(`/partidos/${partidoId}/jugadores_en_cancha`);
-        if (activosResp.ok){
+        if (activosResp.ok) {
           const activosData = await activosResp.json();
-          activosLocal = new Set((activosData.local || []).map(j=> j.jugador_id));
-          activosVisitante = new Set((activosData.visitante || []).map(j=> j.jugador_id));
+          activosLocal = new Set((activosData.local || []).map(j => j.jugador_id));
+          activosVisitante = new Set((activosData.visitante || []).map(j => j.jugador_id));
         }
-      } catch(_) {}
+      } catch (_) {}
 
-      const esLocal = eqId === p.equipo_local_id;
+      // === 4. Determinar activos de cada lado según eqId ===
       const activosSet = esLocal ? activosLocal : activosVisitante;
-      const jugadoresActivos = jugadores.filter(j=> activosSet.has(j.jugador_id));
+      const activosRivalSet = esLocal ? activosVisitante : activosLocal;
 
-      // Si no hay activos (por ejemplo partido no en curso), usar todos
+      const jugadoresActivos = jugadores.filter(j => activosSet.has(j.jugador_id));
+      const jugadoresActivosRival = jugadoresRival.filter(j => activosRivalSet.has(j.jugador_id));
+
+      // === 5. Lista principal (jugador involucrado)
       const listaPrincipal = jugadoresActivos.length > 0 ? jugadoresActivos : jugadores;
-      fillSelect(jugadorSelect, listaPrincipal, j=> j.jugador_id, j=> `${j.nombre} ${j.apellido} (${j.posicion})`);
 
-      // Construir candidatos de asociado según tipo de evento
-      function fillAsociado(){
+      fillSelect(
+        jugadorSelect,
+        listaPrincipal,
+        j => j.jugador_id,
+        j => `${j.nombre} ${j.apellido} (${j.posicion})`
+      );
+
+      // === 6. Construir asociados según tipo de evento ===
+
+      function fillAsociado() {
         const tipo = document.getElementById('tipo').value;
         asociadoSelect.innerHTML = '<option value="">Ninguno</option>';
-        if(tipo === 'sustitucion'){
-          // Obtener suplentes actuales desde el backend para asegurar que
-          // los que ya entraron no aparezcan y los salientes sí estén en banca
-          (async ()=>{
-            try{
+
+        // -- Sustitución: suplentes --
+        if (tipo === 'sustitucion') {
+          (async () => {
+            try {
               const r = await fetch(`/partidos/${partidoId}/suplentes_en_cancha`);
-              if(!r.ok) throw new Error('No se pudo cargar suplentes');
+              if (!r.ok) throw new Error();
               const data = await r.json();
-              const lado = eqId === p.equipo_local_id ? 'local' : 'visitante';
+              const lado = esLocal ? 'local' : 'visitante';
               const lista = Array.isArray(data[lado]) ? data[lado] : [];
-              // Mapear a ids para cruce con listado de jugadores del equipo
-              const idsBanca = new Set(lista.map(j=> j.jugador_id));
+              const idsBanca = new Set(lista.map(j => j.jugador_id));
               const candidatos = jugadores.filter(j => idsBanca.has(j.jugador_id));
-              candidatos.forEach(j=>{
+
+              candidatos.forEach(j => {
                 const opt = document.createElement('option');
                 opt.value = j.jugador_id;
                 opt.textContent = `${j.nombre} ${j.apellido} (${j.posicion})`;
                 asociadoSelect.appendChild(opt);
               });
-            }catch(_){
-              // fallback a lógica local si falla la API
-              const yaIngresados = new Set(
-                (eventosCache || [])
-                  .filter(e => String(e.tipo) === 'sustitucion' && e.equipo_id === eqId && e.jugador_asociado_id)
-                  .map(e => e.jugador_asociado_id)
-              );
-              const candidatos = jugadores.filter(j => !activosSet.has(j.jugador_id) && !yaIngresados.has(j.jugador_id));
-              candidatos.forEach(j=>{
+
+            } catch (_) {
+              // fallback
+              const candidatos = jugadores.filter(j => !activosSet.has(j.jugador_id));
+              candidatos.forEach(j => {
                 const opt = document.createElement('option');
                 opt.value = j.jugador_id;
                 opt.textContent = `${j.nombre} ${j.apellido} (${j.posicion})`;
@@ -195,23 +211,34 @@ async function init(){
               });
             }
           })();
-        } else if (tipo === 'gol' || tipo === 'entrada' || tipo === 'intercepcion'){
-          // Mostrar jugadores activos en cancha como posibles asociados (por ejemplo, asistente, portero rival, involucrado)
-          const candidatos = jugadores.filter(j => activosSet.has(j.jugador_id));
-          candidatos.forEach(j=>{
+
+        // -- Gol: jugadores activos del propio equipo --
+        } else if (tipo === 'gol') {
+          jugadoresActivos.forEach(j => {
             const opt = document.createElement('option');
             opt.value = j.jugador_id;
             opt.textContent = `${j.nombre} ${j.apellido} (${j.posicion})`;
             asociadoSelect.appendChild(opt);
           });
-        } 
+
+        // -- Entrada / Intercepción: jugadores activos del rival --
+        } else if (tipo === 'entrada' || tipo === 'intercepcion') {
+          jugadoresActivosRival.forEach(j => {
+            const opt = document.createElement('option');
+            opt.value = j.jugador_id;
+            opt.textContent = `${j.nombre} ${j.apellido} (${j.posicion})`;
+            asociadoSelect.appendChild(opt);
+          });
+        }
       }
+
       fillAsociado();
 
-      // Recalcular asociados si cambia el tipo
+      // === 7. Actualizar dinámico cuando cambia el tipo ===
       document.getElementById('tipo').removeEventListener('change', fillAsociado);
       document.getElementById('tipo').addEventListener('change', fillAsociado);
     }
+
 
     equipoSelect.addEventListener('change', updateJugadores);
     await updateJugadores();
