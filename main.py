@@ -337,7 +337,7 @@ async def partido_detalle(request: Request, partido_id: int, session: SessionDep
 
     detalle = {
         "partido_id": partido.partido_id,
-        "estado": partido.estado,
+        "estado": partido.estado.name if hasattr(partido.estado, 'name') else str(partido.estado),
         "fecha": str(partido.fecha),
         "hora": partido.hora.strftime("%H:%M") if partido.hora else None,
         "hora_inicio": partido.hora_inicio.strftime("%H:%M:%S") if partido.hora_inicio else None,

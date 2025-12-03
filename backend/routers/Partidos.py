@@ -214,7 +214,7 @@ async def obtener_partidos_por_estado(estado: EstadoPartidos, session: SessionDe
             fecha=partido.fecha,
             hora=partido.hora.strftime("%H:%M") if partido.hora else None,
             lugar=partido.estadio,
-            estado=partido.estado,
+            estado=partido.estado.name if hasattr(partido.estado, 'name') else str(partido.estado),
             goles_local=partido.goles_local,
             goles_visitante=partido.goles_visitante,
         )
@@ -253,7 +253,7 @@ async def obtener_partidos_equipo(equipo_id: int, session: SessionDep):
             fecha=partido.fecha,
             hora=partido.hora.strftime("%H:%M") if partido.hora else None,
             lugar=partido.estadio,
-            estado=partido.estado,
+            estado=partido.estado.name if hasattr(partido.estado, 'name') else str(partido.estado),
             goles_local=partido.goles_local,
             goles_visitante=partido.goles_visitante,
         )
@@ -279,7 +279,7 @@ async def cambiar_estado_partido(partido_id: int, estado:EstadoPartidos, session
             partido.parte = PartePartido.PRIMER_TIEMPO
     
 
-    # Solo actualizar estadísticas y PJ cuando el partido pasa a FINALIZADO
+    # Solo actualizar estadísticas, PJ y minutos jugados cuando el partido pasa a FINALIZADO
     if estado == EstadoPartidos.FINALIZADO and str(partido.estado).lower() != EstadoPartidos.FINALIZADO.value:
         estadistica = session.query(Estadisticas_E).filter_by(equipo_id=partido.equipo_local_id,temporada=partido.temporada_id).first()
         estadistica_rival = session.query(Estadisticas_E).filter_by(equipo_id=partido.equipo_visitante_id,temporada=partido.temporada_id).first()
@@ -831,7 +831,7 @@ async def obtener_partido_por_id(partido_id: int, session: SessionDep):
         hora_fin_segundo_tiempo=partido.hora_fin_segundo_tiempo.strftime("%H:%M:%S") if partido.hora_fin_segundo_tiempo else None,
         parte=partido.parte.name if partido.parte else None,
         lugar=partido.estadio,
-        estado=partido.estado,
+        estado=partido.estado.name if hasattr(partido.estado, 'name') else str(partido.estado),
         goles_local=partido.goles_local,
         goles_visitante=partido.goles_visitante,
     )
