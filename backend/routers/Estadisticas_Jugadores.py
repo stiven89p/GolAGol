@@ -71,6 +71,18 @@ async def obtener_estadisticas_equipo_y_jugadores(equipo_id: int, temporada: int
             "asistencias": est.asistencias,
             "tarjetas_amarillas": est.tarjetas_amarillas,
             "tarjetas_rojas": est.tarjetas_rojas,
+            "minutos_jugados": est.minutos_jugados,
+            "balones_perdidos": est.balones_perdidos,
+            "penales_cobrados": est.penales_cobrados,
+            "penales_fallados": est.penales_fallados,
+            "tiros_totales": est.tiros_totales,
+            "tiros_a_puerta": est.tiros_a_puerta,
+            "entradas": est.entradas,
+            "intercepciones": est.intercepciones,
+            "goles_contra": est.goles_contra,
+            "goles_concedidos": est.goles_concedidos,
+            "paradas": est.paradas,
+            "penales_tapados": est.penales_tapados,
         }
         for est, jug in registros
     ]

@@ -588,7 +588,19 @@ async def jugador_perfil(request: Request, jugador_id: int, session: SessionDep)
             "goles": est.goles or 0,
             "asistencias": est.asistencias or 0,
             "tarjetas_amarillas": est.tarjetas_amarillas or 0,
-            "tarjetas_rojas": est.tarjetas_rojas or 0
+            "tarjetas_rojas": est.tarjetas_rojas or 0,
+            "minutos_jugados": getattr(est, 'minutos_jugados', 0) or 0,
+            "balones_perdidos": getattr(est, 'balones_perdidos', 0) or 0,
+            "penales_cobrados": getattr(est, 'penales_cobrados', 0) or 0,
+            "penales_fallados": getattr(est, 'penales_fallados', 0) or 0,
+            "tiros_totales": getattr(est, 'tiros_totales', 0) or 0,
+            "tiros_a_puerta": getattr(est, 'tiros_a_puerta', 0) or 0,
+            "entradas": getattr(est, 'entradas', 0) or 0,
+            "intercepciones": getattr(est, 'intercepciones', 0) or 0,
+            "goles_contra": getattr(est, 'goles_contra', 0) or 0,
+            "goles_concedidos": getattr(est, 'goles_concedidos', 0) or 0,
+            "paradas": getattr(est, 'paradas', 0) or 0,
+            "penales_tapados": getattr(est, 'penales_tapados', 0) or 0
         })
     
     # Obtener otros jugadores del mismo equipo

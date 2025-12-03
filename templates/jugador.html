@@ -89,6 +89,10 @@
             <div class="jugador-estadisticas panel">
                 <h2>📊 Estadísticas</h2>
                 {% if estadisticas %}
+                    <script>
+                        window.estadisticas = {{ estadisticas | tojson }};
+                        window.jugadorPosicion = '{{ jugador.posicion }}';
+                    </script>
                     {% for est in estadisticas %}
                     <div class="estadistica-temporada">
                         <h3>Temporada {{ est.temporada_nombre or est.temporada }}</h3>
@@ -98,18 +102,59 @@
                             <div class="stat-card"><div class="stat-valor">{{ est.asistencias or 0 }}</div><div class="stat-label">🎯 Asistencias</div></div>
                             <div class="stat-card amarilla"><div class="stat-valor">{{ est.tarjetas_amarillas or 0 }}</div><div class="stat-label">🟨 Amarillas</div></div>
                             <div class="stat-card roja"><div class="stat-valor">{{ est.tarjetas_rojas or 0 }}</div><div class="stat-label">🟥 Rojas</div></div>
-                            <div class="stat-card"><div class="stat-valor">{{ est.minutos_jugados or 0 }}</div>
-                            <div class="stat-card"><div class="stat-valor">{{ est.balones_perdidos or 0 }}</div><div class="stat-label">Balones Perdidos</div></div>
-                            <div class="stat-card"><div class="stat-valor">{{ est.penales_cobrados or 0 }}</div><div class="stat-label">Penales Cobrados</div></div>
-                            <div class="stat-card"><div class="stat-valor">{{ est.penales_fallados or 0 }}</div><div class="stat-label">Penales Fallados</div></div>
-                            <div class="stat-card"><div class="stat-valor">{{ est.tiros_totales or 0 }}</div><div class="stat-label">Tiros Totales</div></div>
-                            <div class="stat-card"><div class="stat-valor">{{ est.tiros_a_puerta or 0 }}</div><div class="stat-label">Tiros a Puerta</div></div>
-                            <div class="stat-card"><div class="stat-valor">{{ est.entradas or 0 }}</div><div class="stat-label">Entradas</div></div>
-                            <div class="stat-card"><div class="stat-valor">{{ est.intercepciones or 0 }}</div><div class="stat-label">Intercepciones</div></div>
-                            <div class="stat-card"><div class="stat-valor">{{ est.goles_contra or 0 }}</div><div class="stat-label">Goles en Contra</div></div>
-                            <div class="stat-card"><div class="stat-valor">{{ est.goles_concedidos or 0 }}</div><div class="stat-label">Goles Concedidos</div></div>
-                            <div class="stat-card"><div class="stat-valor">{{ est.paradas or 0 }}</div><div class="stat-label">Paradas</div></div>
-                            <div class="stat-card"><div class="stat-valor">{{ est.penales_tapados or 0 }}</div><div class="stat-label">Penales Tapados</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.minutos_jugados or 0 }}</div><div class="stat-label">⏱ Minutos</div></div>
+                            {% if jugador.posicion == 'PORTERO' %}
+                                <div class="stat-card"><div class="stat-valor">{{ est.paradas or 0 }}</div><div class="stat-label">Paradas</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ est.penales_tapados or 0 }}</div><div class="stat-label">Penales Tapados</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ est.goles_concedidos or 0 }}</div><div class="stat-label">Goles Concedidos</div></div>
+                            {% elif jugador.posicion == 'DEFENSOR' %}
+                                <div class="stat-card"><div class="stat-valor">{{ est.entradas or 0 }}</div><div class="stat-label">Entradas</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ est.intercepciones or 0 }}</div><div class="stat-label">Intercepciones</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ est.balones_perdidos or 0 }}</div><div class="stat-label">Balones Perdidos</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ est.goles_contra or 0 }}</div><div class="stat-label">Goles en Contra</div></div>
+                            {% elif jugador.posicion == 'MEDIOCAMPISTA' %}
+                                <div class="stat-card"><div class="stat-valor">{{ est.entradas or 0 }}</div><div class="stat-label">Entradas</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ est.intercepciones or 0 }}</div><div class="stat-label">Intercepciones</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ est.tiros_totales or 0 }}</div><div class="stat-label">Tiros Totales</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ (est.goles / est.partidos_jugados) |round(2) if est.partidos_jugados else 0 }}</div><div class="stat-label">promedio de gol por partido</div></div>
+                            {% elif jugador.posicion == 'DELANTERO' %}
+                                <div class="stat-card"><div class="stat-valor">{{ est.tiros_totales or 0 }}</div><div class="stat-label">Tiros Totales</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ (est.goles / est.partidos_jugados) |round(2)  if est.partidos_jugados else 0 }}</div><div class="stat-label">promedio de gol por partido</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ est.tiros_a_puerta or 0 }}</div><div class="stat-label">Tiros a Puerta</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ est.penales_cobrados or 0 }}</div><div class="stat-label">Penales Cobrados</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ est.penales_fallados or 0 }}</div><div class="stat-label">Penales Fallados</div></div>
+                                <div class="stat-card"><div class="stat-valor">{{ est.balones_perdidos or 0 }}</div><div class="stat-label">Balones Perdidos</div></div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Gráficas por temporada -->
+                        <div class="charts-grid" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:12px;">
+                            <!-- Goles vs Asistencias -->
+                            <div class="panel" style="padding:8px;">
+                                <canvas id="chart-goles-{{ est.temporada }}" width="240" height="240"></canvas>
+                            </div>
+                            <!-- Tarjetas -->
+                            <div class="panel" style="padding:8px;">
+                                <canvas id="chart-tarjetas-{{ est.temporada }}" width="240" height="240"></canvas>
+                            </div>
+                            {% if jugador.posicion == 'DEFENSOR' or jugador.posicion == 'MEDIOCAMPISTA' %}
+                            <!-- Defensivas -->
+                            <div class="panel" style="padding:8px;">
+                                <canvas id="chart-defensivas-{{ est.temporada }}" width="240" height="240"></canvas>
+                            </div>
+                            {% endif %}
+                            {% if jugador.posicion == 'DELANTERO' or jugador.posicion == 'MEDIOCAMPISTA' %}
+                            <!-- Tiros -->
+                            <div class="panel" style="padding:8px;">
+                                <canvas id="chart-tiros-{{ est.temporada }}" width="240" height="240"></canvas>
+                            </div>
+                            {% endif %}
+                            {% if jugador.posicion == 'PORTERO' %}
+                            <!-- Portero -->
+                            <div class="panel" style="padding:8px;">
+                                <canvas id="chart-portero-{{ est.temporada }}" width="240" height="240"></canvas>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                     {% endfor %}
@@ -132,6 +177,8 @@
     <script>
         var jugadorId = {{ jugador.jugador_id }};
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/js/jugador_perfil.js"></script>
+    <script src="/static/js/jugador_charts.js"></script>
 </body>
 </html>
