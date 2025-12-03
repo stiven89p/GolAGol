@@ -225,8 +225,10 @@ def procesar_intercepcion(session, evento, partido, Estadisticas_J, estadistica_
     session.refresh(estadistica_jugador)
 
     # Si hay jugador asociado (quien pierde el balón por la intercepción), aumentar balones_perdidos
-    if estadistica_jugador_asociado != None:
+    if getattr(evento, 'jugador_asociado_id', None):
         estad_assoc = estadistica_jugador_asociado if estadistica_jugador_asociado else session.query(Estadisticas_J).filter_by(jugador_id=evento.jugador_asociado_id, temporada=partido.temporada_id).first()
+        if estad_assoc is None:
+            estad_assoc = Estadisticas_J(jugador_id=evento.jugador_asociado_id, temporada=partido.temporada_id)
         estad_assoc.balones_perdidos = (estad_assoc.balones_perdidos or 0) + 1
         session.add(estad_assoc)
         session.commit()
