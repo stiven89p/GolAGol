@@ -181,10 +181,39 @@ async def crear_partido(
 
     return partido
 
-@router.get("/", response_model=list[Partido])
+@router.get("/", response_model=list[PartidoDTO])
 async def obtener_partidos(session: SessionDep):
-    partidos = session.query(Partido).all()
-    return partidos 
+    equipo_local = aliased(Equipo)
+    equipo_visitante = aliased(Equipo)
+
+    rows = (
+        session.query(Partido, equipo_local, equipo_visitante)
+        .join(equipo_local, Partido.equipo_local_id == equipo_local.equipo_id)
+        .join(equipo_visitante, Partido.equipo_visitante_id == equipo_visitante.equipo_id)
+        .order_by(Partido.fecha.desc())
+        .all()
+    )
+
+    dto_list: list[PartidoDTO] = []
+    for partido, el, ev in rows:
+        dto = PartidoDTO(
+            partido_id=partido.partido_id,
+            equipo_local_id=partido.equipo_local_id,
+            equipo_local_nombre=getattr(el, "nombre", "") if el else "",
+            equipo_local_logo=getattr(el, "logo", None) if el else None,
+            equipo_visitante_id=partido.equipo_visitante_id,
+            equipo_visitante_nombre=getattr(ev, "nombre", "") if ev else "",
+            equipo_visitante_logo=getattr(ev, "logo", None) if ev else None,
+            fecha=partido.fecha,
+            hora=partido.hora.strftime("%H:%M") if partido.hora else None,
+            lugar=partido.estadio,
+            estado=partido.estado.name if hasattr(partido.estado, 'name') else str(partido.estado),
+            goles_local=partido.goles_local,
+            goles_visitante=partido.goles_visitante,
+        )
+        dto_list.append(dto)
+
+    return dto_list
 
 @router.get("/{estado}/", response_model=list[PartidoDTO])
 async def obtener_partidos_por_estado(estado: EstadoPartidos, session: SessionDep):
