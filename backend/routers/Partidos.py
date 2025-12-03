@@ -283,6 +283,7 @@ async def jugadores_en_cancha(partido_id: int, session: SessionDep):
 
     # Aplicar eventos ordenados
     eventos = session.query(Evento).filter(Evento.partido_id == partido_id).order_by(Evento.minuto.asc(), Evento.id_evento.asc()).all()
+    amarillas_por_jugador: dict[int, int] = {}
     for e in eventos:
         tipo_val = e.tipo.value if hasattr(e.tipo, 'value') else str(e.tipo)
         # normalizar a enum para comparación robusta
@@ -307,7 +308,16 @@ async def jugadores_en_cancha(partido_id: int, session: SessionDep):
                 activos_local.discard(e.jugador_id)
             elif e.jugador_id in activos_visitante:
                 activos_visitante.discard(e.jugador_id)
+        elif tipo_enum == TipoEvento.TARJETA_AMARILLA:
+            # contar amarillas y aplicar expulsión por doble amarilla
+            if e.jugador_id:
+                amarillas_por_jugador[e.jugador_id] = amarillas_por_jugador.get(e.jugador_id, 0) + 1
+                if amarillas_por_jugador[e.jugador_id] >= 2:
+                    # remover de la cancha por doble amarilla
+                    activos_local.discard(e.jugador_id)
+                    activos_visitante.discard(e.jugador_id)
         # Otros tipos no modifican quién está en cancha
+        
 
     # Cargar datos de jugadores activos
     todos_ids = list(activos_local | activos_visitante)
@@ -338,6 +348,99 @@ async def jugadores_en_cancha(partido_id: int, session: SessionDep):
         "visitante": serializar(activos_visitante),
         "total_local": len(activos_local),
         "total_visitante": len(activos_visitante)
+    }
+
+@router.get("/{partido_id}/suplentes_en_cancha")
+async def suplentes_en_cancha(partido_id: int, session: SessionDep):
+    """Devuelve los jugadores suplentes actualmente en banca para cada equipo del partido."""
+    partido = session.get(Partido, partido_id)
+    if not partido:
+        raise HTTPException(status_code=404, detail="Partido no encontrado")
+
+    from backend.modelos.Formaciones import FormacionJugador
+    from backend.modelos.Jugadores import Jugador
+
+    def cargar_suplentes(formacion_id: int | None) -> set[int]:
+        if not formacion_id:
+            return set()
+        rows = session.query(FormacionJugador).filter(
+            FormacionJugador.formacion_id == formacion_id,
+            FormacionJugador.titular == False
+        ).all()
+        return {r.jugador_id for r in rows}
+
+    # Suplentes iniciales por formación (banca inicial)
+    suplentes_local = cargar_suplentes(partido.formacion_local_id)
+    suplentes_visitante = cargar_suplentes(partido.formacion_visitante_id)
+
+    # Construir mapa jugador -> lado (local/visitante) a partir de ambas formaciones
+    jugador_a_lado: dict[int, str] = {}
+    if partido.formacion_local_id:
+        filas_local = session.query(FormacionJugador).filter(
+            FormacionJugador.formacion_id == partido.formacion_local_id
+        ).all()
+        for fj in filas_local:
+            jugador_a_lado[fj.jugador_id] = "local"
+    if partido.formacion_visitante_id:
+        filas_visit = session.query(FormacionJugador).filter(
+            FormacionJugador.formacion_id == partido.formacion_visitante_id
+        ).all()
+        for fj in filas_visit:
+            jugador_a_lado[fj.jugador_id] = "visitante"
+
+    # Aplicar eventos para actualizar la banca:
+    # - En SUSTITUCION: el que entra deja de ser suplente; el que sale pasa a la banca
+    # - En TARJETA_ROJA: no se agrega a la banca (queda expulsado)
+    eventos = (
+        session
+        .query(Evento)
+        .filter(Evento.partido_id == partido_id)
+        .order_by(Evento.minuto.asc(), Evento.id_evento.asc())
+        .all()
+    )
+
+    for e in eventos:
+        tipo_val = e.tipo.value if hasattr(e.tipo, 'value') else str(e.tipo)
+        try:
+            tipo_enum = e.tipo if isinstance(e.tipo, TipoEvento) else TipoEvento(tipo_val)
+        except Exception:
+            continue
+
+        if tipo_enum == TipoEvento.SUSTITUCION:
+            # Entrante: siempre debe salir de la banca si estuviera
+            if e.jugador_asociado_id:
+                suplentes_local.discard(e.jugador_asociado_id)
+                suplentes_visitante.discard(e.jugador_asociado_id)
+
+    # Cargar datos de jugadores suplentes
+    todos_ids = list(suplentes_local | suplentes_visitante)
+    if todos_ids:
+        jugadores_rows = session.query(Jugador).filter(Jugador.jugador_id.in_(todos_ids)).all()
+        jugadores_map = {j.jugador_id: j for j in jugadores_rows}
+    else:
+        jugadores_map = {}
+
+    def serializar(ids: set[int]):
+        datos = []
+        for jid in ids:
+            j = jugadores_map.get(jid)
+            if not j:
+                continue
+            posicion_val = j.posicion.value if hasattr(j.posicion, 'value') else str(j.posicion)
+            datos.append({
+                "jugador_id": j.jugador_id,
+                "nombre": f"{j.nombre} {j.apellido}",
+                "posicion": posicion_val
+            })
+        return datos
+
+    return {
+        "partido_id": partido.partido_id,
+        "estado": partido.estado,
+        "local": serializar(suplentes_local),
+        "visitante": serializar(suplentes_visitante),
+        "total_local": len(suplentes_local),
+        "total_visitante": len(suplentes_visitante)
     }
 
 @router.patch("/iniciar_tiempo/{partido_id}", response_model=Partido)
