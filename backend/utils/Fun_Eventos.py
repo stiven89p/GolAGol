@@ -35,6 +35,9 @@ def procesar_gol(session, evento, partido, Estadisticas_E, estadistica_jugador,e
                 estadistica_jugador.penales_cobrados = (estadistica_jugador.penales_cobrados or 0) + 1
         except Exception:
             pass
+
+        estadistica_jugador.tiros_a_puerta = (estadistica_jugador.tiros_a_puerta or 0) + 1
+        estadistica_jugador.tiros_totales = (estadistica_jugador.tiros_totales or 0) + 1
         session.add(estadistica_jugador)
 
     # Actualizar estadística del jugador asociado si aplica

@@ -129,15 +129,11 @@ async def crear_evento(session: SessionDep,
                 Evento.jugador_asociado_id == jugador_asociado.jugador_id
             ).count() > 0
 
-            if not ya_contado:
-                actual = estadistica_jugador_asociado.partidos_jugados or 0
-                estadistica_jugador_asociado.partidos_jugados = actual + 1
-                session.add(estadistica_jugador_asociado)
+
         except Exception as e:
             # No impedir el flujo del evento por errores de conteo; log simplificado
             # En producción, usar logging adecuado
             pass
-        procesar_salida(session, evento, partido, TipoEvento, estadistica_jugador)
 
     if tipo_enum in (TipoEvento.GOL, TipoEvento.PENAL):
         # Penal anotado: igual que gol; procesar_gol maneja penales_cobrados
