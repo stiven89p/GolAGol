@@ -493,7 +493,7 @@ def anular_tarjeta(session, evento, partido, Estadisticas_E, TipoEvento, estadis
     if estadistica_jugador:
         session.refresh(estadistica_jugador)
 
-def validar_sustitucion(session, evento, partido, TipoEvento):
+def validar_sustitucion(session, evento, partido, TipoEvento, estadistica_jugador):
     """
     Valida que una sustitución cumpla las reglas:
     - jugador_id (sale) debe estar actualmente en cancha (titular inicial o entró por sustitución previa).
@@ -520,8 +520,7 @@ def validar_sustitucion(session, evento, partido, TipoEvento):
     titulares_iniciales = {fj.jugador_id for fj in formacion_jugadores if fj.titular}
     suplentes_iniciales = {fj.jugador_id for fj in formacion_jugadores if not fj.titular}
     
-    if evento.jugador_id not in titulares_iniciales:
-        raise HTTPException(status_code=400, detail="El jugador que sale no está entre los titulares iniciales")
+
     if evento.jugador_asociado_id not in suplentes_iniciales:
         raise HTTPException(status_code=400, detail="El jugador que entra no está entre los suplentes iniciales")
 
@@ -543,3 +542,33 @@ def validar_sustitucion(session, evento, partido, TipoEvento):
         raise HTTPException(status_code=400, detail="El jugador que sale ya no está en el campo")
     if evento.jugador_asociado_id in en_campo:
         raise HTTPException(status_code=400, detail="El jugador que entra ya está en el campo")
+    
+
+def procesar_salida(session, evento, partido, TipoEvento, estadisticas_map):
+    """
+    jugador sale -> sumar tiempo jugado
+    """
+    from backend.modelos.Eventos import Evento
+    jugador = evento.jugador_id
+    minuto_salida = evento.minuto
+
+    # Buscar minuto de entrada
+    entrada = session.query(Evento).filter_by(
+        partido_id=partido.partido_id,
+        equipo_id=evento.equipo_id,
+        tipo=TipoEvento.SUSTITUCION,
+        jugador_asociado_id=jugador
+    ).order_by(Evento.minuto.asc()).first()
+
+    if not entrada:
+        # Era titular
+        minuto_entrada = 0
+    else:
+        minuto_entrada = entrada.minuto
+
+    minutos = minuto_salida - minuto_entrada
+    minutos = max(minutos, 0)
+
+    estadisticas_map.minutos_jugados += minutos
+
+

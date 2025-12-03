@@ -1,7 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Form
 from backend.utils.enumeraciones import TipoEvento
-from backend.utils.Fun_Eventos import procesar_gol, procesar_tarjeta, anular_gol, anular_tarjeta, validar_sustitucion, anular_gol_en_contra
+from backend.utils.Fun_Eventos import procesar_gol, procesar_tarjeta, anular_gol, anular_tarjeta, validar_sustitucion, procesar_tarjeta,procesar_penal_fallado, procesar_tiro, procesar_entrada, procesar_intercepcion, procesar_gol_en_contra,procesar_salida
 from backend.modelos.Equipos import Equipo
 from backend.modelos.Estadisticas_Jugadores import Estadisticas_J
 from backend.modelos.Estadisticas_Equipos import Estadisticas_E
@@ -113,7 +113,7 @@ async def crear_evento(session: SessionDep,
             raise HTTPException(status_code=404, detail="El jugador que entra no existe")
         if jugador_asociado.equipo_id != evento.equipo_id:
             raise HTTPException(status_code=400, detail="El jugador que entra no pertenece al equipo del evento")
-        validar_sustitucion(session, evento, partido, TipoEvento)
+        validar_sustitucion(session, evento, partido, TipoEvento, estadistica_jugador)
 
         # Incrementar partidos jugados para el jugador que entra (una sola vez por partido)
         try:
@@ -137,13 +137,7 @@ async def crear_evento(session: SessionDep,
             # No impedir el flujo del evento por errores de conteo; log simplificado
             # En producción, usar logging adecuado
             pass
-
-    # Mapear tipos adicionales a sus procesadores
-    from backend.utils.Fun_Eventos import (
-        procesar_gol, procesar_tarjeta, anular_gol, anular_tarjeta,
-        procesar_penal_fallado, procesar_tiro, procesar_parada, procesar_entrada, procesar_intercepcion,
-        procesar_gol_en_contra
-    )
+        procesar_salida(session, evento, partido, TipoEvento, estadistica_jugador)
 
     if tipo_enum in (TipoEvento.GOL, TipoEvento.PENAL):
         # Penal anotado: igual que gol; procesar_gol maneja penales_cobrados
