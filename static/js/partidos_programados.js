@@ -3,6 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const ultimosLista = document.getElementById("ultimos-lista");
     const isDetailPage = !!document.querySelector('.match-detail');
     const toggleBtn = document.getElementById("toggle-partidos");
+    const toggleUltimosBtn = document.getElementById("toggle-ultimos");
 
     let showAll = false;
     let programadosCache = [];
@@ -17,7 +18,14 @@ document.addEventListener("DOMContentLoaded", () => {
             : null;
 
         // En página de detalle mostramos FINALIZADOS en el sidebar
-        const source = isDetailPage ? finalizadosCache : programadosCache;
+        // Ensure newest first on every render
+        const sortDesc = (a, b) => {
+            const dateA = new Date(a.fecha + (a.hora ? ' ' + a.hora : ''));
+            const dateB = new Date(b.fecha + (b.hora ? ' ' + b.hora : ''));
+            return dateB - dateA;
+        };
+        const sourceRaw = isDetailPage ? finalizadosCache : programadosCache;
+        const source = Array.isArray(sourceRaw) ? [...sourceRaw].sort(sortDesc) : [];
         const data = (!isDetailPage && showAll) ? source : source.slice(0, 5);
 
         data.forEach(p => {
@@ -86,11 +94,21 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!isDetailPage && toggleBtn) toggleBtn.textContent = showAll ? 'Ver menos' : 'Ver todos';
     };
     
+    let showAllUltimos = false;
+
     const renderUltimos = () => {
         if (!ultimosLista) return;
         ultimosLista.innerHTML = "";
 
-        const data = finalizadosCache.slice(0, 5);
+        // Ensure newest first on every render
+        const sortDesc = (a, b) => {
+            const dateA = new Date(a.fecha + (a.hora ? ' ' + a.hora : ''));
+            const dateB = new Date(b.fecha + (b.hora ? ' ' + b.hora : ''));
+            return dateB - dateA;
+        };
+        const baseRaw = Array.isArray(finalizadosCache) ? finalizadosCache : [];
+        const base = [...baseRaw].sort(sortDesc);
+        const data = showAllUltimos ? base : base.slice(0, Math.min(base.length, 5));
 
         data.forEach(p => {
             const card = document.createElement("div");
@@ -145,8 +163,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
 
-            ultimosLista.appendChild(card);
+            // Defensive: avoid rendering more than 5 when collapsed
+            if (showAllUltimos || ultimosLista.childElementCount < 5) {
+                ultimosLista.appendChild(card);
+            }
         });
+        // Update toggle text
+        if (toggleUltimosBtn) toggleUltimosBtn.textContent = showAllUltimos ? 'Ver menos' : 'Ver todos';
     };
 
     const cargarPartidos = async () => {
@@ -190,6 +213,34 @@ document.addEventListener("DOMContentLoaded", () => {
         toggleBtn.addEventListener('click', () => {
             showAll = !showAll;
             renderProgramados();
+        });
+    }
+
+    async function reloadFinalizados(){
+        try{
+            const resFinalizados = await fetch("/partidos/finalizado/");
+            if(resFinalizados.ok){
+                const finalizados = await resFinalizados.json();
+                // re-sort to keep most recent first
+                const sortDesc = (a, b) => {
+                    const dateA = new Date(a.fecha + (a.hora ? ' ' + a.hora : ''));
+                    const dateB = new Date(b.fecha + (b.hora ? ' ' + b.hora : ''));
+                    return dateB - dateA;
+                };
+                finalizados.sort(sortDesc);
+                finalizadosCache = finalizados;
+            }
+        }catch(_e){ /* ignore */ }
+    }
+
+    if (toggleUltimosBtn) {
+        toggleUltimosBtn.addEventListener('click', async () => {
+            showAllUltimos = !showAllUltimos;
+            // When expanding, refresh data to ensure we have all items
+            if (showAllUltimos) {
+                await reloadFinalizados();
+            }
+            renderUltimos();
         });
     }
 
