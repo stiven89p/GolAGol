@@ -92,27 +92,24 @@
                     {% for est in estadisticas %}
                     <div class="estadistica-temporada">
                         <h3>Temporada {{ est.temporada_nombre or est.temporada }}</h3>
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-valor">{{ est.partidos_jugados or 0 }}</div>
-                                <div class="stat-label">Partidos</div>
-                            </div>
-                            <div class="stat-card destacado">
-                                <div class="stat-valor">{{ est.goles or 0 }}</div>
-                                <div class="stat-label">⚽ Goles</div>
-                            </div>
-                            <div class="stat-card">
-                                <div class="stat-valor">{{ est.asistencias or 0 }}</div>
-                                <div class="stat-label">🎯 Asistencias</div>
-                            </div>
-                            <div class="stat-card amarilla">
-                                <div class="stat-valor">{{ est.tarjetas_amarillas or 0 }}</div>
-                                <div class="stat-label">🟨 T. Amarillas</div>
-                            </div>
-                            <div class="stat-card roja">
-                                <div class="stat-valor">{{ est.tarjetas_rojas or 0 }}</div>
-                                <div class="stat-label">🟥 T. Rojas</div>
-                            </div>
+                        <div class="stats-grid stats-grid-extendida">
+                            <div class="stat-card"><div class="stat-valor">{{ est.partidos_jugados or 0 }}</div><div class="stat-label">Partidos</div></div>
+                            <div class="stat-card destacado"><div class="stat-valor">{{ est.goles or 0 }}</div><div class="stat-label">⚽ Goles</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.asistencias or 0 }}</div><div class="stat-label">🎯 Asistencias</div></div>
+                            <div class="stat-card amarilla"><div class="stat-valor">{{ est.tarjetas_amarillas or 0 }}</div><div class="stat-label">🟨 Amarillas</div></div>
+                            <div class="stat-card roja"><div class="stat-valor">{{ est.tarjetas_rojas or 0 }}</div><div class="stat-label">🟥 Rojas</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.minutos_jugados or 0 }}</div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.balones_perdidos or 0 }}</div><div class="stat-label">Balones Perdidos</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.penales_cobrados or 0 }}</div><div class="stat-label">Penales Cobrados</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.penales_fallados or 0 }}</div><div class="stat-label">Penales Fallados</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.tiros_totales or 0 }}</div><div class="stat-label">Tiros Totales</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.tiros_a_puerta or 0 }}</div><div class="stat-label">Tiros a Puerta</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.entradas or 0 }}</div><div class="stat-label">Entradas</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.intercepciones or 0 }}</div><div class="stat-label">Intercepciones</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.goles_contra or 0 }}</div><div class="stat-label">Goles en Contra</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.goles_concedidos or 0 }}</div><div class="stat-label">Goles Concedidos</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.paradas or 0 }}</div><div class="stat-label">Paradas</div></div>
+                            <div class="stat-card"><div class="stat-valor">{{ est.penales_tapados or 0 }}</div><div class="stat-label">Penales Tapados</div></div>
                         </div>
                     </div>
                     {% endfor %}
