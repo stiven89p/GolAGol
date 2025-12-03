@@ -143,6 +143,39 @@ def procesar_tiro(session, evento, partido, Estadisticas_J, estadistica_jugador,
     estadistica_jugador.tiros_totales = (estadistica_jugador.tiros_totales or 0) + 1
     if a_puerta:
         estadistica_jugador.tiros_a_puerta = (estadistica_jugador.tiros_a_puerta or 0) + 1
+
+
+        try:
+            from backend.modelos.Formaciones import Formacion
+            # Equipo del ejecutor y su rival
+            equipo_ejecutor = evento.equipo_id
+            equipo_rival = partido.equipo_visitante_id if equipo_ejecutor == partido.equipo_local_id else partido.equipo_local_id
+
+            # Intentar usar la formación del rival asignada al partido; si no existe, fallback por equipo
+            formacion_rival_id = None
+            if equipo_rival == partido.equipo_local_id:
+                formacion_rival_id = getattr(partido, 'formacion_local_id', None)
+            else:
+                formacion_rival_id = getattr(partido, 'formacion_visitante_id', None)
+
+            formacion_rival = None
+            if formacion_rival_id:
+                formacion_rival = session.get(Formacion, formacion_rival_id)
+            if not formacion_rival:
+                formacion_rival = session.query(Formacion).filter_by(equipo_id=equipo_rival).first()
+
+            portero_id = getattr(formacion_rival, 'portero_id', None) if formacion_rival else None
+            if portero_id:
+                estadistica_portero = session.query(Estadisticas_J).filter_by(jugador_id=portero_id,temporada=partido.temporada_id).first()
+                if estadistica_portero is None:
+                        estadistica_portero = Estadisticas_J(jugador_id=portero_id, temporada=partido.temporada_id)
+        except Exception:
+            # No bloquear si no podemos identificar al portero
+            estadistica_portero = None
+        if estadistica_portero:
+            estadistica_portero.paradas = (estadistica_portero.paradas or 0) + 1
+            session.add(estadistica_portero)
+
     session.add(estadistica_jugador)
     session.commit()
     session.refresh(estadistica_jugador)
@@ -192,31 +225,28 @@ def procesar_intercepcion(session, evento, partido, Estadisticas_J, estadistica_
     session.refresh(estadistica_jugador)
 
     # Si hay jugador asociado (quien pierde el balón por la intercepción), aumentar balones_perdidos
-    if getattr(evento, 'jugador_asociado_id', None):
+    if estadistica_jugador_asociado != None:
         estad_assoc = estadistica_jugador_asociado if estadistica_jugador_asociado else session.query(Estadisticas_J).filter_by(jugador_id=evento.jugador_asociado_id, temporada=partido.temporada_id).first()
-        if estad_assoc is None:
-            estad_assoc = Estadisticas_J(jugador_id=evento.jugador_asociado_id, temporada=partido.temporada_id)
         estad_assoc.balones_perdidos = (estad_assoc.balones_perdidos or 0) + 1
         session.add(estad_assoc)
         session.commit()
         session.refresh(estad_assoc)
 
 def procesar_tarjeta(session, evento, partido, Estadisticas_E, TipoEvento, estadistica_jugador):
-    """
-    Actualiza estadísticas cuando ocurre una tarjeta (amarilla o roja).
-    """
+    from backend.modelos.Eventos import Evento
+
     # Determinar equipo
-    if evento.equipo_id == partido.equipo_local_id:
-        equipo_id = partido.equipo_local_id
-    else:
-        equipo_id = partido.equipo_visitante_id
+    equipo_id = partido.equipo_local_id if evento.equipo_id == partido.equipo_local_id else partido.equipo_visitante_id
 
     # Obtener o crear estadísticas del equipo
-    estadistica = session.query(Estadisticas_E).filter_by(equipo_id=equipo_id, temporada=partido.temporada_id).first()
+    estadistica = session.query(Estadisticas_E).filter_by(
+        equipo_id=equipo_id, temporada=partido.temporada_id
+    ).first()
+
     if estadistica is None:
         estadistica = Estadisticas_E(equipo_id=equipo_id, temporada=partido.temporada_id)
 
-    # Actualizar según el tipo de evento
+    # ---- 1. Aplicar tarjeta recibida ----
     if evento.tipo == TipoEvento.TARJETA_AMARILLA:
         estadistica.tarjetas_amarillas = (estadistica.tarjetas_amarillas or 0) + 1
         if estadistica_jugador:
@@ -229,15 +259,27 @@ def procesar_tarjeta(session, evento, partido, Estadisticas_E, TipoEvento, estad
             estadistica_jugador.tarjetas_rojas = (estadistica_jugador.tarjetas_rojas or 0) + 1
             session.add(estadistica_jugador)
 
-    # Guardar cambios
+    # Guardar cambios del evento actual (amarilla o roja directa)
     session.add_all([partido, estadistica])
     session.commit()
 
-    # Refrescar
-    session.refresh(partido)
-    session.refresh(estadistica)
-    if estadistica_jugador:
-        session.refresh(estadistica_jugador)
+    # ---- 2. Verificar doble amarilla en BD ----
+    count_amarillas = session.query(Evento).filter_by(
+        partido_id=evento.partido_id,
+        jugador_id=evento.jugador_id,
+        tipo=TipoEvento.TARJETA_AMARILLA
+    ).count()
+
+    # Si tiene 2 o más amarillas -> roja por doble amarilla
+    if count_amarillas >= 2:
+        estadistica.tarjetas_rojas = (estadistica.tarjetas_rojas or 0) + 1
+        if estadistica_jugador:
+            estadistica_jugador.tarjetas_rojas = (estadistica_jugador.tarjetas_rojas or 0) + 1
+            session.add(estadistica_jugador)
+
+        session.add(estadistica)
+        session.commit()
+
 
 def anular_gol(session, evento, partido, Estadisticas_E, estadistica_jugador,estadistica_jugador_asociado=None):
     if evento.equipo_id == partido.equipo_local_id:
