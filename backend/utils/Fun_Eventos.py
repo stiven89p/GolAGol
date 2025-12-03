@@ -383,8 +383,13 @@ def procesar_gol_en_contra(session, evento, partido, Estadisticas_E, estadistica
 
     # actualizar: rival goles a favor, autogol equipo goles en contra
     estadistica_rival.goles_favor = (estadistica_rival.goles_favor or 0) + 1
-    estadistica_autogol.goles_contra = (estadistica_autogol.goles_contra or 0) + 1
-
+    
+    juagador_autogol = session.query(Estadisticas_J).filter_by(jugador_id=evento.jugador_id, temporada=partido.temporada_id).first()
+    if juagador_autogol is None:
+        juagador_autogol = Estadisticas_J(jugador_id=evento.jugador_id, temporada=partido.temporada_id)
+        
+    juagador_autogol.goles_contra = (juagador_autogol.goles_contra or 0) + 1
+    session.add(juagador_autogol)
     # Incrementar 'goles_concedidos' al portero del equipo que sufrió el autogol
     try:
         from backend.modelos.Formaciones import Formacion
