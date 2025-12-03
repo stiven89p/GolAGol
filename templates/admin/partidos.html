@@ -148,6 +148,7 @@
                     {% elif partido.estado == 'EN_CURSO' %}
                         <button class="btn-sm btn-edit" onclick="editarPartido({{ partido.partido_id }})">Editar</button>
                         <a href="/admin/partidos/{{ partido.partido_id }}/eventos" class="btn-sm">Eventos</a>
+                        <button class="btn-sm btn-success" onclick="acabarPartido({{ partido.partido_id }})">▶ Finalizar</button>
                     {% else %}
                         <a href="/partido/{{ partido.partido_id }}" class="btn-sm">Ver</a>
                     {% endif %}

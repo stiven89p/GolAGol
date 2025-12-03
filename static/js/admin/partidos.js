@@ -104,7 +104,7 @@ document.getElementById('equipo_local_id').addEventListener('change', async (e) 
 });
 
 // Iniciar partido (cambiar estado de PROGRAMADO a EN_CURSO)
-async function iniciarPartido(partidoId) {
+window.iniciarPartido = async function iniciarPartido(partidoId) {
     if (!confirm('¿Iniciar este partido? El estado cambiará a EN CURSO.')) {
         return;
     }
@@ -127,8 +127,31 @@ async function iniciarPartido(partidoId) {
     }
 }
 
+window.acabarPartido = async function acabarPartido(partidoId) {
+    if (!confirm('¿Iniciar este partido? El estado cambiará a FINALIZADO.')) {
+        return;
+    }
+    
+    try {
+        // El valor debe coincidir con el enum: "finalizado" (minúsculas)
+        const response = await fetch(`/partidos/${partidoId}?estado=finalizado`, {
+            method: 'PATCH'
+        });
+        
+        if (response.ok) {
+            mostrarMensaje('Partido iniciado correctamente');
+            setTimeout(() => location.reload(), 1000);
+        } else {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.detail || 'Error al finalizar partido');
+        }
+    } catch (error) {
+        mostrarMensaje(error.message, 'error');
+    }
+}
+
 // --------- Gestión de Formaciones del Partido ---------
-async function abrirFormaciones(partidoId){
+window.abrirFormaciones = async function abrirFormaciones(partidoId){
     const modal = document.getElementById('modal-formaciones-partido');
     document.getElementById('modal-partido-id').value = partidoId;
     document.getElementById('formaciones-local').innerHTML = 'Cargando...';
