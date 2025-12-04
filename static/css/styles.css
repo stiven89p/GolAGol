@@ -17,7 +17,7 @@
 }
 
 .right-panel {
-    flex: 0 0 400px;
+    flex: 0 0 500px;
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -142,7 +142,7 @@ h1, h2, h3 {
 ================================ */
 .main-layout {
     display: grid;
-    grid-template-columns: 1fr 400px;
+    grid-template-columns: 1fr 500px;
     gap: 30px;
     margin: 20px;
 }
