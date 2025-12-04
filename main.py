@@ -385,6 +385,26 @@ async def partido_detalle(request: Request, partido_id: int, session: SessionDep
             path = f"img/{path}"
         return f"/static/{path}"
 
+    # Función para procesar fotos de jugadores
+    def foto_url(foto_val: str | None):
+        if not foto_val:
+            return "/static/img/default-player.png"
+        
+        # Convertir a string y limpiar URLs corruptas
+        foto_str = str(foto_val)
+        if '/static/img/http' in foto_str:
+            foto_str = foto_str.replace('/static/img/', '')
+        
+        # Si ya es URL absoluta o ruta desde static, dejarla
+        if foto_str.startswith("http") or foto_str.startswith("/static/"):
+            return foto_str
+        
+        # Caso común: almacena 'img/archivo.png' o solo 'archivo.png'
+        path = foto_str
+        if not path.startswith("img/"):
+            path = f"img/{path}"
+        return f"/static/{path}"
+
     # Función para cargar formación con jugadores
     def cargar_formacion(formacion_id: int | None):
         if not formacion_id:
@@ -410,7 +430,7 @@ async def partido_detalle(request: Request, partido_id: int, session: SessionDep
                     "jugador_id": jugador.jugador_id,
                     "nombre": f"{jugador.nombre} {jugador.apellido}",
                     "posicion": fj.posicion.name if hasattr(fj.posicion, 'name') else str(fj.posicion),
-                    "foto": logo_url(jugador.foto)
+                    "foto": foto_url(jugador.foto)
                 }
                 if fj.titular:
                     titulares.append(info)
