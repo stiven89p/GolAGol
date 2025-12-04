@@ -191,18 +191,9 @@
 </head>
 <body>
   {% include 'partials/header.html' %}
-  {% set logo_url = url_for('static', path='img/default_logo.png') %}
-  {% if equipo and equipo.logo %}
-    {% if equipo.logo.startswith('http') or equipo.logo.startswith('/') %}
-      {% set logo_url = equipo.logo %}
-    {% else %}
-      {% set logo_url = url_for('static', path='img/' + equipo.logo) %}
-    {% endif %}
-  {% endif %}
-
   <!-- Encabezado del equipo -->
   <header class="team-header">
-    <img src="{{ logo_url }}" alt="Logo {{ equipo.nombre if equipo else 'Equipo' }}" class="team-logo">
+    <img src="{{ equipo.logo if equipo and equipo.logo else url_for('static', path='img/default_logo.png') }}" alt="Logo {{ equipo.nombre if equipo else 'Equipo' }}" class="team-logo" onerror="this.src='{{ url_for('static', path='img/default_logo.png') }}'">
     <div class="team-info">
       <h1>{{ equipo.nombre if equipo else 'Equipo' }}</h1>
       {% if equipo %}

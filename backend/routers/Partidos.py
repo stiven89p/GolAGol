@@ -273,12 +273,17 @@ async def obtener_partidos_equipo(equipo_id: int, session: SessionDep):
 
     dto_list: list[PartidoDTO] = []
     for partido, el, ev in rows:
+        # Limpiar URLs de logos corruptas
+    
+        logo_local = getattr(el, "logo", None) if el else None
+        logo_visitante = getattr(ev, "logo", None) if ev else None
+
         dto = PartidoDTO(
             partido_id=partido.partido_id,
             equipo_local_nombre=getattr(el, "nombre", "") if el else "",
-            equipo_local_logo=getattr(el, "logo", None) if el else None,
+            equipo_local_logo=logo_local,
             equipo_visitante_nombre=getattr(ev, "nombre", "") if ev else "",
-            equipo_visitante_logo=getattr(ev, "logo", None) if ev else None,
+            equipo_visitante_logo=logo_visitante,
             fecha=partido.fecha,
             hora=partido.hora.strftime("%H:%M") if partido.hora else None,
             lugar=partido.estadio,

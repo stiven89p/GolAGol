@@ -223,7 +223,7 @@
           // Foto: puede venir como jugador_foto o foto
           const fotoFile = item.jugador_foto || item.foto || null;
           const isDefault = !fotoFile;
-          const foto = isDefault ? '/static/img/default-player.png' : `/static/img/${fotoFile}`;
+          const foto = isDefault ? '/static/img/default-player.png' : (/^https?:\/\//.test(fotoFile) ? fotoFile : `/static/img/${fotoFile}`)
           const avatarClass = isDefault ? 'stat-avatar default-avatar' : 'stat-avatar';
 
           return `
@@ -319,7 +319,17 @@
         link.title = `Ver perfil de ${j.nombre} ${j.apellido}`;
 
         const img = document.createElement('img');
-        img.src = j.foto ? `/static/img/${j.foto}` : '/static/img/default-player.png';
+        const fotoUrl = j.foto || '';
+        
+        // DEBUG: ver qué URL estamos recibiendo
+        console.log(`Jugador ${j.nombre}: foto original = "${j.foto}"`);
+        
+        img.src = (/^https?:\/\//.test(fotoUrl) || fotoUrl.startsWith('/static/')) 
+          ? fotoUrl 
+          : (fotoUrl ? `/static/img/${fotoUrl}` : '/static/img/default-player.png')
+        
+        console.log(`  -> img.src = "${img.src}"`);
+        
         img.alt = `${j.nombre} ${j.apellido}`;
         img.className = 'jugador-foto';
         img.onerror = function() {
@@ -394,7 +404,10 @@
       div.className = 'jugador-card goleador-item';
 
       const img = document.createElement('img');
-      img.src = g.jugador_foto ? `/static/img/${g.jugador_foto}` : '/static/img/default-player.png';
+      const fotoUrl = g.jugador_foto || '';
+      img.src = (/^https?:\/\//.test(fotoUrl) || fotoUrl.startsWith('/static/'))
+        ? fotoUrl
+        : (fotoUrl ? `/static/img/${fotoUrl}` : '/static/img/default-player.png')
       img.alt = `${g.jugador_nombre} ${g.jugador_apellido}`;
       img.className = 'jugador-foto';
       img.onerror = function() {
@@ -458,7 +471,7 @@
       const localLogo = document.createElement('img');
       localLogo.className = 'escudo local';
       localLogo.alt = `Escudo ${p.equipo_local_nombre || 'Local'}`;
-      localLogo.src = p.equipo_local_logo ? `/static/img/${p.equipo_local_logo}` : '/static/img/default_logo.png';
+      localLogo.src = p.equipo_local_logo ? (/^https?:\/\//.test(p.equipo_local_logo) ? p.equipo_local_logo : `/static/img/${p.equipo_local_logo}`) : '/static/img/default_logo.png'
       localLogo.onerror = function() { 
         if (this.src !== '/static/img/default_logo.png') {
           this.src = '/static/img/default_logo.png'; 
@@ -469,7 +482,7 @@
       const visitanteLogo = document.createElement('img');
       visitanteLogo.className = 'escudo visitante';
       visitanteLogo.alt = `Escudo ${p.equipo_visitante_nombre || 'Visitante'}`;
-      visitanteLogo.src = p.equipo_visitante_logo ? `/static/img/${p.equipo_visitante_logo}` : '/static/img/default_logo.png';
+      visitanteLogo.src = p.equipo_visitante_logo ? (/^https?:\/\//.test(p.equipo_visitante_logo) ? p.equipo_visitante_logo : `/static/img/${p.equipo_visitante_logo}`) : '/static/img/default_logo.png'
       visitanteLogo.onerror = function() { 
         if (this.src !== '/static/img/default_logo.png') {
           this.src = '/static/img/default_logo.png'; 

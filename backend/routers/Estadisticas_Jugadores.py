@@ -59,12 +59,18 @@ async def obtener_estadisticas_equipo_y_jugadores(equipo_id: int, temporada: int
     if not stats_equipo and not registros:
         raise HTTPException(status_code=404, detail="No hay estadísticas para el equipo en la temporada indicada")
 
-    jugadores_enriquecidos = [
-        {
+    jugadores_enriquecidos = []
+    for est, jug in registros:
+        # Limpiar URL de foto si está corrupta
+        foto = str(jug.foto) if jug.foto else None
+        if foto and '/static/img/http' in foto:
+            foto = foto.replace('/static/img/', '')
+        
+        jugadores_enriquecidos.append({
             "jugador_id": est.jugador_id,
             "jugador_nombre": jug.nombre,
             "jugador_apellido": jug.apellido,
-            "jugador_foto": jug.foto,
+            "jugador_foto": foto,
             "posicion": jug.posicion,
             "partidos_jugados": est.partidos_jugados,
             "goles": est.goles,
@@ -83,9 +89,7 @@ async def obtener_estadisticas_equipo_y_jugadores(equipo_id: int, temporada: int
             "goles_concedidos": est.goles_concedidos,
             "paradas": est.paradas,
             "penales_tapados": est.penales_tapados,
-        }
-        for est, jug in registros
-    ]
+        })
 
     return {
         "equipo": stats_equipo,
@@ -112,11 +116,16 @@ async def obtener_goleadores_temporada(temporada_id: int, session: SessionDep, l
     # Construir DTOs con posición
     goleadores = []
     for idx, (est, jugador, equipo) in enumerate(estadisticas[:limit], start=1):
+        # Limpiar URL de foto si está corrupta
+        foto = str(jugador.foto) if jugador.foto else None
+        if foto and '/static/img/http' in foto:
+            foto = foto.replace('/static/img/', '')
+        
         goleadores.append(GoleadorDTO(
             posicion=idx,
             jugador_nombre=jugador.nombre,
             jugador_apellido=jugador.apellido,
-            jugador_foto=jugador.foto,
+            jugador_foto=foto,
             equipo_nombre=equipo.nombre,
             goles=est.goles
         ))
@@ -146,11 +155,16 @@ async def obtener_goleadores_temporada_equipo(temporada_id: int, equipo_id: int,
     # Construir DTOs con posición
     goleadores = []
     for idx, (est, jugador, equipo) in enumerate(estadisticas[:limit], start=1):
+        # Limpiar URL de foto si está corrupta
+        foto = str(jugador.foto) if jugador.foto else None
+        if foto and '/static/img/http' in foto:
+            foto = foto.replace('/static/img/', '')
+        
         goleadores.append(GoleadorDTO(
             posicion=idx,
             jugador_nombre=jugador.nombre,
             jugador_apellido=jugador.apellido,
-            jugador_foto=jugador.foto,
+            jugador_foto=foto,
             equipo_nombre=equipo.nombre,
             goles=est.goles
         ))
@@ -217,16 +231,21 @@ async def obtener_top_estadisticas(temporada_id: int, session: SessionDep, limit
     ).all()
     
     def format_stat(data, stat_field):
-        return [
-            {
+        result = []
+        for est, jugador, equipo in data:
+            # Limpiar URL de foto si está corrupta
+            foto = str(jugador.foto) if jugador.foto else None
+            if foto and '/static/img/http' in foto:
+                foto = foto.replace('/static/img/', '')
+            
+            result.append({
                 "jugador_nombre": f"{jugador.nombre} {jugador.apellido}",
-                "jugador_foto": jugador.foto,
+                "jugador_foto": foto,
                 "equipo_nombre": equipo.nombre,
                 "posicion": jugador.posicion,
                 "valor": getattr(est, stat_field) if stat_field != "goles_asistencias" else (est.goles + est.asistencias)
-            }
-            for est, jugador, equipo in data
-        ]
+            })
+        return result
     
     return {
         "goleadores": format_stat(goleadores, "goles"),

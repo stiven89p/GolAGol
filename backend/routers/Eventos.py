@@ -216,14 +216,28 @@ async def obtener_eventos_partido(partido_id: int, session: SessionDep):
         jugador = session.get(Jugador, e.jugador_id)
         jugador_asociado = session.get(Jugador, e.jugador_asociado_id) if e.jugador_asociado_id else None
         
-        # Construir URLs completas para las fotos
+        # Construir URLs para las fotos - validando si ya son URLs absolutas
         jugador_foto_url = None
-        if jugador:
-            jugador_foto_url = f"/static/img/{jugador.foto}" if jugador.foto else "/static/img/default-player.png"
+        if jugador and jugador.foto:
+            foto = str(jugador.foto)
+            # Limpiar URLs corruptas con /static/img/ antes de http
+            if '/static/img/http' in foto:
+                foto = foto.replace('/static/img/', '')
+            # Si ya es URL absoluta, usarla directamente; sino, agregar prefijo
+            jugador_foto_url = foto if foto.startswith('http') else f"/static/img/{foto}"
+        else:
+            jugador_foto_url = "/static/img/default-player.png"
         
         jugador_asociado_foto_url = None
-        if jugador_asociado:
-            jugador_asociado_foto_url = f"/static/img/{jugador_asociado.foto}" if jugador_asociado.foto else "/static/img/default-player.png"
+        if jugador_asociado and jugador_asociado.foto:
+            foto_asociado = str(jugador_asociado.foto)
+            # Limpiar URLs corruptas con /static/img/ antes de http
+            if '/static/img/http' in foto_asociado:
+                foto_asociado = foto_asociado.replace('/static/img/', '')
+            # Si ya es URL absoluta, usarla directamente; sino, agregar prefijo
+            jugador_asociado_foto_url = foto_asociado if foto_asociado.startswith('http') else f"/static/img/{foto_asociado}"
+        else:
+            jugador_asociado_foto_url = "/static/img/default-player.png"
         
         respuesta.append({
             "id_evento": e.id_evento,

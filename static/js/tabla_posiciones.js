@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td>${index + 1}</td>
                     <td style="display:flex;align-items:center;gap:10px;">
                         <a href="/equipo/${team.equipo_id}" style="display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;">
-                            <img src="/static/img/${team.equipo_logo}" 
+                                <img src="${/^https?:\/\//.test(team.equipo_logo) ? team.equipo_logo : ('/static/img/' + (team.equipo_logo || 'default_logo.png'))}" 
                                  onerror="this.src='/static/img/default_logo.png'"
                                  style="width:28px;height:28px;object-fit:contain;">
                             <span>${team.equipo_nombre}</span>

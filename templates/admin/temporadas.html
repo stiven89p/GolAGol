@@ -1,0 +1,109 @@
+{% extends "admin/layout.html" %}
+
+{% block title %}Gestionar Temporadas - Admin{% endblock %}
+
+{% block content %}
+<div class="admin-section">
+    <div class="section-header">
+        <h2 class="title is-3">Gestión de Temporadas</h2>
+        <button class="button is-primary" onclick="abrirModalCrear()">
+            <span class="icon">
+                <i class="fas fa-plus"></i>
+            </span>
+            <span>Nueva Temporada</span>
+        </button>
+    </div>
+
+    <div class="table-container">
+        <table class="table is-fullwidth is-striped is-hoverable admin-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Fecha Inicio</th>
+                    <th>Fecha Fin</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for temporada in temporadas %}
+                <tr>
+                    <td>{{ temporada.temporada_id }}</td>
+                    <td><strong>{{ temporada.nombre }}</strong></td>
+                    <td>{{ temporada.fecha_inicio.strftime('%d/%m/%Y') }}</td>
+                    <td>{{ temporada.fecha_fin.strftime('%d/%m/%Y') }}</td>
+                    <td>
+                        <span class="tag {% if temporada.estado == 'EN_CURSO' %}is-success{% elif temporada.estado == 'FINALIZADA' %}is-dark{% else %}is-warning{% endif %}">
+                            {{ temporada.estado }}
+                        </span>
+                    </td>
+                    <td>
+                        {% if temporada.estado == 'EN_CURSO' %}
+                        <button class="button is-small is-danger" onclick="finalizarTemporada({{ temporada.temporada_id }})">
+                            <span class="icon">
+                                <i class="fas fa-flag-checkered"></i>
+                            </span>
+                            <span>Finalizar</span>
+                        </button>
+                        {% else %}
+                        <span class="has-text-grey-light">Finalizada</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal para crear temporada -->
+<div class="modal" id="modalCrearTemporada">
+    <div class="modal-background" onclick="cerrarModalCrear()"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Nueva Temporada</p>
+            <button class="delete" aria-label="close" onclick="cerrarModalCrear()"></button>
+        </header>
+        <section class="modal-card-body">
+            <form id="formCrearTemporada">
+                <div class="field">
+                    <label class="label">Fecha de Inicio</label>
+                    <div class="control">
+                        <input class="input" type="date" id="fecha_inicio" name="fecha_inicio" required>
+                    </div>
+                    <p class="help">La temporada se creará con el nombre basado en el año (ej: 2024/2025)</p>
+                </div>
+
+                <div class="field">
+                    <label class="label">Fecha de Fin</label>
+                    <div class="control">
+                        <input class="input" type="date" id="fecha_fin" name="fecha_fin" required>
+                    </div>
+                </div>
+
+                <div class="notification is-info is-light">
+                    <p><strong>Nota:</strong> Al crear la temporada se generarán automáticamente:</p>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li>• Estadísticas para todos los equipos activos</li>
+                        <li>• Estadísticas para todos los jugadores</li>
+                    </ul>
+                </div>
+            </form>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" onclick="crearTemporada()">
+                <span class="icon">
+                    <i class="fas fa-check"></i>
+                </span>
+                <span>Crear Temporada</span>
+            </button>
+            <button class="button" onclick="cerrarModalCrear()">Cancelar</button>
+        </footer>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/admin/temporadas.js"></script>
+{% endblock %}

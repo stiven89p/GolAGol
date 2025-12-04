@@ -111,15 +111,26 @@ async def listar_formaciones_equipo(equipo_id: int, session: SessionDep):
     rows = session.query(Formacion).filter(Formacion.equipo_id == equipo_id).all()
     result: list[FormacionDTO] = []
     for f in rows:
-        jugadores = session.query(FormacionJugador).filter(FormacionJugador.formacion_id == f.formacion_id).all()
-        titulares_info = [
-            {"jugador_id": j.jugador_id, "posicion": j.posicion}
-            for j in jugadores if j.titular
-        ]
-        suplentes_info = [
-            {"jugador_id": j.jugador_id, "posicion": j.posicion}
-            for j in jugadores if not j.titular
-        ]
+        jugadores_rel = session.query(FormacionJugador).filter(FormacionJugador.formacion_id == f.formacion_id).all()
+        ids = [jr.jugador_id for jr in jugadores_rel]
+        jugadores = session.query(Jugador).filter(Jugador.jugador_id.in_(ids)).all() if ids else []
+        jmap = {j.jugador_id: j for j in jugadores}
+
+        titulares_info = []
+        suplentes_info = []
+        for jr in jugadores_rel:
+            j = jmap.get(jr.jugador_id)
+            nombre = f"{j.nombre} {j.apellido}" if j else None
+            item = {
+                "jugador_id": jr.jugador_id,
+                "posicion": jr.posicion,
+                "nombre": nombre
+            }
+            if jr.titular:
+                titulares_info.append(item)
+            else:
+                suplentes_info.append(item)
+
         result.append(
             FormacionDTO(
                 formacion_id=f.formacion_id,

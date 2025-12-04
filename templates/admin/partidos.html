@@ -9,6 +9,27 @@
         <button class="btn btn-primary" onclick="mostrarFormulario()">+ Nuevo Partido</button>
     </div>
     
+    <div class="filters" style="margin: 12px 0; display: flex; gap: 8px; align-items: center;">
+        <select id="filtro-equipo" style="min-width: 220px;">
+            <option value="">Todos los equipos</option>
+            {% for equipo in equipos %}
+            <option value="{{ equipo.equipo_id }}">{{ equipo.nombre }}</option>
+            {% endfor %}
+        </select>
+        <select id="filtro-estado" style="min-width: 180px;">
+            <option value="">Todos los estados</option>
+            <option value="PROGRAMADO">Programado</option>
+            <option value="EN_CURSO">En Curso</option>
+            <option value="FINALIZADO">Finalizado</option>
+        </select>
+        <button class="btn btn-primary" onclick="aplicarFiltros()">
+            <i class="fas fa-search"></i> Buscar
+        </button>
+        <button class="btn btn-secondary" onclick="limpiarFiltros()">
+            <i class="fas fa-times"></i> Limpiar
+        </button>
+    </div>
+    
     <div id="formulario-partido" class="form-modal" style="display: none;">
         <div class="form-modal-content large">
             <span class="close" onclick="cerrarFormulario()">&times;</span>
@@ -144,9 +165,9 @@
                 <td>
                     {% if partido.estado == 'PROGRAMADO' %}
                         <button class="btn-sm btn-success" onclick="iniciarPartido({{ partido.partido_id }})">▶ Iniciar</button>
+                        <button class="btn-sm" onclick="editarPartido({{ partido.partido_id }})">✎ Editar</button>
                         <button class="btn-sm" onclick="abrirFormaciones({{ partido.partido_id }})">Formaciones</button>
                     {% elif partido.estado == 'EN_CURSO' %}
-                        <button class="btn-sm btn-edit" onclick="editarPartido({{ partido.partido_id }})">Editar</button>
                         <a href="/admin/partidos/{{ partido.partido_id }}/eventos" class="btn-sm">Eventos</a>
                         <button class="btn-sm btn-success" onclick="acabarPartido({{ partido.partido_id }})">▶ Finalizar</button>
                     {% else %}
@@ -162,4 +183,25 @@
 
 {% block scripts %}
 <script src="/static/js/admin/partidos.js"></script>
+<script>
+function aplicarFiltros(){
+    const equipoId = document.getElementById('filtro-equipo').value;
+    const estado = document.getElementById('filtro-estado').value;
+    const params = new URLSearchParams();
+    if(equipoId) params.append('equipo_id', equipoId);
+    if(estado) params.append('estado', estado);
+    const q = params.toString();
+    window.location.href = `/admin/partidos${q ? ('?' + q) : ''}`;
+}
+function limpiarFiltros(){
+    window.location.href = '/admin/partidos';
+}
+</script>
+{% if editar_partido_id %}
+<script>
+    document.addEventListener('DOMContentLoaded', function(){
+        try{ editarPartido({{ editar_partido_id }}); }catch(e){ /* ignore */ }
+    });
+</script>
+{% endif %}
 {% endblock %}

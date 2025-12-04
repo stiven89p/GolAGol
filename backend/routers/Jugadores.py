@@ -22,8 +22,7 @@ async def crear_jugador(session: SessionDep,
                         ):
     foto_name = None
     if foto:
-        uploaded = await upload_file(foto)
-        foto_name = uploaded["file_name"]
+        foto_name = await upload_file(foto)
 
     nombremayuscula = nombre.title() 
     apellidomayuscula = apellido.title()
@@ -70,12 +69,34 @@ async def obtener_jugador(jugador_id: int, session: SessionDep):
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
     return jugador
 
-@router.get("/equipo/{equipo_id}", response_model=list[Jugador])
+@router.get("/equipo/{equipo_id}")
 async def obtener_jugadores_equipo(equipo_id: int, session: SessionDep):
     jugadores = session.query(Jugador).filter(Jugador.equipo_id == equipo_id).all()
     if not jugadores:
         return []
-    return jugadores
+    
+    # Normalizar URLs de fotos para evitar problemas con rutas
+    result = []
+    for j in jugadores:
+        # Limpiar URL de foto si está corrupta
+        foto = str(j.foto) if j.foto else None
+        if foto and '/static/img/http' in foto:
+            foto = foto.replace('/static/img/', '')
+        
+        jugador_dict = {
+            "jugador_id": j.jugador_id,
+            "nombre": j.nombre,
+            "apellido": j.apellido,
+            "fecha_nacimiento": j.fecha_nacimiento,
+            "posicion": j.posicion,
+            "nacionalidad": j.nacionalidad,
+            "numero_camiseta": j.numero_camiseta,
+            "equipo_id": j.equipo_id,
+            "foto": foto
+        }
+        result.append(jugador_dict)
+    
+    return result
 
 @router.get("/{Posicion}/", response_model=list[Jugador])
 async def obtener_jugador_posicion(Posicion: PosicionJugador , session: SessionDep):
@@ -101,8 +122,7 @@ async def actualizar_jugador(jugador_id: int,
         raise HTTPException(status_code=404, detail="Jugador no encontrado")
 
     if foto:
-        uploaded = await upload_file(foto)
-        jugador.foto = uploaded["file_name"]
+        jugador.foto = await upload_file(foto)
 
     nombremayuscula = nombre.title() 
     apellidomayuscula = apellido.title()

@@ -114,7 +114,7 @@
                 <li class="stat-item">
                     <div class="stat-rank">${index + 1}</div>
                     <div class="stat-player">
-                        <img src="${item.jugador_foto ? '/static/img/' + item.jugador_foto : '/static/img/default-player.png'}" 
+                        <img src="${item.jugador_foto ? (item.jugador_foto.startsWith('http') ? item.jugador_foto : '/static/img/' + item.jugador_foto) : '/static/img/default-player.png'}" 
                              alt="${item.jugador_nombre}"
                              onerror="this.src='/static/img/default-player.png'">
                         <div class="stat-player-info">

@@ -275,6 +275,73 @@ async function init(){
         mostrarMensaje(err.message, 'error');
       }
     });
+
+    // Botones control de tiempos/parte
+    const btnIniciar = document.getElementById('btn-iniciar-tiempo');
+    const btnFinalizar = document.getElementById('btn-finalizar-tiempo');
+    const btnActualizarParte = document.getElementById('btn-actualizar-parte');
+
+    async function ensureEnCurso(){
+      try{
+        // Obtener estado actual
+        const r = await fetch(`/partidos/id/${partidoId}`);
+        if(!r.ok) return false;
+        const info = await r.json();
+        const estado = String(info.estado).toLowerCase();
+        if(estado === 'en curso') return true;
+        // Cambiar a EN_CURSO
+        const resp = await fetch(`/partidos/${partidoId}?estado=en%20curso`, { method: 'PATCH' });
+        return resp.ok;
+      }catch(_){ return false; }
+    }
+
+    async function callPatch(url, requireEnCurso = false, doReload = false){
+      try{
+        if(requireEnCurso){
+          const ok = await ensureEnCurso();
+          if(!ok) throw new Error('El partido no pudo ponerse EN CURSO');
+        }
+        const resp = await fetch(url, { method: 'PATCH' });
+        if(!resp.ok){
+          const err = await resp.json().catch(()=>({}));
+          throw new Error(err.detail || 'Operación no válida');
+        }
+        mostrarMensaje('Operación realizada');
+        if(doReload){
+          setTimeout(()=> window.location.reload(), 800);
+        }
+      }catch(err){
+        mostrarMensaje(err.message || 'Error en la operación', 'error');
+      }
+    }
+
+    // Inicial: solo finalizar habilitado, el resto deshabilitado
+    if(btnFinalizar){
+      btnFinalizar.disabled = false;
+      btnFinalizar.addEventListener('click', async ()=>{
+        await callPatch(`/partidos/finalizar_tiempo/${partidoId}`, true, false);
+        // Al finalizar, habilitar actualizar parte
+        if(btnActualizarParte) btnActualizarParte.disabled = false;
+      });
+    }
+    if(btnActualizarParte){
+      btnActualizarParte.disabled = true;
+      btnActualizarParte.addEventListener('click', async ()=>{
+        await callPatch(`/partidos/actualizar_parte/${partidoId}`, true, false);
+        // Al actualizar parte, habilitar iniciar
+        if(btnIniciar) btnIniciar.disabled = false;
+      });
+    }
+    if(btnIniciar){
+      btnIniciar.disabled = true;
+      btnIniciar.addEventListener('click', async ()=>{
+        await callPatch(`/partidos/iniciar_tiempo/${partidoId}`, true, true);
+        // Después de iniciar, volver a estado inicial (opcional)
+        btnFinalizar.disabled = false;
+        btnActualizarParte.disabled = true;
+        btnIniciar.disabled = true;
+      });
+    }
   }catch(err){
     mostrarMensaje('Error cargando datos del partido', 'error');
   }

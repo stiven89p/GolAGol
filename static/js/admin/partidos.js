@@ -24,11 +24,17 @@ async function editarPartido(id) {
         document.getElementById('fecha').value = partido.fecha;
         if (partido.hora) document.getElementById('hora').value = partido.hora.substring(0, 5);
         document.getElementById('jornada').value = partido.jornada;
-        // Estos campos no vienen completos en el DTO /partidos/id/:id para edición;
-        // Si se necesitan, se debería consultar otro endpoint de detalle editable.
-        // document.getElementById('equipo_local_id').value = ...
-        // document.getElementById('equipo_visitante_id').value = ...
-        // document.getElementById('temporada_id').value = ...
+        // Preseleccionar equipos si vienen en el DTO
+        if (typeof partido.equipo_local_id !== 'undefined' && document.getElementById('equipo_local_id')) {
+            document.getElementById('equipo_local_id').value = String(partido.equipo_local_id);
+        }
+        if (typeof partido.equipo_visitante_id !== 'undefined' && document.getElementById('equipo_visitante_id')) {
+            document.getElementById('equipo_visitante_id').value = String(partido.equipo_visitante_id);
+        }
+        // Temporada solo si está disponible en el DTO
+        if (typeof partido.temporada_id !== 'undefined' && document.getElementById('temporada_id')) {
+            document.getElementById('temporada_id').value = String(partido.temporada_id);
+        }
         document.getElementById('estadio').value = partido.lugar || '';
         if (document.getElementById('estado')) {
             document.getElementById('estado').value = partido.estado;
@@ -197,7 +203,50 @@ window.abrirFormaciones = async function abrirFormaciones(partidoId){
                 const lbl = document.createElement('label');
                 lbl.htmlFor = id;
                 lbl.style.cursor = 'pointer';
-                lbl.textContent = `${f.defensas}-${f.mediocampistas}-${f.delanteros} (ID ${f.formacion_id})`;
+                // Pretty label with formation badge
+                const badge = document.createElement('span');
+                badge.className = 'badge';
+                badge.style.marginRight = '8px';
+                badge.textContent = `${f.defensas}-${f.mediocampistas}-${f.delanteros}`;
+                const text = document.createElement('span');
+                text.textContent = `Formación #${f.formacion_id}`;
+                lbl.appendChild(badge);
+                lbl.appendChild(text);
+                // Subdetails: titulares/suplentes resumen
+                const sub = document.createElement('div');
+                sub.style.fontSize = '0.85rem';
+                sub.style.color = '#8b949e';
+                sub.style.marginTop = '4px';
+                // Build real list: jugadores titulares y suplentes
+                const makeList = (arr, title) => {
+                    const wrap = document.createElement('div');
+                    const heading = document.createElement('strong');
+                    heading.textContent = `${title}:`;
+                    heading.style.display = 'block';
+                    heading.style.color = '#c9d1d9';
+                    wrap.appendChild(heading);
+                    const ul = document.createElement('ul');
+                    ul.style.margin = '6px 0 8px';
+                    ul.style.paddingLeft = '18px';
+                    (arr || []).forEach(it => {
+                        const li = document.createElement('li');
+                        const nombre = it && it.nombre ? it.nombre : `#${it.jugador_id}`;
+                        const pos = it && it.posicion ? ` (${it.posicion})` : '';
+                        li.textContent = nombre + pos;
+                        ul.appendChild(li);
+                    });
+                    wrap.appendChild(ul);
+                    return wrap;
+                };
+                sub.appendChild(makeList(f.titulares, 'Titulares'));
+                sub.appendChild(makeList(f.suplentes, 'Suplentes'));
+                lbl.appendChild(sub);
+                // highlight on select
+                radio.addEventListener('change', ()=>{
+                    // remove selected from siblings
+                    cont.querySelectorAll('.chk-item').forEach(el=> el.classList.remove('selected'));
+                    wrap.classList.add('selected');
+                });
                 wrap.appendChild(radio);
                 wrap.appendChild(lbl);
                 cont.appendChild(wrap);

@@ -58,7 +58,7 @@ function renderizarJugadores(jugadores) {
             html += `<h3 class="posicion-titulo">${posicionLabels[posicion]}</h3>`;
             
             jugadores.forEach(j => {
-                const fotoUrl = j.foto ? `/static/img/${j.foto}` : '/static/img/default-player.png';
+                const fotoUrl = j.foto ? (/^https?:\/\//.test(j.foto) ? j.foto : `/static/img/${j.foto}`) : '/static/img/default-player.png';
                 const edad = calcularEdad(j.fecha_nacimiento);
                 
                 html += `
@@ -132,7 +132,7 @@ function renderizarInfoJugador() {
     
     const container = document.getElementById('jugador-info');
     const j = jugadorSeleccionado;
-    const fotoUrl = j.foto ? `/static/img/${j.foto}` : '/static/img/default-player.png';
+    const fotoUrl = j.foto ? (/^https?:\/\//.test(j.foto) ? j.foto : `/static/img/${j.foto}`) : '/static/img/default-player.png';
     const edad = calcularEdad(j.fecha_nacimiento);
     
     let html = `

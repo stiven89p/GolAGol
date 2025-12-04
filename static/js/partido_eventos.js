@@ -68,7 +68,8 @@ function renderEventos(eventos) {
                 className += ' evento-gol';
                 descripcion = evento.descripcion || `Gol de ${evento.jugador_nombre || 'Jugador'}`;
                 if (evento.jugador_foto) {
-                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                    const fotoUrl = /^https?:\/\//.test(evento.jugador_foto) ? evento.jugador_foto : `/static/img/${evento.jugador_foto}`;
+                    fotoHTML = `<img src="${fotoUrl}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
                 }
                 if (evento.jugador_asociado_nombre) {
                     descripcion += ` (Asistencia: ${evento.jugador_asociado_nombre})`;
@@ -78,8 +79,10 @@ function renderEventos(eventos) {
             case 'SUSTITUCION':
                 icono = '🔄';
                 className += ' evento-sustitucion';
-                const saleFoto = evento.jugador_foto ? `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto jugador-sale" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">` : '';
-                const entraFoto = evento.jugador_asociado_foto ? `<img src="${evento.jugador_asociado_foto}" alt="${evento.jugador_asociado_nombre}" class="evento-jugador-foto jugador-entra" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">` : '';
+                const saleFotoUrl = evento.jugador_foto ? (/^https?:\/\//.test(evento.jugador_foto) ? evento.jugador_foto : `/static/img/${evento.jugador_foto}`) : '';
+                const entraFotoUrl = evento.jugador_asociado_foto ? (/^https?:\/\//.test(evento.jugador_asociado_foto) ? evento.jugador_asociado_foto : `/static/img/${evento.jugador_asociado_foto}`) : '';
+                const saleFoto = saleFotoUrl ? `<img src="${saleFotoUrl}" alt="${evento.jugador_nombre}" class="evento-jugador-foto jugador-sale" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">` : '';
+                const entraFoto = entraFotoUrl ? `<img src="${entraFotoUrl}" alt="${evento.jugador_asociado_nombre}" class="evento-jugador-foto jugador-entra" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">` : '';
                 
                 fotoHTML = `<div class="sustitucion-fotos">${saleFoto}${entraFoto}</div>`;
                 descripcion = `<span class="jugador-sale-nombre">${evento.jugador_nombre || 'Jugador'}</span> sale`;
@@ -105,7 +108,8 @@ function renderEventos(eventos) {
                 className += ' evento-penal';
                 descripcion = evento.descripcion || `Penal convertido por ${evento.jugador_nombre || 'Jugador'}`;
                 if (evento.jugador_foto) {
-                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                    const fotoUrl = /^https?:\/\//.test(evento.jugador_foto) ? evento.jugador_foto : `/static/img/${evento.jugador_foto}`;
+                    fotoHTML = `<img src="${fotoUrl}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
                 }
                 break;
             case 'penal_fallado':
@@ -114,7 +118,8 @@ function renderEventos(eventos) {
                 className += ' evento-penal-fallado';
                 descripcion = evento.descripcion || `Penal fallado por ${evento.jugador_nombre || 'Jugador'}`;
                 if (evento.jugador_foto) {
-                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                    const fotoUrl = /^https?:\/\//.test(evento.jugador_foto) ? evento.jugador_foto : `/static/img/${evento.jugador_foto}`;
+                    fotoHTML = `<img src="${fotoUrl}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
                 }
                 break;
             case 'tiro':
@@ -123,7 +128,8 @@ function renderEventos(eventos) {
                 className += ' evento-tiro';
                 descripcion = evento.descripcion || `Tiro de ${evento.jugador_nombre || 'Jugador'}`;
                 if (evento.jugador_foto) {
-                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                    const fotoUrl = /^https?:\/\//.test(evento.jugador_foto) ? evento.jugador_foto : `/static/img/${evento.jugador_foto}`;
+                    fotoHTML = `<img src="${fotoUrl}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
                 }
                 break;
             case 'entrada':
@@ -132,7 +138,8 @@ function renderEventos(eventos) {
                 className += ' evento-entrada';
                 descripcion = evento.descripcion || `Entrada de ${evento.jugador_nombre || 'Jugador'}`;
                 if (evento.jugador_foto) {
-                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                    const fotoUrl = /^https?:\/\//.test(evento.jugador_foto) ? evento.jugador_foto : `/static/img/${evento.jugador_foto}`;
+                    fotoHTML = `<img src="${fotoUrl}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
                 }
                 break;
             case 'intercepcion':
@@ -141,16 +148,29 @@ function renderEventos(eventos) {
                 className += ' evento-intercepcion';
                 descripcion = evento.descripcion || `Intercepción de ${evento.jugador_nombre || 'Jugador'}`;
                 if (evento.jugador_foto) {
-                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                    const fotoUrl = /^https?:\/\//.test(evento.jugador_foto) ? evento.jugador_foto : `/static/img/${evento.jugador_foto}`;
+                    fotoHTML = `<img src="${fotoUrl}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
                 }
                 break;
-                            case 'gol_en_contra':
+            case 'gol_en_contra':
             case 'GOL_EN_CONTRA':
                 icono = '⚽';
                 className += ' evento-gol-en-contra';
                 descripcion = evento.descripcion || `Autogol de ${evento.jugador_nombre || 'Jugador'}`;
                 if (evento.jugador_foto) {
-                    fotoHTML = `<img src="${evento.jugador_foto}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                    const fotoUrl = /^https?:\/\//.test(evento.jugador_foto) ? evento.jugador_foto : `/static/img/${evento.jugador_foto}`;
+                    fotoHTML = `<img src="${fotoUrl}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
+                }
+                break;
+
+            case 'tiro_a_puerta':
+            case 'TIRO_A_PUERTA':
+                icono = '🎯';
+                className += ' evento-tiro-puerta';
+                descripcion = evento.descripcion || `Tiro a puerta de ${evento.jugador_nombre || 'Jugador'}`;
+                if (evento.jugador_foto) {
+                    const fotoUrl = /^https?:\/\//.test(evento.jugador_foto) ? evento.jugador_foto : `/static/img/${evento.jugador_foto}`;
+                    fotoHTML = `<img src="${fotoUrl}" alt="${evento.jugador_nombre}" class="evento-jugador-foto" onerror="if(this.src!='/static/img/default-player.png')this.src='/static/img/default-player.png'">`;
                 }
                 break;
 

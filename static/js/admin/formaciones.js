@@ -59,7 +59,7 @@ async function cargarJugadoresEquipo(equipoId){
 
     // Helper to create a checkbox+label with photo
     function createOption(j, cls){
-      const fotoUrl = j.foto ? `/static/img/${j.foto}` : '/static/img/default-player.png';
+      const fotoUrl = j.foto ? (j.foto.startsWith('http') ? j.foto : `/static/img/${j.foto}`) : '/static/img/default-player.png';
       const chk = document.createElement('input');
       chk.type='checkbox';
       chk.value=j.jugador_id;
@@ -115,7 +115,7 @@ async function cargarJugadoresEquipo(equipoId){
 
     // Render titulares (all non-porteros)
     jugadoresNoPorteros.forEach(j=>{
-      const fotoUrl = j.foto ? `/static/img/${j.foto}` : '/static/img/default-player.png';
+      const fotoUrl = j.foto ? (j.foto.startsWith('http') ? j.foto : `/static/img/${j.foto}`) : '/static/img/default-player.png';
       
       // Para titulares (sin porteros)
       const chkTit = document.createElement('input');

@@ -17,6 +17,11 @@
   <div class="grid two-cols" style="gap:1rem;">
     <div>
       <h4>Registrar Evento</h4>
+      <div class="form-actions" style="margin-bottom: 0.75rem;">
+        <button type="button" class="btn btn-secondary" id="btn-finalizar-tiempo">Finalizar Tiempo</button>
+        <button type="button" class="btn btn-secondary" id="btn-actualizar-parte" disabled>Actualizar Parte</button>
+        <button type="button" class="btn btn-secondary" id="btn-iniciar-tiempo" disabled>Iniciar Tiempo</button>
+      </div>
       <form id="evento-form">
         <input type="hidden" id="partido_id" value="{{ partido_id }}">
         <div class="form-row">

@@ -24,12 +24,9 @@ app = FastAPI(lifespan=create_tables, title="Gol a Gol API")
 
 from fastapi.middleware.cors import CORSMiddleware
 
-# Montar archivos estáticos ANTES de las rutas
-app.mount("/static", StaticFiles(directory="static"), name="static")
-
 templates = Jinja2Templates(directory="templates")
 
-# 🔹 Rutas del proyecto
+# 🔹 Rutas del proyecto (ANTES de montar static)
 app.include_router(backend.routers.Equipos.router)
 app.include_router(backend.routers.Partidos.router)
 app.include_router(backend.routers.Eventos.router)
@@ -101,9 +98,15 @@ async def admin_equipos(request: Request, session: SessionDep):
     def logo_url(logo_val: str|None):
         if not logo_val:
             return "/static/img/default_logo.png"
-        if str(logo_val).startswith("http") or str(logo_val).startswith("/static/"):
-            return str(logo_val)
-        path = str(logo_val)
+        
+        # Limpiar URLs corruptas
+        logo_str = str(logo_val)
+        if '/static/img/http' in logo_str:
+            logo_str = logo_str.replace('/static/img/', '')
+        
+        if logo_str.startswith("http") or logo_str.startswith("/static/"):
+            return logo_str
+        path = logo_str
         if not path.startswith("img/"):
             path = f"img/{path}"
         return f"/static/{path}"
@@ -131,20 +134,31 @@ async def admin_equipos(request: Request, session: SessionDep):
 async def admin_jugadores(request: Request, session: SessionDep, equipo_id: int = None, posicion: str = None):
     from backend.modelos.Jugadores import Jugador
     from datetime import datetime
+    from backend.utils.enumeraciones import PosicionJugador
     
     query = session.query(Jugador, Equipo).join(Equipo, Jugador.equipo_id == Equipo.equipo_id)
     
     if equipo_id:
         query = query.filter(Jugador.equipo_id == equipo_id)
     if posicion:
-        query = query.filter(Jugador.posicion == posicion)
+        # Normalizar y convertir a enum seguro
+        try:
+            pos_enum = PosicionJugador(posicion.lower())
+            query = query.filter(Jugador.posicion == pos_enum)
+        except Exception:
+            # Si el valor no es válido, no aplicar filtro de posición
+            pass
     
     rows = query.all()
     
     jugadores = []
     for jugador, equipo in rows:
         edad = datetime.now().year - jugador.fecha_nacimiento.year
-        foto_url = f"/static/img/{jugador.foto}" if jugador.foto else "/static/img/default-player.png"
+        if jugador.foto:
+            jf = str(jugador.foto)
+            foto_url = jf if jf.startswith("http") or jf.startswith("/static/") else f"/static/img/{jf}"
+        else:
+            foto_url = "/static/img/default-player.png"
         posicion_value = jugador.posicion.value if hasattr(jugador.posicion, 'value') else str(jugador.posicion)
         jugadores.append({
             "jugador_id": jugador.jugador_id,
@@ -167,20 +181,40 @@ async def admin_jugadores(request: Request, session: SessionDep, equipo_id: int 
     })
 
 @app.get("/admin/partidos", response_class=HTMLResponse)
-async def admin_partidos(request: Request, session: SessionDep):
+async def admin_partidos(request: Request, session: SessionDep, equipo_id: int = None, estado: str = None):
     from backend.modelos.Temporada import Temporada
+    from backend.utils.enumeraciones import EstadoPartidos
     
     el = aliased(Equipo, name="equipo_local")
     ev = aliased(Equipo, name="equipo_visitante")
     
-    rows = (
+    query = (
         session.query(Partido, el, ev)
         .select_from(Partido)
         .join(el, Partido.equipo_local_id == el.equipo_id)
         .join(ev, Partido.equipo_visitante_id == ev.equipo_id)
-        .order_by(Partido.fecha.desc())
-        .all()
     )
+
+    # Filtro por equipo: local o visitante
+    if equipo_id:
+        from sqlalchemy import or_
+        query = query.filter(or_(Partido.equipo_local_id == equipo_id, Partido.equipo_visitante_id == equipo_id))
+
+    # Filtro por estado: convertir cadena a enum robustamente
+    if estado:
+        est_enum = None
+        try:
+            # Permitir nombre del enum (PROGRAMADO) o valor en minúsculas (programado)
+            est_enum = EstadoPartidos[estado]
+        except Exception:
+            try:
+                est_enum = EstadoPartidos(estado.lower())
+            except Exception:
+                est_enum = None
+        if est_enum:
+            query = query.filter(Partido.estado == est_enum)
+
+    rows = query.order_by(Partido.fecha.desc()).all()
     
     partidos = []
     for partido, eq_local, eq_visitante in rows:
@@ -204,6 +238,48 @@ async def admin_partidos(request: Request, session: SessionDep):
         "partidos": partidos,
         "equipos": equipos,
         "temporadas": temporadas
+    })
+
+@app.get("/admin/partidos/{partido_id}", response_class=HTMLResponse)
+async def admin_partidos_editar(request: Request, partido_id: int, session: SessionDep):
+    """Renderiza la gestión de partidos y abre el formulario en modo edición para el partido dado."""
+    from backend.modelos.Temporada import Temporada
+
+    el = aliased(Equipo, name="equipo_local")
+    ev = aliased(Equipo, name="equipo_visitante")
+
+    rows = (
+        session.query(backend.modelos.Partidos.Partido, el, ev)
+        .select_from(backend.modelos.Partidos.Partido)
+        .join(el, backend.modelos.Partidos.Partido.equipo_local_id == el.equipo_id)
+        .join(ev, backend.modelos.Partidos.Partido.equipo_visitante_id == ev.equipo_id)
+        .order_by(backend.modelos.Partidos.Partido.fecha.desc())
+        .all()
+    )
+
+    partidos = []
+    for partido, eq_local, eq_visitante in rows:
+        partidos.append({
+            "partido_id": partido.partido_id,
+            "fecha": partido.fecha.strftime("%d/%m/%Y"),
+            "hora": partido.hora.strftime("%H:%M") if partido.hora else "",
+            "equipo_local": eq_local.nombre,
+            "equipo_visitante": eq_visitante.nombre,
+            "goles_local": partido.goles_local,
+            "goles_visitante": partido.goles_visitante,
+            "jornada": partido.jornada,
+            "estado": partido.estado
+        })
+
+    equipos = session.query(Equipo).filter(Equipo.activo == True).all()
+    temporadas = session.query(Temporada).all()
+
+    return templates.TemplateResponse("admin/partidos.html", {
+        "request": request,
+        "partidos": partidos,
+        "equipos": equipos,
+        "temporadas": temporadas,
+        "editar_partido_id": partido_id
     })
 
 @app.get("/admin/formaciones", response_class=HTMLResponse)
@@ -250,6 +326,15 @@ async def admin_formaciones(request: Request, session: SessionDep, equipo_id: in
         "equipos": equipos
     })
 
+@app.get("/admin/temporadas", response_class=HTMLResponse)
+async def admin_temporadas(request: Request, session: SessionDep):
+    from backend.modelos.Temporada import Temporada
+    temporadas = session.query(Temporada).order_by(Temporada.temporada_id.desc()).all()
+    return templates.TemplateResponse("admin/temporadas.html", {
+        "request": request,
+        "temporadas": temporadas
+    })
+
 @app.get("/admin/partidos/{partido_id}/eventos", response_class=HTMLResponse)
 async def admin_eventos_partido(request: Request, partido_id: int, session: SessionDep):
     # Validar que el partido existe
@@ -285,11 +370,17 @@ async def partido_detalle(request: Request, partido_id: int, session: SessionDep
     def logo_url(logo_val: str|None):
         if not logo_val:
             return "/static/img/default_logo.png"
+        
+        # Limpiar URLs corruptas
+        logo_str = str(logo_val)
+        if '/static/img/http' in logo_str:
+            logo_str = logo_str.replace('/static/img/', '')
+        
         # si ya es url absoluta o ruta desde static, dejarla
-        if str(logo_val).startswith("http") or str(logo_val).startswith("/static/"):
-            return str(logo_val)
+        if logo_str.startswith("http") or logo_str.startswith("/static/"):
+            return logo_str
         # caso común: almacena 'img/archivo.png' o solo 'archivo.png'
-        path = str(logo_val)
+        path = logo_str
         if not path.startswith("img/"):
             path = f"img/{path}"
         return f"/static/{path}"
@@ -373,9 +464,18 @@ async def equipo(request: Request, equipo_id: int, session: SessionDep):
     def logo_url(logo_val: str|None):
         if not logo_val:
             return "/static/img/default_logo.png"
-        if str(logo_val).startswith("http") or str(logo_val).startswith("/static/"):
-            return str(logo_val)
-        path = str(logo_val)
+        
+        # Convertir a string y limpiar URLs corruptas
+        logo_str = str(logo_val)
+        if '/static/img/http' in logo_str:
+            logo_str = logo_str.replace('/static/img/', '')
+        
+        # Si ya es URL absoluta o ruta desde static, dejarla
+        if logo_str.startswith("http") or logo_str.startswith("/static/"):
+            return logo_str
+        
+        # Caso común: almacena 'img/archivo.png' o solo 'archivo.png'
+        path = logo_str
         if not path.startswith("img/"):
             path = f"img/{path}"
         return f"/static/{path}"
@@ -475,9 +575,21 @@ async def equipo(request: Request, equipo_id: int, session: SessionDep):
             Estadisticas_J.temporada == latest_season
         ).all()
 
+    # Crear dict del equipo con logo procesado
+    equipo_data = {
+        "equipo_id": equipo.equipo_id,
+        "nombre": equipo.nombre,
+        "ciudad": equipo.ciudad,
+        "estadio": equipo.estadio,
+        "anio_fundacion": equipo.anio_fundacion,
+        "titulos": equipo.titulos,
+        "activo": equipo.activo,
+        "logo": logo_url(equipo.logo)
+    }
+    
     return templates.TemplateResponse("equipo.html", {
         "request": request,
-        "equipo": equipo,
+        "equipo": equipo_data,
         "resultados": resultados,
         "proximos": proximos,
         "estadisticas": estadisticas,
@@ -495,9 +607,15 @@ async def jugadores_equipo(request: Request, equipo_id: int, session: SessionDep
     def logo_url(logo_val: str|None):
         if not logo_val:
             return "/static/img/default_logo.png"
-        if str(logo_val).startswith("http") or str(logo_val).startswith("/static/"):
-            return str(logo_val)
-        path = str(logo_val)
+        
+        # Limpiar URLs corruptas
+        logo_str = str(logo_val)
+        if '/static/img/http' in logo_str:
+            logo_str = logo_str.replace('/static/img/', '')
+        
+        if logo_str.startswith("http") or logo_str.startswith("/static/"):
+            return logo_str
+        path = logo_str
         if not path.startswith("img/"):
             path = f"img/{path}"
         return f"/static/{path}"
@@ -530,9 +648,15 @@ async def jugador_perfil(request: Request, jugador_id: int, session: SessionDep)
     def logo_url(logo_val: str|None):
         if not logo_val:
             return "/static/img/default-player.png"
-        if str(logo_val).startswith("http") or str(logo_val).startswith("/static/"):
-            return str(logo_val)
-        path = str(logo_val)
+        
+        # Limpiar URLs corruptas
+        logo_str = str(logo_val)
+        if '/static/img/http' in logo_str:
+            logo_str = logo_str.replace('/static/img/', '')
+        
+        if logo_str.startswith("http") or logo_str.startswith("/static/"):
+            return logo_str
+        path = logo_str
         if not path.startswith("img/"):
             path = f"img/{path}"
         return f"/static/{path}"
@@ -643,11 +767,6 @@ async def equipos_listado(request: Request, session: SessionDep):
     equipos = session.query(Equipo).all()
     return templates.TemplateResponse("equipos_listado.html", {"request": request, "equipos": equipos})
 
-@app.get("/partidos", response_class=HTMLResponse)
-async def partidos_listado(request: Request, session: SessionDep):
-    equipos = session.query(Equipo).all()
-    return templates.TemplateResponse("partidos_listado.html", {"request": request, "equipos": equipos})
-
 @app.get("/estadisticas/detalle", response_class=HTMLResponse)
 async def estadisticas_detalle(request: Request, session: SessionDep, temporada_id: int = None):
     """Vista detallada de estadísticas por categorías"""
@@ -674,4 +793,7 @@ async def estadisticas_detalle(request: Request, session: SessionDep, temporada_
         "temporada_nombre": temporada_nombre,
         "cache_bust": int(time.time())
     })
+
+# Montar archivos estáticos AL FINAL (después de todas las rutas)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 

@@ -14,7 +14,7 @@
       <div class="equipos-lista">
         {% for equipo in equipos %}
         <a href="/equipo/{{ equipo.equipo_id }}" class="equipo-card">
-          <img src="{{ url_for('static', path='img/' ~ equipo.logo) if equipo.logo else url_for('static', path='img/default_logo.png') }}" alt="Logo {{ equipo.nombre }}" class="equipo-logo" />
+          <img src="{% if equipo.logo %}{% if equipo.logo.startswith('http') or equipo.logo.startswith('/static/') %}{{ equipo.logo }}{% else %}{{ url_for('static', path='img/' ~ equipo.logo) }}{% endif %}{% else %}{{ url_for('static', path='img/default_logo.png') }}{% endif %}" alt="Logo {{ equipo.nombre }}" class="equipo-logo" />
           <div class="equipo-info">
             <h2 class="equipo-nombre">{{ equipo.nombre }}</h2>
             <p class="equipo-meta">Ciudad: {{ equipo.ciudad }}</p>

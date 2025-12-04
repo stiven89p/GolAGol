@@ -31,7 +31,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 tdJugador.style.gap = "8px";
 
                 const imgJugador = document.createElement("img");
-                imgJugador.src = g.jugador_foto ? `/static/img/${g.jugador_foto}` : '/static/img/default-player.png';
+                imgJugador.src = g.jugador_foto ? (/^https?:\/\//.test(g.jugador_foto) ? g.jugador_foto : `/static/img/${g.jugador_foto}`) : '/static/img/default-player.png';
                 imgJugador.alt = `${g.jugador_nombre} ${g.jugador_apellido}`;
                 imgJugador.style.width = "32px";
                 imgJugador.style.height = "32px";

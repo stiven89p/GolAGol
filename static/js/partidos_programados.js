@@ -38,11 +38,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const imgLocal = document.createElement("img");
             imgLocal.className = "escudo local";
-            imgLocal.src = p.equipo_local_logo ? `/static/img/${p.equipo_local_logo}` : "/static/img/default_logo.png";
+            imgLocal.src = p.equipo_local_logo ? (/^https?:\/\//.test(p.equipo_local_logo) ? p.equipo_local_logo : `/static/img/${p.equipo_local_logo}`) : "/static/img/default_logo.png";
 
             const imgVisitante = document.createElement("img");
             imgVisitante.className = "escudo visitante";
-            imgVisitante.src = p.equipo_visitante_logo ? `/static/img/${p.equipo_visitante_logo}` : "/static/img/default_logo.png";
+            imgVisitante.src = p.equipo_visitante_logo ? (/^https?:\/\//.test(p.equipo_visitante_logo) ? p.equipo_visitante_logo : `/static/img/${p.equipo_visitante_logo}`) : "/static/img/default_logo.png";
 
             const marcador = document.createElement("div");
             marcador.className = "marcador";
@@ -120,11 +120,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
             const imgLocal = document.createElement("img");
             imgLocal.className = "escudo local";
-            imgLocal.src = p.equipo_local_logo ? `/static/img/${p.equipo_local_logo}` : "/static/img/default_logo.png";
+            imgLocal.src = p.equipo_local_logo ? (/^https?:\/\//.test(p.equipo_local_logo) ? p.equipo_local_logo : `/static/img/${p.equipo_local_logo}`) : "/static/img/default_logo.png";
 
             const imgVisitante = document.createElement("img");
             imgVisitante.className = "escudo visitante";
-            imgVisitante.src = p.equipo_visitante_logo ? `/static/img/${p.equipo_visitante_logo}` : "/static/img/default_logo.png";
+            imgVisitante.src = p.equipo_visitante_logo ? (/^https?:\/\//.test(p.equipo_visitante_logo) ? p.equipo_visitante_logo : `/static/img/${p.equipo_visitante_logo}`) : "/static/img/default_logo.png";
 
             const marcador = document.createElement("div");
             marcador.className = "marcador";
