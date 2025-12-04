@@ -4,41 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3c908b9c-b3de-4969-adf8-2087551b374f" name="Changes" comment="Agrega los componentes iniciales de React y la configuración base de la aplicación frontend">
-      <change afterPath="$PROJECT_DIR$/static/css/styles.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/equipo.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/partidos_programados.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/static/js/tabla_posiciones.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/templates/equipo.html" afterDir="false" />
+    <list default="true" id="3c908b9c-b3de-4969-adf8-2087551b374f" name="Changes" comment="Normaliza URLs de imágenes en varios archivos y agrega gestión de temporadas en la interfaz de administración">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/db.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/db.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/modelos/Equipos.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/modelos/Equipos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/modelos/Estadisticas_Equipos.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/modelos/Estadisticas_Equipos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/modelos/Estadisticas_Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/modelos/Estadisticas_Jugadores.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/modelos/Eventos.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/modelos/Eventos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/modelos/Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/modelos/Jugadores.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/modelos/Partidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/modelos/Partidos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/modelos/Plantilla_partido.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/modelos/Temporada.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/modelos/Temporada.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/modelos/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/modelos/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Equipos.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/Equipos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Estadisticas_Equipos.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/Estadisticas_Equipos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Estadisticas_Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/Estadisticas_Jugadores.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Eventos.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/Eventos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Jugadores.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/Jugadores.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Partidos.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/Partidos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/Temporadas.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/Temporadas.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/routers/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/routers/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/utils/Fun_Eventos.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/Fun_Eventos.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/utils/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/utils/bucket.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/bucket.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Backend/utils/enumeraciones.py" beforeDir="false" afterPath="$PROJECT_DIR$/backend/utils/enumeraciones.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Templates/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_eventos.http" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_main.http" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/tests/test_targetas.http" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -315,6 +282,7 @@
       <workItem from="1763246201063" duration="11595000" />
       <workItem from="1763260398520" duration="69000" />
       <workItem from="1763264896932" duration="90000" />
+      <workItem from="1764817695876" duration="344000" />
     </task>
     <task id="LOCAL-00001" summary="Add initial FastAPI application and migration state configuration files">
       <option name="closed" value="true" />
@@ -452,7 +420,15 @@
       <option name="project" value="LOCAL" />
       <updated>1762274840568</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="Normaliza URLs de imágenes en varios archivos y agrega gestión de temporadas en la interfaz de administración">
+      <option name="closed" value="true" />
+      <created>1764817827433</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1764817827433</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -485,7 +461,8 @@
     <MESSAGE value="Add player positions enumeration and update equipo and jugador models for active status" />
     <MESSAGE value="Rename functions for consistency and clarity in equipos, estadisticas, eventos, jugadores, partidos, and temporadas modules" />
     <MESSAGE value="Se actualizaron los test y se crearon una parte para los buket" />
-    <option name="LAST_COMMIT_MESSAGE" value="Se actualizaron los test y se crearon una parte para los buket" />
+    <MESSAGE value="Normaliza URLs de imágenes en varios archivos y agrega gestión de temporadas en la interfaz de administración" />
+    <option name="LAST_COMMIT_MESSAGE" value="Normaliza URLs de imágenes en varios archivos y agrega gestión de temporadas en la interfaz de administración" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/GolAGol$.coverage" NAME=" Coverage Results" MODIFIED="1763045072303" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
