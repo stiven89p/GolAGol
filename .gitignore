@@ -72,3 +72,9 @@ static/img/*.webp
 
 # Mantener solo el logo por defecto
 !static/img/default_logo.png
+
+# Claude Code
+.claude/
+
+# Logos descargados en tests
+tests/logos_equipos/
