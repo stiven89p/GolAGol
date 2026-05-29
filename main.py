@@ -201,6 +201,7 @@ async def admin_partidos(request: Request, session: SessionDep, equipo_id: int =
         query = query.filter(or_(Partido.equipo_local_id == equipo_id, Partido.equipo_visitante_id == equipo_id))
 
     # Filtro por estado: convertir cadena a enum robustamente
+    est_enum = None
     if estado:
         est_enum = None
         try:
@@ -214,7 +215,10 @@ async def admin_partidos(request: Request, session: SessionDep, equipo_id: int =
         if est_enum:
             query = query.filter(Partido.estado == est_enum)
 
-    rows = query.order_by(Partido.fecha.desc()).all()
+    if est_enum == EstadoPartidos.PROGRAMADO:
+        rows = query.order_by(Partido.fecha.asc(), Partido.hora.asc()).all()
+    else:
+        rows = query.order_by(Partido.fecha.desc()).all()
     
     partidos = []
     for partido, eq_local, eq_visitante in rows:

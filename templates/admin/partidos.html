@@ -7,6 +7,7 @@
     <div class="section-header">
         <h2>Gestión de Partidos</h2>
         <button class="btn btn-primary" onclick="mostrarFormulario()">+ Nuevo Partido</button>
+        <button class="btn btn-secondary" onclick="mostrarModalFixture()">&#9889; Generar Fixture</button>
     </div>
     
     <div class="filters" style="margin: 12px 0; display: flex; gap: 8px; align-items: center;">
@@ -141,6 +142,65 @@
         </div>
     </div>
     
+    <!-- Modal: Generar Fixture -->
+    <div id="modal-fixture" class="form-modal" style="display:none;">
+        <div class="form-modal-content">
+            <span class="close" onclick="cerrarModalFixture()">&times;</span>
+            <h3>Generar Fixture Automático</h3>
+            <form id="fixture-form">
+                <div class="form-group">
+                    <label for="fixture-temporada">Temporada *</label>
+                    <select id="fixture-temporada" required>
+                        <option value="">Seleccione...</option>
+                        {% for temporada in temporadas %}
+                        <option value="{{ temporada.temporada_id }}">{{ temporada.nombre }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Días de juego *</label>
+                    <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;">
+                        <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" name="dias_semana" value="0"> Lunes</label>
+                        <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" name="dias_semana" value="1"> Martes</label>
+                        <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" name="dias_semana" value="2"> Miércoles</label>
+                        <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" name="dias_semana" value="3"> Jueves</label>
+                        <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" name="dias_semana" value="4"> Viernes</label>
+                        <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" name="dias_semana" value="5" checked> Sábado</label>
+                        <label style="display:flex;align-items:center;gap:4px;"><input type="checkbox" name="dias_semana" value="6" checked> Domingo</label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="fixture-max">Partidos simultáneos por horario</label>
+                    <input type="number" id="fixture-max" min="1" max="20" value="1" style="width:80px;">
+                </div>
+
+                <div class="form-group">
+                    <label>Horarios disponibles</label>
+                    <div id="fixture-horas" style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
+                        <div class="hora-row" style="display:flex;align-items:center;gap:6px;">
+                            <input type="time" value="14:00">
+                            <button type="button" class="btn-sm" onclick="quitarHora(this)">✕</button>
+                        </div>
+                        <div class="hora-row" style="display:flex;align-items:center;gap:6px;">
+                            <input type="time" value="17:00">
+                            <button type="button" class="btn-sm" onclick="quitarHora(this)">✕</button>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-sm" style="margin-top:6px;" onclick="agregarHora()">+ Agregar hora</button>
+                </div>
+
+                <div id="fixture-resultado" style="display:none;margin:12px 0;padding:12px;background:#1e3a2a;border-radius:6px;color:#58d68d;font-weight:600;"></div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cerrarModalFixture()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="fixture-submit">Generar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <table class="admin-table">
         <thead>
             <tr>

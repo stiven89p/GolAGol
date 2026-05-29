@@ -1,6 +1,8 @@
+import random
 from fastapi import APIRouter, HTTPException, Form
+from pydantic import BaseModel
 from sqlalchemy.orm import aliased
-from datetime import date, datetime, time
+from datetime import date, datetime, time, timedelta
 from backend.modelos.Equipos import Equipo
 from backend.modelos.Partidos import Partido, PartidoCrear, PartidoDTO
 from backend.modelos.Formaciones import Formacion, FormacionJugador
@@ -180,6 +182,115 @@ async def crear_partido(
     session.refresh(partido)
 
     return partido
+
+class GenerarFixtureRequest(BaseModel):
+    temporada_id: int
+    dias_semana: list[int]          # 0=lunes … 6=domingo
+    max_simultaneos: int = 1        # partidos jugándose al mismo tiempo en un horario
+    horas: list[str] = ["15:00"]    # formato HH:MM
+
+
+class GenerarFixtureResponse(BaseModel):
+    partidos_creados: int
+    jornadas: int
+    fecha_inicio: date
+    fecha_fin: date
+
+
+@router.post("/generar/", response_model=GenerarFixtureResponse)
+async def generar_fixture(body: GenerarFixtureRequest, session: SessionDep):
+    temporada = session.get(Temporada, body.temporada_id)
+    if not temporada:
+        raise HTTPException(status_code=404, detail="La temporada no existe")
+
+    if not body.dias_semana:
+        raise HTTPException(status_code=400, detail="Seleccione al menos un día de la semana")
+    for d in body.dias_semana:
+        if d < 0 or d > 6:
+            raise HTTPException(status_code=400, detail=f"Día inválido: {d}. Use 0=lunes … 6=domingo")
+
+    if body.max_simultaneos < 1:
+        raise HTTPException(status_code=400, detail="El máximo de partidos simultáneos debe ser al menos 1")
+
+    if not body.horas:
+        raise HTTPException(status_code=400, detail="Especifique al menos una hora")
+    try:
+        horas_time = [time.fromisoformat(h) for h in body.horas]
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=f"Hora inválida: {exc}")
+
+    existing = session.query(Partido).filter(Partido.temporada_id == body.temporada_id).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Ya existen partidos para esta temporada. Elimínalos antes de generar el fixture.")
+
+    equipos = session.query(Equipo).filter(Equipo.activo == True).all()
+    if len(equipos) < 2:
+        raise HTTPException(status_code=400, detail="Se necesitan al menos 2 equipos activos")
+
+    team_estadio = {e.equipo_id: e.estadio for e in equipos}
+    ids = [e.equipo_id for e in equipos]
+    random.shuffle(ids)
+
+    n = len(ids)
+    if n % 2 == 1:
+        ids.append(None)
+        n += 1
+
+    def siguiente_valida(d: date) -> date:
+        while d.weekday() not in body.dias_semana:
+            d += timedelta(days=1)
+        return d
+
+    fecha_actual = siguiente_valida(temporada.fecha_inicio)
+    hora_idx = 0          # índice en horas_time para el slot actual
+    slot_count = 0        # partidos asignados al slot actual
+    partidos_a_crear: list[Partido] = []
+    teams = list(ids)
+
+    for jornada in range(n - 1):
+        for i in range(n // 2):
+            a, b = teams[i], teams[n - 1 - i]
+            if a is None or b is None:
+                continue
+            home, away = (a, b) if jornada % 2 == 0 else (b, a)
+
+            # Si el slot actual ya está lleno, avanzar al siguiente horario del día
+            if slot_count >= body.max_simultaneos:
+                hora_idx += 1
+                slot_count = 0
+                # Si se agotaron todos los horarios del día, pasar al siguiente día válido
+                if hora_idx >= len(horas_time):
+                    hora_idx = 0
+                    fecha_actual += timedelta(days=1)
+                    fecha_actual = siguiente_valida(fecha_actual)
+
+            hora = horas_time[hora_idx]
+            partidos_a_crear.append(Partido(
+                fecha=fecha_actual,
+                hora=hora,
+                jornada=jornada + 1,
+                estadio=team_estadio.get(home, ""),
+                equipo_local_id=home,
+                equipo_visitante_id=away,
+                temporada_id=body.temporada_id,
+            ))
+            slot_count += 1
+
+        teams = [teams[0]] + [teams[-1]] + teams[1:-1]
+
+    if not partidos_a_crear:
+        raise HTTPException(status_code=400, detail="No se generaron partidos")
+
+    session.add_all(partidos_a_crear)
+    session.commit()
+
+    return GenerarFixtureResponse(
+        partidos_creados=len(partidos_a_crear),
+        jornadas=n - 1,
+        fecha_inicio=temporada.fecha_inicio,
+        fecha_fin=max(p.fecha for p in partidos_a_crear),
+    )
+
 
 @router.get("/", response_model=list[PartidoDTO])
 async def obtener_partidos(session: SessionDep):

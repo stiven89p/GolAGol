@@ -17,7 +17,7 @@ async function editarPartido(id) {
     try {
         const response = await fetch(`/partidos/id/${id}`);
         const partido = await response.json();
-        
+
         mostrarFormulario(false);
         document.getElementById('form-title').textContent = 'Editar Partido';
         document.getElementById('partido_id').value = partido.partido_id;
@@ -46,16 +46,16 @@ async function editarPartido(id) {
 
 document.getElementById('partido-form').addEventListener('submit', async (e) => {
     e.preventDefault();
-    
+
     const partidoId = document.getElementById('partido_id').value;
     const localId = parseInt(document.getElementById('equipo_local_id').value);
     const visitanteId = parseInt(document.getElementById('equipo_visitante_id').value);
-    
+
     if (localId === visitanteId) {
         mostrarMensaje('El equipo local y visitante no pueden ser el mismo', 'error');
         return;
     }
-    
+
     const formData = new FormData();
     formData.append('fecha', document.getElementById('fecha').value);
     formData.append('hora', document.getElementById('hora').value + ':00');
@@ -65,7 +65,7 @@ document.getElementById('partido-form').addEventListener('submit', async (e) => 
     formData.append('estadio', document.getElementById('estadio').value.trim());
     formData.append('temporada_id', document.getElementById('temporada_id').value);
     formData.append('estado', document.getElementById('estado').value);
-    
+
     try {
         let url, method;
         if (partidoId) {
@@ -76,12 +76,12 @@ document.getElementById('partido-form').addEventListener('submit', async (e) => 
             url = '/partidos/';
             method = 'POST';
         }
-        
+
         const response = await fetch(url, {
             method: method,
             body: formData
         });
-        
+
         if (response.ok) {
             mostrarMensaje(`Partido ${partidoId ? 'actualizado' : 'creado'} correctamente`);
             cerrarFormulario();
@@ -99,7 +99,7 @@ document.getElementById('partido-form').addEventListener('submit', async (e) => 
 document.getElementById('equipo_local_id').addEventListener('change', async (e) => {
     const equipoId = e.target.value;
     if (!equipoId) return;
-    
+
     try {
         const response = await fetch(`/equipos/${equipoId}`);
         const equipo = await response.json();
@@ -111,16 +111,16 @@ document.getElementById('equipo_local_id').addEventListener('change', async (e) 
 
 // Iniciar partido (cambiar estado de PROGRAMADO a EN_CURSO)
 window.iniciarPartido = async function iniciarPartido(partidoId) {
-    if (!confirm('¿Iniciar este partido? El estado cambiará a EN CURSO.')) {
+    if (!confirm('Iniciar este partido? El estado cambiara a EN CURSO.')) {
         return;
     }
-    
+
     try {
-        // El valor debe coincidir con el enum: "en curso" (minúsculas con espacio)
+        // El valor debe coincidir con el enum: "en curso" (minusculas con espacio)
         const response = await fetch(`/partidos/${partidoId}?estado=en%20curso`, {
             method: 'PATCH'
         });
-        
+
         if (response.ok) {
             mostrarMensaje('Partido iniciado correctamente');
             setTimeout(() => location.reload(), 1000);
@@ -134,18 +134,18 @@ window.iniciarPartido = async function iniciarPartido(partidoId) {
 }
 
 window.acabarPartido = async function acabarPartido(partidoId) {
-    if (!confirm('¿Iniciar este partido? El estado cambiará a FINALIZADO.')) {
+    if (!confirm('Finalizar este partido? El estado cambiara a FINALIZADO.')) {
         return;
     }
-    
+
     try {
-        // El valor debe coincidir con el enum: "finalizado" (minúsculas)
+        // El valor debe coincidir con el enum: "finalizado" (minusculas)
         const response = await fetch(`/partidos/${partidoId}?estado=finalizado`, {
             method: 'PATCH'
         });
-        
+
         if (response.ok) {
-            mostrarMensaje('Partido iniciado correctamente');
+            mostrarMensaje('Partido finalizado correctamente');
             setTimeout(() => location.reload(), 1000);
         } else {
             const error = await response.json().catch(() => ({}));
@@ -156,7 +156,7 @@ window.acabarPartido = async function acabarPartido(partidoId) {
     }
 }
 
-// --------- Gestión de Formaciones del Partido ---------
+// --------- Gestion de Formaciones del Partido ---------
 window.abrirFormaciones = async function abrirFormaciones(partidoId){
     const modal = document.getElementById('modal-formaciones-partido');
     document.getElementById('modal-partido-id').value = partidoId;
@@ -171,7 +171,7 @@ window.abrirFormaciones = async function abrirFormaciones(partidoId){
         if(!resp.ok) throw new Error('No se pudo cargar el partido');
         const p = await resp.json();
 
-        // Nombres y enlaces de creación
+        // Nombres y enlaces de creacion
         document.getElementById('nombre-local').textContent = p.equipo_local_nombre || 'Local';
         document.getElementById('nombre-visitante').textContent = p.equipo_visitante_nombre || 'Visitante';
         document.getElementById('link-formaciones-local').href = `/admin/formaciones?equipo_id=${p.equipo_local_id}`;
@@ -209,7 +209,7 @@ window.abrirFormaciones = async function abrirFormaciones(partidoId){
                 badge.style.marginRight = '8px';
                 badge.textContent = `${f.defensas}-${f.mediocampistas}-${f.delanteros}`;
                 const text = document.createElement('span');
-                text.textContent = `Formación #${f.formacion_id}`;
+                text.textContent = `Formacion #${f.formacion_id}`;
                 lbl.appendChild(badge);
                 lbl.appendChild(text);
                 // Subdetails: titulares/suplentes resumen
@@ -270,17 +270,17 @@ async function asignarFormacionesSeleccionadas(){
     const localSel = document.querySelector('input[name="formacion_local"]:checked');
     const visSel = document.querySelector('input[name="formacion_visitante"]:checked');
     if(!localSel && !visSel){
-        mostrarMensaje('Seleccione al menos una formación para asignar', 'error');
+        mostrarMensaje('Seleccione al menos una formacion para asignar', 'error');
         return;
     }
     try{
         if(localSel){
             const r1 = await fetch(`/partidos/${partidoId}/formacion/${localSel.value}`, { method: 'POST' });
-            if(!r1.ok) throw new Error('Error asignando formación local');
+            if(!r1.ok) throw new Error('Error asignando formacion local');
         }
         if(visSel){
             const r2 = await fetch(`/partidos/${partidoId}/formacion/${visSel.value}`, { method: 'POST' });
-            if(!r2.ok) throw new Error('Error asignando formación visitante');
+            if(!r2.ok) throw new Error('Error asignando formacion visitante');
         }
         mostrarMensaje('Formaciones asignadas');
         cerrarModalFormaciones();
@@ -290,14 +290,115 @@ async function asignarFormacionesSeleccionadas(){
     }
 }
 
+// --------- Generar Fixture ---------
+
+window.mostrarModalFixture = function() {
+    var res = document.getElementById('fixture-resultado');
+    if (res) res.style.display = 'none';
+    var modal = document.getElementById('modal-fixture');
+    if (modal) modal.style.display = 'flex';
+};
+
+window.cerrarModalFixture = function() {
+    var modal = document.getElementById('modal-fixture');
+    if (modal) modal.style.display = 'none';
+};
+
+window.agregarHora = function() {
+    var cont = document.getElementById('fixture-horas');
+    var row = document.createElement('div');
+    row.className = 'hora-row';
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;';
+    var inp = document.createElement('input');
+    inp.type = 'time';
+    inp.value = '20:00';
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn-sm';
+    btn.textContent = 'X';
+    btn.onclick = function() { window.quitarHora(btn); };
+    row.appendChild(inp);
+    row.appendChild(btn);
+    cont.appendChild(row);
+};
+
+window.quitarHora = function(btn) {
+    var cont = document.getElementById('fixture-horas');
+    if (cont && cont.children.length > 1) {
+        btn.parentElement.remove();
+    }
+};
+
+var fixtureForm = document.getElementById('fixture-form');
+if (fixtureForm) {
+    fixtureForm.addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        var temporadaId = document.getElementById('fixture-temporada').value;
+        if (!temporadaId) {
+            mostrarMensaje('Seleccione una temporada', 'error');
+            return;
+        }
+
+        var dias = Array.from(document.querySelectorAll('input[name="dias_semana"]:checked'))
+            .map(function(cb) { return parseInt(cb.value); });
+        if (dias.length === 0) {
+            mostrarMensaje('Seleccione al menos un dia de la semana', 'error');
+            return;
+        }
+
+        var horas = Array.from(document.querySelectorAll('#fixture-horas input[type="time"]'))
+            .map(function(inp) { return inp.value; })
+            .filter(function(v) { return !!v; });
+        if (horas.length === 0) {
+            mostrarMensaje('Agregue al menos un horario', 'error');
+            return;
+        }
+
+        var maxPorDia = parseInt(document.getElementById('fixture-max').value) || 1;
+        var submitBtn = document.getElementById('fixture-submit');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Generando...';
+
+        try {
+            var resp = await fetch('/partidos/generar/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    temporada_id: parseInt(temporadaId),
+                    dias_semana: dias,
+                    max_simultaneos: maxPorDia,
+                    horas: horas
+                })
+            });
+
+            var data = await resp.json();
+            if (!resp.ok) {
+                throw new Error(data.detail || 'Error al generar fixture');
+            }
+
+            var resEl = document.getElementById('fixture-resultado');
+            resEl.style.display = 'block';
+            resEl.textContent = 'Generados: ' + data.partidos_creados + ' partidos en ' + data.jornadas + ' jornadas (' + data.fecha_inicio + ' al ' + data.fecha_fin + ')';
+            setTimeout(function() {
+                window.cerrarModalFixture();
+                location.reload();
+            }, 2500);
+        } catch (err) {
+            mostrarMensaje(err.message, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Generar';
+        }
+    });
+}
+
 // Cerrar modales al hacer clic fuera
 window.onclick = function(event) {
-    const modalPartido = document.getElementById('formulario-partido');
-    const modalFormaciones = document.getElementById('modal-formaciones-partido');
-    if (event.target === modalPartido) {
-        cerrarFormulario();
-    }
-    if (event.target === modalFormaciones) {
-        cerrarModalFormaciones();
-    }
-}
+    var modalPartido = document.getElementById('formulario-partido');
+    var modalFormaciones = document.getElementById('modal-formaciones-partido');
+    var modalFixture = document.getElementById('modal-fixture');
+    if (event.target === modalPartido) cerrarFormulario();
+    if (event.target === modalFormaciones) cerrarModalFormaciones();
+    if (event.target === modalFixture) window.cerrarModalFixture();
+};
