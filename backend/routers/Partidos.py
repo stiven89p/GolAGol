@@ -442,23 +442,25 @@ async def cambiar_estado_partido(partido_id: int, estado:EstadoPartidos, session
         if estadistica_rival:
             estadistica_rival.partidos_jugados = (estadistica_rival.partidos_jugados or 0) + 1
 
-        if partido.goles_local > partido.goles_visitante:
-            estadistica.victorias += 1
-            estadistica_rival.derrotas += 1
-            estadistica.puntos += 3
+        goles_local = partido.goles_local or 0
+        goles_visitante = partido.goles_visitante or 0
 
-        elif partido.goles_local < partido.goles_visitante:
-            estadistica.derrotas += 1
-            estadistica_rival.victorias += 1
-            estadistica_rival.puntos += 3
+        if estadistica and estadistica_rival:
+            if goles_local > goles_visitante:
+                estadistica.victorias += 1
+                estadistica_rival.derrotas += 1
+                estadistica.puntos += 3
+            elif goles_local < goles_visitante:
+                estadistica.derrotas += 1
+                estadistica_rival.victorias += 1
+                estadistica_rival.puntos += 3
+            else:
+                estadistica.empates += 1
+                estadistica_rival.empates += 1
+                estadistica.puntos += 1
+                estadistica_rival.puntos += 1
 
-        else:
-            estadistica.empates += 1
-            estadistica_rival.empates += 1
-            estadistica.puntos += 1
-            estadistica_rival.puntos += 1
-
-        session.add_all([estadistica, estadistica_rival])
+            session.add_all([estadistica, estadistica_rival])
         
         # Actualizar partidos_jugados para los jugadores que participaron
         _actualizar_partidos_jugados_jugadores(session, partido)
@@ -467,7 +469,7 @@ async def cambiar_estado_partido(partido_id: int, estado:EstadoPartidos, session
         _actualizar_minutos_jugados(session, partido)
 
 
-    partido.estado = estado
+    partido.estado = estado.value
     session.add(partido)
     session.commit()
     session.refresh(partido)
